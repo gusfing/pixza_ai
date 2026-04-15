@@ -9,6 +9,7 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    command: /bin/sh -c "npx prisma db push && npm start"
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
