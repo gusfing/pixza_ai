@@ -40,6 +40,16 @@ Click **"Deploy"**! Coolify will handle the build, setup SSL, and launch the app
 
 ---
 
+## 🎁 Bonus: Using Self-Hosted S3 (MinIO)
+Coolify can host your own private S3 service (MinIO) so you don't even need the Local Disk storage.
+
+1.  In Coolify, go to **"Resources"** -> **"New"** -> **"S3"** (or MinIO).
+2.  Once created, it will give you:
+    - `Endpoint` (e.g., `http://31.97.128.162:9000`)
+    - `Root User/Password` (These are your `ACCESS_KEY_ID` and `SECRET_ACCESS_KEY`)
+3.  Add these to your app's environment variables in Coolify.
+4.  The app will automatically switch from Local Disk to your shiny new Private S3!
+
 ### Troubleshooting
 - **Logs**: You can view real-time logs directly in the Coolify "Logs" tab.
 - **Port**: Ensure port 3000 is exposed (Coolify handles the internal mapping automatically).

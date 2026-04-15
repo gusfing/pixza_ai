@@ -19,6 +19,7 @@ export const r2 = isR2Configured ? new S3Client({
     accessKeyId: r2Config.accessKeyId!,
     secretAccessKey: r2Config.secretAccessKey!,
   },
+  forcePathStyle: true, // Required for self-hosted S3/MinIO
 }) : null;
 
 const BUCKET = r2Config.bucket;
