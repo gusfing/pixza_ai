@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node-banana-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+      # AI Provider Keys
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - FAL_API_KEY=${FAL_API_KEY}
+      - REPLICATE_API_KEY=${REPLICATE_API_KEY}
+      - WAVESPEED_API_KEY=${WAVESPEED_API_KEY}
+      - KIE_API_KEY=${KIE_API_KEY}
+      # Optional storage overrides
+      - R2_ENDPOINT=${R2_ENDPOINT}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+      - R2_PUBLIC_URL=${R2_PUBLIC_URL}
+    volumes:
+      - media_storage:/app/storage
+
+volumes:
+  media_storage:
+    driver: local
