@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toast } from "@/components/Toast";
 import { SessionProvider } from "@/components/SessionProvider";
+import { WPAuthProvider } from "@/lib/wp-auth-context";
 
 export const metadata: Metadata = {
   title: "Pixza Studio - AI Image Workflow",
@@ -12,10 +13,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <SessionProvider>
-          {children}
-          <Toast />
-        </SessionProvider>
+        <WPAuthProvider>
+          <SessionProvider>
+            {children}
+            <Toast />
+          </SessionProvider>
+        </WPAuthProvider>
       </body>
     </html>
   );

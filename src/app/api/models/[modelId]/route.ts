@@ -1266,7 +1266,7 @@ export async function GET(
           { name: "num_steps", type: "integer", description: "Number of diffusion steps", default: 20, minimum: 1, maximum: 50 },
           { name: "guidance", type: "number", description: "Guidance scale", default: 7.5, minimum: 1, maximum: 20 },
           { name: "seed", type: "integer", description: "Random seed", minimum: 0 },
-          ...(isImg2Img ? [{ name: "strength", type: "number", description: "Transformation strength", default: 0.8, minimum: 0, maximum: 1 }] : [])
+          ...(isImg2Img ? [{ name: "strength", type: "number", description: "Transformation strength", default: 0.8, minimum: 0, maximum: 1 } as any] : [])
         ],
         inputs: [
           { name: "prompt", type: "text", required: true, label: "Prompt" },

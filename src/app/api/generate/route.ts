@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
           provider: body.selectedModel?.provider ?? "gemini",
           outputType: body.mediaType ?? "image",
           status: "pending",
-          metadata: { aspectRatio: body.aspectRatio, parameters: body.parameters },
+          metadata: { aspectRatio: body.aspectRatio, parameters: body.parameters } as any,
         },
       });
       generationId = gen.id;

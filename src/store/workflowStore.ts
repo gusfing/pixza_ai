@@ -32,7 +32,7 @@ import { logger } from "@/utils/logger";
 import { externalizeWorkflowMedia, hydrateWorkflowMedia } from "@/utils/mediaStorage";
 import { EditOperation, applyEditOperations as executeEditOps } from "@/lib/chat/editOperations";
 import { ModelPricing, getModelCost } from "@/utils/costCalculator";
-import { ProviderModel } from "@/types/models";
+import { ProviderModel } from "@/lib/providers/types";
 import {
   loadSaveConfigs,
   saveSaveConfig,
@@ -602,7 +602,7 @@ const workflowStoreImpl: StateCreator<WorkflowStore> = (set, get) => ({
       models.forEach((model) => {
         const cost = getModelCost(model.pricing);
         if (cost) {
-          pricingMap.set(model.modelId, cost);
+          pricingMap.set(model.id, cost);
         }
       });
 

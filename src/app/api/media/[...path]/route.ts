@@ -5,9 +5,10 @@ import { getLocalFilePath } from "@/lib/storage/local";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const filePath = params.path.join("/");
+  const { path: pathSegments } = await params;
+  const filePath = pathSegments.join("/");
   const fullPath = getLocalFilePath(filePath);
 
   try {

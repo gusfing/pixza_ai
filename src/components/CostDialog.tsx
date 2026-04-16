@@ -147,24 +147,27 @@ export function CostDialog({ predictedCost, incurredCost, onClose }: CostDialogP
             {predictedCost.nodeCount === 0 ? (
               <p className="text-sm text-neutral-500 text-center py-8 italic">No active engines in workflow</p>
             ) : (
-              sortedItems.map((item, idx) => (
-                <div key={idx} className="p-3 bg-neutral-900 rounded border border-white/5 flex items-center gap-3">
-                  <ProviderIcon provider={item.provider} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-tight">
-                        {getTierDisplayName(item.provider)}
-                      </span>
-                      <span className="text-xs font-bold text-neutral-200">
-                        {item.subtotal !== null ? formatCost(item.subtotal) : "—"}
-                      </span>
+              (() => {
+                const sortedItems = [...predictedCost.breakdown].sort((a, b) => (b.subtotal ?? 0) - (a.subtotal ?? 0));
+                return sortedItems.map((item, idx) => (
+                  <div key={idx} className="p-3 bg-neutral-900 rounded border border-white/5 flex items-center gap-3">
+                    <ProviderIcon provider={item.provider} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-tight">
+                          {getTierDisplayName(item.provider)}
+                        </span>
+                        <span className="text-xs font-bold text-neutral-200">
+                          {item.subtotal !== null ? formatCost(item.subtotal) : "—"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-300 truncate">
+                        {item.count}x {item.modelName}
+                      </p>
                     </div>
-                    <p className="text-xs text-neutral-300 truncate">
-                      {item.count}x {item.modelName}
-                    </p>
                   </div>
-                </div>
-              ))
+                ));
+              })()
             )}
           </div>
 

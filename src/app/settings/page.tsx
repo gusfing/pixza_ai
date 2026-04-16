@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useWPAuth } from "@/lib/wp-auth-context";
+import { wpCancelSubscription, wpUpdateUserMeta } from "@/lib/wordpress";
 
 const C = { bg: "#040406", surface: "#0e0e10", surface2: "#161618", border: "rgba(255,255,255,0.08)", text: "#fff", text2: "rgba(255,255,255,0.5)", text3: "rgba(255,255,255,0.25)", accent: "#92dce5", action: "#d64933" };
 
@@ -25,20 +26,23 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 
 // ── Profile tab ──────────────────────────────────────────────
 function ProfileTab() {
-  const { data: session, update } = useSession();
-  const user = session?.user;
+  const { user, token } = useWPAuth();
   const [name, setName] = useState(user?.name ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const save = async () => {
-    if (!session) return;
+    if (!token) return;
     setSaving(true);
-    // In a real SaaS, we'd call an API to update the profile in DB
-    // For now, we update the local session state
-    await update({ name });
-    setSaving(false); setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await wpUpdateUserMeta(token, { name } as any);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e) {
+      alert("Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const inp: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
@@ -76,19 +80,32 @@ function ProfileTab() {
 
 // ── Subscription tab ─────────────────────────────────────────
 function SubscriptionTab() {
-  const { data: session } = useSession();
-  const user = session?.user as any;
+  const { user, token } = useWPAuth();
   const [sub, setSub] = useState<any | null>(null);
   const [coupon, setCoupon] = useState("");
   const [couponMsg, setCouponMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // In SaaS, we'd fetch subscription from Stripe/Prisma
-    // For now, we match the Plan from session
-  }, [session]);
+    // In WordPress version, the subscription info is often in the user meta or 
+    // fetched via wpGetSubscription in wordpress.ts
+  }, [user]);
 
-  const currentPlan = user?.plan?.toLowerCase() ?? "free";
+  const currentPlan = user?.meta?.plan?.toLowerCase() ?? "free";
+
+  const handleCancel = async () => {
+    if (!token) return;
+    if (!confirm("Are you sure you want to cancel your subscription?")) return;
+    setLoading(true);
+    try {
+      await wpCancelSubscription(token);
+      alert("Subscription cancelled successfully.");
+    } catch (e) {
+      alert("Failed to cancel subscription");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleUpgrade = async (plan: string) => {
     setLoading(true);
@@ -170,7 +187,6 @@ function SubscriptionTab() {
 
 // ── Notifications tab ────────────────────────────────────────
 function NotificationsTab() {
-  const { data: session } = useSession();
   const [prefs, setPrefs] = useState({ generation_done: true, weekly_digest: true, product_updates: true, promotions: false });
   const [saved, setSaved] = useState(false);
 
@@ -202,10 +218,9 @@ function NotificationsTab() {
 
 // ── Appearance tab ───────────────────────────────────────────
 function AppearanceTab() {
-  const { data: session } = useSession();
-  const user = session?.user as any;
-  const [model, setModel] = useState(user?.preferredModel ?? "fal-ai/flux-pro");
-  const [tab, setTab] = useState(user?.preferredTab ?? "Image");
+  const { user } = useWPAuth();
+  const [model, setModel] = useState(user?.meta?.preferred_model ?? "fal-ai/flux-pro");
+  const [tab, setTab] = useState(user?.meta?.preferred_tab ?? "Image");
   const [saved, setSaved] = useState(false);
 
   const save = async () => {
@@ -245,18 +260,15 @@ function AppearanceTab() {
 
 // ── Main page ────────────────────────────────────────────────
 export default function SettingsPage() {
-  const { data: session, status } = useSession();
+  const { user, loading: authLoading, logout } = useWPAuth();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("profile");
 
-  const loading = status === "loading";
-  const user = session?.user;
-
   useEffect(() => {
-    if (!loading && !user) router.push("/auth/signin");
-  }, [loading, user, router]);
+    if (!authLoading && !user) router.push("/auth/signin");
+  }, [authLoading, user, router]);
 
-  if (loading) return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ width: 32, height: 32, borderRadius: "50%", border: "2px solid rgba(146,220,229,0.2)", borderTopColor: C.accent, animation: "spin 0.8s linear infinite" }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>;
+  if (authLoading) return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ width: 32, height: 32, borderRadius: "50%", border: "2px solid rgba(146,220,229,0.2)", borderTopColor: C.accent, animation: "spin 0.8s linear infinite" }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>;
   if (!user) return null;
 
   const TABS: { id: Tab; label: string }[] = [
@@ -274,7 +286,7 @@ export default function SettingsPage() {
           <img src="/pixza-logo.png" alt="" style={{ width: 26, height: 26, borderRadius: 7, objectFit: "contain" }} />
           <span style={{ fontSize: 14, fontWeight: 600, color: C.text }}>Pixza Studio</span>
         </Link>
-        <button onClick={() => signOut()} style={{ fontSize: 12, color: C.text3, background: "none", border: "none", cursor: "pointer" }}>Sign out</button>
+        <button onClick={() => logout()} style={{ fontSize: 12, color: C.text3, background: "none", border: "none", cursor: "pointer" }}>Sign out</button>
       </header>
 
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "32px 16px" }}>

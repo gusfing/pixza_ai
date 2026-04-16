@@ -52,6 +52,7 @@ export const defaultProviderSettings: ProviderSettings = {
     fal: { id: "fal", name: "fal.ai", enabled: false, apiKey: null, apiKeyEnvVar: "FAL_API_KEY" },
     kie: { id: "kie", name: "Kie.ai", enabled: false, apiKey: null, apiKeyEnvVar: "KIE_API_KEY" },
     wavespeed: { id: "wavespeed", name: "WaveSpeed", enabled: false, apiKey: null, apiKeyEnvVar: "WAVESPEED_API_KEY" },
+    cloudflare: { id: "cloudflare", name: "Cloudflare", enabled: false, apiKey: null, apiKeyEnvVar: "CLOUDFLARE_API_KEY" },
   }
 };
 

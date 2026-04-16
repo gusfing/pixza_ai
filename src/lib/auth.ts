@@ -39,7 +39,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!valid) return null;
 
-        return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+        return { id: user.id, email: user.email, name: user.name, image: user.image, role: (user as any).role };
       },
     }),
   ],

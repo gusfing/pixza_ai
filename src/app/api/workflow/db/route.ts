@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       workflows,
     });
   } catch (error) {
-    logger.error('db.workflow', 'Failed to fetch workflows', {}, error instanceof Error ? error : undefined);
+    logger.error('system', 'Failed to fetch workflows', {}, error instanceof Error ? error : undefined);
     return NextResponse.json({ success: false, error: "Failed to fetch workflows" }, { status: 500 });
   }
 }
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    logger.info('db.workflow', 'Workflow saved safely to DB', {
+    logger.info('system', 'Workflow saved safely to DB', {
       workflowId: workflow.id,
       userId,
     });
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       workflow,
     });
   } catch (error) {
-    logger.error('db.workflow', 'Failed to save workflow', {}, error instanceof Error ? error : undefined);
+    logger.error('system', 'Failed to save workflow', {}, error instanceof Error ? error : undefined);
     return NextResponse.json({ success: false, error: "Failed to save workflow" }, { status: 500 });
   }
 }
