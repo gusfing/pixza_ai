@@ -6,7 +6,7 @@ export default async function AdminDashboard() {
   const session = await auth();
 
   // Security check: only ADMINs can see this
-  if (!session || (session.user as any).role !== "ADMIN") {
+  if (!session || session.user.role !== "ADMIN") {
     redirect("/");
   }
 
@@ -42,7 +42,7 @@ export default async function AdminDashboard() {
       <div className="p-6 bg-card border rounded-2xl shadow-sm">
         <h2 className="text-xl font-semibold mb-4">Recent Signups</h2>
         <div className="space-y-4">
-          {recentUsers.map((u) => (
+          {(recentUsers as any[]).map((u) => (
             <div key={u.email} className="flex justify-between items-center py-2 border-b last:border-0">
               <div>
                 <p className="font-medium">{u.email}</p>

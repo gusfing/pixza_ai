@@ -2,11 +2,15 @@
   "name": "node-banana",
   "version": "1.4.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
     "start": "node server.js",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage"
