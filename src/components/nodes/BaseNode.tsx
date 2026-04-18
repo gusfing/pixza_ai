@@ -18,20 +18,12 @@ interface BaseNodeProps {
   contentClassName?: string;
   minWidth?: number;
   minHeight?: number;
-  /** When true, node has no background/border — content fills the entire node area */
   fullBleed?: boolean;
-  /** Media URL (image/video) to use for aspect-fit resize on resize-handle double-click */
   aspectFitMedia?: string | null;
-  /** When true, bottom corners lose rounding so the selection ring connects to the settings panel below */
   settingsExpanded?: boolean;
-  /** Settings panel rendered outside the bordered area so it shares the node's full width */
   settingsPanel?: ReactNode;
 }
 
-/**
- * Read a node's effective width or height, respecting React Flow's internal
- * priority: node.width > node.style.width > node.measured.width.
- */
 function getNodeDimension(node: Node, axis: "width" | "height"): number {
   return (
     (node[axis] as number) ??
@@ -41,11 +33,6 @@ function getNodeDimension(node: Node, axis: "width" | "height"): number {
   );
 }
 
-/**
- * Apply dimensions to a React Flow node, writing to both `node.width/height`
- * (where NodeResizer writes) and `node.style` (the original source) so neither
- * silently overrides the other.
- */
 function applyNodeDimensions(node: Node, width: number, height: number): Node {
   return {
     ...node,
@@ -81,9 +68,7 @@ export function BaseNode({
   const isAnimatingRef = useRef(false);
   const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Adjust node height when settings expand or collapse
   useLayoutEffect(() => {
-    // Cancel any pending animation timeout from a previous toggle (handles rapid toggling)
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
       animationTimeoutRef.current = null;
@@ -93,15 +78,10 @@ export function BaseNode({
     const ANIMATION_MS = 160;
 
     if (!settingsExpanded && trackedSettingsHeightRef.current > 0) {
-      // --- COLLAPSE ---
       const heightToRemove = trackedSettingsHeightRef.current;
       trackedSettingsHeightRef.current = 0;
       isAnimatingRef.current = true;
-
-      // Lock content height for the full animation duration
-      if (contentEl) {
-        contentEl.style.height = contentEl.offsetHeight + "px";
-      }
+      if (contentEl) contentEl.style.height = contentEl.offsetHeight + "px";
 
       setNodes((nodes) =>
         nodes.map((node) => {
@@ -120,12 +100,7 @@ export function BaseNode({
         if (contentEl) contentEl.style.height = "";
       }, ANIMATION_MS);
     } else if (settingsExpanded && settingsPanel) {
-      // --- EXPAND ---
-      // Lock the content wrapper rigid so flex can't redistribute space as the
-      // settings panel grows. Without this, flex-1 + min-h-0 lets the wrapper
-      // shrink between CSS transition frames and the ResizeObserver setNodes catch-up.
       isAnimatingRef.current = true;
-
       if (contentEl) {
         const wrapperEl = contentEl.parentElement as HTMLElement | null;
         if (wrapperEl) {
@@ -136,10 +111,6 @@ export function BaseNode({
 
       animationTimeoutRef.current = setTimeout(() => {
         isAnimatingRef.current = false;
-
-        // Apply the final panel height in one shot, then unlock the wrapper.
-        // Subtract any previously saved panel height to avoid double-counting
-        // on workflow reload (saved node height already includes panel).
         const finalHeight = trackedSettingsHeightRef.current;
         if (finalHeight > 0) {
           setNodes((nodes) =>
@@ -168,10 +139,8 @@ export function BaseNode({
         }
       }, ANIMATION_MS);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsExpanded]);
 
-  // ResizeObserver to track dynamic settings panel height changes (e.g., model param count changes)
   useLayoutEffect(() => {
     if (!settingsExpanded || !settingsPanel) return;
     const panelEl = settingsPanelRef.current;
@@ -182,19 +151,13 @@ export function BaseNode({
         const newPanelHeight = entry.contentRect.height;
         if (newPanelHeight === 0) continue;
         const delta = newPanelHeight - trackedSettingsHeightRef.current;
-        if (Math.abs(delta) < 2) continue; // Ignore sub-pixel changes
+        if (Math.abs(delta) < 2) continue;
 
         trackedSettingsHeightRef.current = newPanelHeight;
-
-        // During animation, just track the height — skip setNodes to avoid
-        // multiple re-renders. The expand timeout will apply one final update.
         if (isAnimatingRef.current) continue;
 
-        // Lock content height to prevent image flicker during resize
         const contentEl = contentRef.current;
-        if (contentEl) {
-          contentEl.style.height = contentEl.offsetHeight + "px";
-        }
+        if (contentEl) contentEl.style.height = contentEl.offsetHeight + "px";
 
         setNodes((nodes) =>
           nodes.map((node) => {
@@ -208,28 +171,15 @@ export function BaseNode({
           })
         );
 
-        // Release locked height after layout settles
         requestAnimationFrame(() => {
-          if (contentEl) {
-            contentEl.style.height = "";
-          }
+          if (contentEl) contentEl.style.height = "";
         });
       }
     });
 
     observer.observe(panelEl);
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsExpanded, settingsPanel]);
-
-  // Cleanup animation timeout on unmount
-  useLayoutEffect(() => {
-    return () => {
-      if (animationTimeoutRef.current) {
-        clearTimeout(animationTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const handleResize: OnResize = useCallback(
     (_event, params) => {
@@ -286,30 +236,26 @@ export function BaseNode({
 
   return (
     <div
-      className={hasExpandedSettings
-        ? `relative flex flex-col w-full h-full overflow-visible bg-neutral-800 rounded-lg ${selected ? "ring-2 ring-blue-500/40 shadow-lg shadow-blue-500/25" : ""}`
-        : "contents"}
+      className={hasExpandedSettings ? "relative flex flex-col w-full h-full animate-obsidian" : "contents"}
       onDoubleClick={handleResizeHandleDblClick}
     >
       <NodeResizer
         isVisible={selected}
         minWidth={minWidth}
         minHeight={minHeight}
-        lineClassName="!border-transparent"
-        handleClassName="!w-5 !h-5 !bg-transparent !border-none"
+        lineClassName="!border-white/20"
+        handleClassName="!w-4 !h-4 !bg-white !rounded-full !shadow-xl !border-4 !border-[#0A0A0A]"
         onResize={handleResize}
       />
+      
       <div
         className={`
-          ${hasExpandedSettings ? "flex-1 min-h-0 w-full" : "h-full w-full"} flex flex-col overflow-visible relative
-          ${fullBleed
-            ? `${settingsExpanded ? "rounded-t-lg border-b-0" : "rounded-lg"} bg-neutral-800/50 border border-neutral-700/40`
-            : `bg-neutral-800 ${settingsExpanded ? "rounded-t-lg border-b-0" : "rounded-lg"} shadow-lg border`}
-          ${fullBleed ? "" : (isCurrentlyExecuting || isExecuting ? "border-blue-500 ring-1 ring-blue-500/20" : "border-neutral-700/60")}
-          ${fullBleed ? "" : (hasError ? "border-red-500" : "")}
-          ${fullBleed && selected && !settingsExpanded ? "ring-2 ring-blue-500/40 shadow-lg shadow-blue-500/25" : ""}
-          ${!fullBleed && selected && !settingsExpanded ? "border-blue-500 ring-2 ring-blue-500/40 shadow-lg shadow-blue-500/25" : ""}
-          ${!fullBleed && selected && settingsExpanded ? "border-blue-500" : ""}
+          relative flex flex-col overflow-hidden transition-all duration-300
+          ${fullBleed ? "bg-transparent" : "bg-white"}
+          ${settingsExpanded ? "rounded-t-[24px]" : "rounded-[24px]"}
+          ${selected ? "ring-[6px] ring-white/10 shadow-[0_0_80px_rgba(255,255,255,0.1)]" : "shadow-2xl shadow-black/50"}
+          ${isCurrentlyExecuting || isExecuting ? "ring-2 ring-white animate-pulse" : ""}
+          ${hasError ? "ring-2 ring-red-500" : ""}
           ${className}
         `}
         onMouseEnter={(e) => {
@@ -321,10 +267,16 @@ export function BaseNode({
           setHoveredNodeId(null);
         }}
       >
-        <div ref={contentRef} style={{ contain: "layout style" }} className={contentClassName ?? (fullBleed ? "flex-1 min-h-0 relative" : "px-3 pb-4 flex-1 min-h-0 overflow-visible flex flex-col")}>{children}</div>
+        <div 
+          ref={contentRef} 
+          className={contentClassName ?? (fullBleed ? "flex-1 min-h-0 relative" : "px-6 py-6 flex-1 min-h-0 flex flex-col")}
+        >
+          {children}
+        </div>
       </div>
+
       {settingsPanel && (
-        <div ref={settingsPanelRef}>
+        <div ref={settingsPanelRef} className="glass-panel rounded-b-[24px] border-t-0 p-4">
           {settingsPanel}
         </div>
       )}

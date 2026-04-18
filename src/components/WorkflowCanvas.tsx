@@ -1938,7 +1938,7 @@ export function WorkflowCanvas() {
   return (
     <div
       ref={reactFlowWrapper}
-      className={`flex-1 bg-canvas-bg relative ${isDragOver ? "ring-2 ring-inset ring-blue-500" : ""}`}
+      className={`flex-1 bg-[#0A0A0A] relative ${isDragOver ? "ring-2 ring-inset ring-white/20" : ""}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -2060,7 +2060,7 @@ export function WorkflowCanvas() {
         nodesDraggable={!isModalOpen}
         nodesConnectable={!isModalOpen}
         elementsSelectable={!isModalOpen}
-        className="bg-neutral-900"
+        className="bg-[#0A0A0A]"
         proOptions={{ hideAttribution: true }}
         defaultEdgeOptions={{
           type: "editable",
@@ -2070,8 +2070,8 @@ export function WorkflowCanvas() {
         <SharedEdgeGradients />
         <GroupBackgroundsPortal />
         <GroupControlsOverlay />
-        <Background color="#1a1a1a" gap={28} size={1} />
-        <Controls className="[&>button]:fill-neutral-300 [&>button:hover]:fill-neutral-100" />
+        <Background color="#111111" gap={40} size={1} />
+        <Controls className="glass-panel !border-none !shadow-none !bg-transparent [&>button]:!bg-transparent [&>button]:!border-white/5 [&>button]:fill-white/40 [&>button:hover]:fill-white" />
         <MiniMap
           className="rounded-xl overflow-hidden"
           style={{ background: "var(--surface-1)", border: "1px solid var(--border-md)" }}

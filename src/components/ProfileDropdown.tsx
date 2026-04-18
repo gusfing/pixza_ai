@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Settings, CreditCard, FileText, LogOut, User, Sparkles, LayoutTemplate,
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -13,27 +14,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSession, signOut } from "next-auth/react";
 
-const PLAN_STYLES: Record<string, { bg: string; text: string; border: string }> = {
-  PRO:    { bg: "rgba(146,220,229,0.1)", text: "#92dce5", border: "rgba(146,220,229,0.2)" },
-  FREE:   { bg: "rgba(255,255,255,0.06)", text: "rgba(255,255,255,0.4)", border: "rgba(255,255,255,0.1)" },
-};
-
-function Avatar({ name, image, size = 36 }: { name: string; image?: string; size?: number }) {
+function Avatar({ name, image, size = 32 }: { name: string; image?: string; size?: number }) {
   const initials = name?.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "P";
   if (image) {
     return (
-      <div style={{ width: size, height: size, borderRadius: "50%", overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg,#92dce5,#d64933)", padding: 1.5 }}>
-        <img src={image} alt={name} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+      <div style={{ width: size, height: size }} className="rounded-full overflow-hidden flex-shrink-0 bg-white/5 p-[1px]">
+        <img src={image} alt={name} className="w-full h-full rounded-full object-cover" />
       </div>
     );
   }
   return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%", flexShrink: 0,
-      background: "linear-gradient(135deg, #92dce5, #d64933)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.35, fontWeight: 700, color: "#080808",
-    }}>
+    <div 
+      style={{ width: size, height: size, fontSize: size * 0.4 }} 
+      className="rounded-full flex-shrink-0 bg-white text-black flex items-center justify-center font-black"
+    >
       {initials}
     </div>
   );
@@ -46,7 +40,6 @@ export function ProfileDropdown() {
 
   const user = session?.user;
   const plan = (user?.plan ?? "FREE") as "FREE" | "PRO";
-  const planStyle = PLAN_STYLES[plan] ?? PLAN_STYLES.FREE;
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -55,12 +48,12 @@ export function ProfileDropdown() {
 
   if (!user) {
     return (
-      <div style={{ display: "flex", gap: 8 }}>
-        <Link href="/auth/signin" style={{ padding: "6px 14px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", fontSize: 13, textDecoration: "none", transition: "color 0.15s" }}>
-          Sign in
+      <div className="flex items-center gap-2">
+        <Link href="/auth/signin" className="px-4 py-2 text-xs font-bold text-white/40 hover:text-white transition-colors uppercase tracking-widest">
+          Sign In
         </Link>
-        <Link href="/auth/signup" style={{ padding: "6px 14px", borderRadius: 9, background: "#92dce5", color: "#080808", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
-          Get started
+        <Link href="/auth/signup" className="btn-minimal btn-minimal-primary px-5 py-2 text-xs">
+          Join
         </Link>
       </div>
     );
@@ -69,95 +62,68 @@ export function ProfileDropdown() {
   return (
     <DropdownMenu onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button
-          style={{
-            display: "flex", alignItems: "center", gap: 10,
-            padding: "6px 10px 6px 6px", borderRadius: 12,
-            background: open ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
-            border: `1px solid ${open ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.07)"}`,
-            cursor: "pointer", transition: "all 0.15s", outline: "none",
-          }}
-        >
-          <Avatar name={user.name || "User"} image={user.image || undefined} size={30} />
-          <div style={{ textAlign: "left", minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 120 }}>
-              {user.name || "User"}
-            </div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", lineHeight: 1.2 }}>
-              {plan.toUpperCase()}
-            </div>
-          </div>
-          <svg
-            width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.3)" strokeWidth={2.5}
-            style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
+        <button className={cn(
+          "flex items-center gap-3 pl-1 pr-3 py-1 rounded-full transition-all border border-transparent",
+          open ? "bg-white/10 border-white/10" : "hover:bg-white/5"
+        )}>
+          <Avatar name={user.name || "User"} image={user.image || undefined} size={28} />
+          <span className="hidden md:inline text-xs font-bold text-white/60 tracking-tight">
+            {user.name?.split(' ')[0]}
+          </span>
+          <ChevronDown className={cn("w-3 h-3 text-white/20 transition-transform", open && "rotate-180")} />
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" sideOffset={8} style={{ width: 260 }}>
-        {/* Profile header */}
-        <div style={{ padding: "12px 14px 10px", display: "flex", alignItems: "center", gap: 12 }}>
-          <Avatar name={user.name || "User"} image={user.image || undefined} size={40} />
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name || "User"}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</div>
+      <DropdownMenuContent 
+        align="end" 
+        sideOffset={12} 
+        className="w-64 glass-panel rounded-[32px] border-white/5 p-2 animate-obsidian shadow-2xl"
+      >
+        <div className="px-4 py-4 flex items-center gap-4">
+          <Avatar name={user.name || "User"} image={user.image || undefined} size={44} />
+          <div className="min-w-0">
+            <p className="text-sm font-black text-white truncate">{user.name || "User"}</p>
+            <p className="text-[10px] font-bold text-white/30 truncate uppercase tracking-widest">{plan} Account</p>
           </div>
-          <span style={{ marginLeft: "auto", flexShrink: 0, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 99, background: planStyle.bg, color: planStyle.text, border: `1px solid ${planStyle.border}`, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            {plan}
-          </span>
         </div>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-white/5 mx-2" />
 
-        {/* Status badge */}
-        <div style={{ padding: "6px 14px 8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <Sparkles size={13} style={{ color: "rgba(255,255,255,0.3)" }} />
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Status</span>
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 6, background: "rgba(146,220,229,0.1)", color: "#92dce5", border: "1px solid rgba(146,220,229,0.15)", textTransform: "capitalize" }}>
-            {plan === "PRO" ? "Pro Member" : "Free Plan"}
-          </span>
-        </div>
-
-        <DropdownMenuSeparator />
-
-        {/* Nav items */}
-        {[
-          { label: "Profile",        href: "/profile",   icon: <User size={14} /> },
-          { label: "Settings",       href: "/settings",  icon: <Settings size={14} /> },
-          { label: "Subscription",   href: "/settings#subscription", icon: <CreditCard size={14} /> },
-          { label: "Templates",      href: "/examples",  icon: <LayoutTemplate size={14} /> },
-          { label: "Terms & Privacy",href: "/terms",     icon: <FileText size={14} /> },
-        ].map(item => (
-          <DropdownMenuItem key={item.label} asChild>
-            <Link href={item.href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", color: "rgba(255,255,255,0.6)", textDecoration: "none", borderRadius: 10, transition: "all 0.12s" }}
-              className="group"
-            >
-              <span style={{ color: "rgba(255,255,255,0.3)", display: "flex" }}>{item.icon}</span>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
+        <div className="p-1 space-y-1">
+          <DropdownMenuItem asChild>
+            <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-white/50 hover:text-white hover:bg-white/5 transition-all outline-none">
+              <User className="w-4 h-4" />
+              <span className="text-xs font-bold tracking-tight">Gallery</span>
             </Link>
           </DropdownMenuItem>
-        ))}
+          <DropdownMenuItem asChild>
+            <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-white/50 hover:text-white hover:bg-white/5 transition-all outline-none">
+              <Settings className="w-4 h-4" />
+              <span className="text-xs font-bold tracking-tight">Studio Settings</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/settings#subscription" className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-white/50 hover:text-white hover:bg-white/5 transition-all outline-none">
+              <CreditCard className="w-4 h-4" />
+              <span className="text-xs font-bold tracking-tight">Billing</span>
+            </Link>
+          </DropdownMenuItem>
+        </div>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-white/5 mx-2" />
 
-        {/* Sign out */}
-        <DropdownMenuItem asChild>
-          <button
-            onClick={handleLogout}
-            style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderRadius: 10, background: "rgba(214,73,51,0.08)", border: "none", cursor: "pointer", transition: "background 0.15s" }}
-            onMouseEnter={e => (e.currentTarget.style.background = "rgba(214,73,51,0.15)")}
-            onMouseLeave={e => (e.currentTarget.style.background = "rgba(214,73,51,0.08)")}
-          >
-            <LogOut size={14} style={{ color: "#d64933" }} />
-            <span style={{ fontSize: 13, fontWeight: 500, color: "#d64933" }}>Sign out</span>
-          </button>
-        </DropdownMenuItem>
+        <div className="p-1">
+          <DropdownMenuItem asChild>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-red-400/60 hover:text-red-400 hover:bg-red-400/5 transition-all outline-none"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-xs font-bold tracking-tight">Sign Out</span>
+            </button>
+          </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
-
