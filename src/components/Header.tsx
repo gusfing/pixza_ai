@@ -42,7 +42,7 @@ function CommentsBtn() {
   if (nodesWithComments.length === 0) return null;
 
   return (
-    <button onClick={handleClick} className="relative p-2 text-white/40 hover:text-white transition-colors" title={`${unviewed} unviewed comments`}>
+    <button onClick={handleClick} className="relative p-2 text-white/70 hover:text-white transition-colors" title={`${unviewed} unviewed comments`}>
       <MessageSquare className="w-4 h-4" />
       {unviewed > 0 && (
         <span className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full border border-[#0A0A0A]" />
@@ -110,13 +110,13 @@ export function Header() {
         {/* ── Left ── */}
         <div className="flex items-center gap-6">
           <Link href="/landing" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-transform group-hover:scale-110">
-              <img src="/pixza-logo.png" alt="" className="w-5 h-5 invert" />
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-400 via-violet-500 to-fuchsia-500 flex items-center justify-center transition-transform group-hover:rotate-12 group-hover:scale-110 shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+              <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert brightness-200" />
             </div>
           </Link>
 
           <div className="flex items-center gap-2">
-            <span className={`text-sm font-bold tracking-tight ${configured ? "text-white" : "text-white/30"}`}>
+            <span className={`text-sm font-bold tracking-tight ${configured ? "text-white" : "text-white/60"}`}>
               {configured ? workflowName : "Untitled Studio"}
             </span>
             {configured && <CostIndicator />}
@@ -130,7 +130,7 @@ export function Header() {
         <div className="hidden md:flex items-center gap-1 p-1 rounded-full glass-panel">
           <button 
             onClick={() => canSave ? saveToFile() : (setProjectModalMode("settings"), setShowProjectModal(true))}
-            className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-white transition-all relative"
+            className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all relative"
             title="Save Project"
           >
             <Save className="w-4 h-4" />
@@ -140,7 +140,7 @@ export function Header() {
           </button>
           <button 
             onClick={() => setShowWorkflowBrowser(true)}
-            className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-white transition-all"
+            className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all"
             title="Open Project"
           >
             <FolderOpen className="w-4 h-4" />
@@ -148,7 +148,7 @@ export function Header() {
           {saveDirectoryPath && (
             <button 
               onClick={handleOpenDir}
-              className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-white transition-all"
+              className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all"
               title="Open Directory"
             >
               <ExternalLink className="w-4 h-4" />
@@ -156,7 +156,7 @@ export function Header() {
           )}
           <button 
             onClick={() => { setProjectModalMode(configured ? "settings" : "new"); setShowProjectModal(true); }}
-            className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-white transition-all"
+            className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all"
             title="Settings"
           >
             <Settings className="w-4 h-4" />
@@ -184,7 +184,7 @@ export function Header() {
 
           <button 
             onClick={() => setShortcutsDialogOpen(true)}
-            className="p-2 text-white/40 hover:text-white transition-colors"
+            className="p-2 text-white/70 hover:text-white transition-colors"
             title="Shortcuts"
           >
             <Command className="w-4 h-4" />

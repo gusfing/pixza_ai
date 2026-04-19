@@ -1,7 +1,19 @@
 "use client";
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Plus, ChevronLeft, ChevronRight, Settings, Image as ImageIcon, 
+  Video, Music, Box, Sparkles, LayoutGrid, Compass, Crown, 
+  ArrowRight, Download, RefreshCw, X, Globe, BrainCog, Code, Terminal,
+  User, Check, Search, Palette, Maximize2, Share2
+} from "lucide-react";
 import { useWorkflowStore } from "@/store/workflowStore";
+import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
+import { cn } from "@/lib/utils";
+
+/* ── Types & Data ────────────────────────────────────────── */
 
 type Tab = "Image" | "Video" | "Audio" | "3D";
 type Screen = "home" | "generate" | "templates" | "gallery" | "settings";
@@ -26,61 +38,44 @@ const MODELS: Model[] = [
   { provider: "fal", modelId: "fal-ai/trellis", label: "Trellis", tabs: ["3D"] },
   { provider: "fal", modelId: "fal-ai/stable-zero123", label: "Zero123", tabs: ["3D"] },
   { provider: "replicate", modelId: "stability-ai/triposr", label: "TripoSR", tabs: ["3D"] },
-  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-1-schnell", label: "FLUX.1 Schnell (CF)", tabs: ["Image"] },
-  { provider: "cloudflare", modelId: "@cf/stabilityai/stable-diffusion-xl-base-1.0", label: "SDXL Base (CF)", tabs: ["Image"] },
-  { provider: "cloudflare", modelId: "@cf/bytedance/stable-diffusion-xl-lightning", label: "SDXL Lightning (CF)", tabs: ["Image"] },
-  { provider: "cloudflare", modelId: "@cf/lykon/dreamshaper-8-lcm", label: "DreamShaper 8 (CF)", tabs: ["Image"] },
-  { provider: "cloudflare", modelId: "@cf/runwayml/stable-diffusion-v1-5-img2img", label: "SD 1.5 Img2Img (CF)", tabs: ["Image"] },
 ];
 
 const TEMPLATES = [
-  { id: "product-float", tab: "Image" as Tab, title: "Floating Product Shot", model: "FLUX.1 Pro", provider: "fal", modelId: "fal-ai/flux-pro", emoji: "📦", color: "#d64933", prompt: "Isolate the product from its original background. Place it on a soft neutral background. Make it float slightly with a soft shadow underneath for elevation. Use balanced studio lighting and sharp focus to highlight details, preserving original logos, branding, colors, textures, and stitching." },
-  { id: "cinematic-portrait", tab: "Image" as Tab, title: "Cinematic Portrait", model: "FLUX Realism", provider: "fal", modelId: "fal-ai/flux-realism", emoji: "🎬", color: "#92dce5", prompt: "Cinematic portrait photography, shallow depth of field, golden hour lighting, film grain, 35mm lens, professional color grading, bokeh background" },
-  { id: "style-transfer", tab: "Image" as Tab, title: "Artistic Style Transfer", model: "FLUX Dev I2I", provider: "fal", modelId: "fal-ai/flux/dev/image-to-image", emoji: "🎨", color: "#f97316", prompt: "Transform into a painterly impressionist style, vibrant colors, visible brushstrokes, artistic interpretation while preserving the subject" },
-  { id: "concept-art", tab: "Image" as Tab, title: "Epic Concept Art", model: "Gemini Imagen 4", provider: "gemini", modelId: "nano-banana-2", emoji: "✦", color: "#92dce5", prompt: "Epic fantasy concept art, dramatic lighting, detailed environment, professional illustration, cinematic composition, 8K resolution" },
-  { id: "product-video", tab: "Video" as Tab, title: "Product Reveal", model: "Kling 1.6 Pro", provider: "fal", modelId: "fal-ai/kling-video/v1.6/pro/text-to-video", emoji: "🛍", color: "#a855f7", prompt: "Elegant product reveal, slow 360 rotation, studio lighting, dark background, luxury feel, smooth camera movement" },
-  { id: "city-timelapse", tab: "Video" as Tab, title: "City Timelapse", model: "Veo 2", provider: "gemini", modelId: "veo-2.0-generate-001", emoji: "🌆", color: "#4285f4", prompt: "Timelapse of a futuristic city at night, neon lights reflecting on wet streets, cars as light trails, dramatic sky" },
-  { id: "3d-product", tab: "3D" as Tab, title: "3D Product Model", model: "Trellis", provider: "fal", modelId: "fal-ai/trellis", emoji: "◉", color: "#eee5e9", prompt: "High quality 3D model from product photo, clean geometry, accurate textures" },
-  { id: "ambient-music", tab: "Audio" as Tab, title: "Ambient Soundtrack", model: "Stable Audio", provider: "fal", modelId: "fal-ai/stable-audio", emoji: "🎵", color: "#10b981", prompt: "Cinematic ambient music, ethereal pads, subtle percussion, emotional and atmospheric" },
+  { id: "product-float", tab: "Image" as Tab, title: "Floating Product Shot", model: "FLUX.1 Pro", provider: "fal", modelId: "fal-ai/flux-pro", icon: <Box className="w-4 h-4" />, color: "white", prompt: "Isolate the product from its original background. Place it on a soft neutral background. Make it float slightly with a soft shadow underneath for elevation. Use balanced studio lighting and sharp focus to highlight details, preserving original logos, branding, colors, textures, and stitching." },
+  { id: "cinematic-portrait", tab: "Image" as Tab, title: "Cinematic Portrait", model: "FLUX Realism", provider: "fal", modelId: "fal-ai/flux-realism", icon: <ImageIcon className="w-4 h-4" />, color: "white", prompt: "Cinematic portrait photography, shallow depth of field, golden hour lighting, film grain, 35mm lens, professional color grading, bokeh background" },
+  { id: "concept-art", tab: "Image" as Tab, title: "Epic Concept Art", model: "Gemini Imagen 4", provider: "gemini", modelId: "nano-banana-2", icon: <Sparkles className="w-4 h-4" />, color: "white", prompt: "Epic fantasy concept art, dramatic lighting, detailed environment, professional illustration, cinematic composition, 8K resolution" },
+  { id: "product-video", tab: "Video" as Tab, title: "Product Reveal", model: "Kling 1.6 Pro", provider: "fal", modelId: "fal-ai/kling-video/v1.6/pro/text-to-video", icon: <Video className="w-4 h-4" />, color: "white", prompt: "Elegant product reveal, slow 360 rotation, studio lighting, dark background, luxury feel, smooth camera movement" },
 ];
 
 const GALLERY_ITEMS = [
-  { emoji: "📦", title: "Product Shot", mode: "Image", color: "#d64933", bg: "linear-gradient(135deg,#1a0a08,#2d1208)" },
-  { emoji: "🎬", title: "Portrait", mode: "Image", color: "#92dce5", bg: "linear-gradient(135deg,#081428,#0a1e3a)" },
-  { emoji: "🌆", title: "City Video", mode: "Video", color: "#4285f4", bg: "linear-gradient(135deg,#080a14,#0c1020)" },
-  { emoji: "🎨", title: "Style Art", mode: "Image", color: "#f97316", bg: "linear-gradient(135deg,#1a0f0a,#2a1a0d)" },
-  { emoji: "◉", title: "3D Model", mode: "3D", color: "#eee5e9", bg: "linear-gradient(135deg,#141414,#1e1e1e)" },
-  { emoji: "🎵", title: "Soundtrack", mode: "Audio", color: "#10b981", bg: "linear-gradient(135deg,#0a1a0a,#0d2a0d)" },
+  { icon: <ImageIcon />, title: "Product Shot", mode: "Image" },
+  { icon: <ImageIcon />, title: "Portrait", mode: "Image" },
+  { icon: <Video />, title: "City Video", mode: "Video" },
+  { icon: <Sparkles />, title: "Style Art", mode: "Image" },
+  { icon: <Box />, title: "3D Model", mode: "3D" },
+  { icon: <Music />, title: "Soundtrack", mode: "Audio" },
 ];
 
-const PCOLORS: Record<string, string> = { gemini: "#4285f4", fal: "#a855f7", replicate: "#ef4444", wavespeed: "#f97316", cloudflare: "#f38020" };
 const TABS: Tab[] = ["Image", "Video", "Audio", "3D"];
-const TAB_ICONS: Record<Tab, string> = { Image: "🖼", Video: "▶", Audio: "🎵", "3D": "◉" };
-
-const C = {
-  bg: "#0a0a0c",
-  surface: "#141416",
-  surface2: "#1c1c1f",
-  border: "rgba(255,255,255,0.08)",
-  text: "#fff",
-  text2: "rgba(255,255,255,0.5)",
-  text3: "rgba(255,255,255,0.25)",
-  accent: "#92dce5",
-  action: "#d64933",
+const TAB_ICONS: Record<Tab, any> = { 
+  Image: <ImageIcon className="w-6 h-6" />, 
+  Video: <Video className="w-6 h-6" />, 
+  Audio: <Music className="w-6 h-6" />, 
+  "3D": <Box className="w-6 h-6" /> 
 };
 
-/* ── Shared components ─────────────────────────────────────── */
+/* ── Shared Components ────────────────────────────────────── */
 
-function Label({ children }: { children: React.ReactNode }) {
-  return <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: C.text3, margin: "0 0 8px" }}>{children}</p>;
+function Label({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <p className={cn("text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2", className)}>
+      {children}
+    </p>
+  );
 }
 
-function Divider() {
-  return <div style={{ height: 1, background: C.border, margin: "4px 0" }} />;
-}
-
-function ModelDropdown({ models, value, onChange, getKey }: {
-  models: Model[]; value: string; onChange: (v: string) => void; getKey: (p: string) => string | null;
+function ModelDropdown({ models, value, onChange }: {
+  models: Model[]; value: string; onChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -94,81 +89,87 @@ function ModelDropdown({ models, value, onChange, getKey }: {
   }, [open]);
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <button onClick={() => setOpen(!open)} style={{
-        width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "13px 16px", borderRadius: 14, border: `1px solid ${C.border}`,
-        background: C.surface2, color: C.text, fontSize: 15, fontWeight: 500, cursor: "pointer",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ width: 9, height: 9, borderRadius: "50%", background: PCOLORS[sel?.provider] || "#7c7c7c", flexShrink: 0 }} />
-          <span>{sel?.label || "Select model"}</span>
+    <div ref={ref} className="relative">
+      <button 
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between p-4 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all outline-none"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_white]" />
+          <span className="text-sm font-bold text-white">{sel?.label || "Select model"}</span>
         </div>
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke={C.text3} strokeWidth={2.5} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.15s", flexShrink: 0 }}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
+        <Plus className={cn("w-4 h-4 text-white/20 transition-transform", open && "rotate-45")} />
       </button>
-      {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, right: 0, zIndex: 200, background: "#1a1a1e", border: `1px solid ${C.border}`, borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 64px rgba(0,0,0,0.8)" }}>
-          {Array.from(new Set(models.map(m => m.provider))).map((prov, pi) => (
-            <div key={prov}>
-              {pi > 0 && <Divider />}
-              <div style={{ padding: "10px 16px 5px", display: "flex", alignItems: "center", gap: 7 }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: PCOLORS[prov] || "#7c7c7c" }} />
-                <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: C.text3 }}>{prov}</span>
-                {!getKey(prov) && prov !== "gemini" && <span style={{ marginLeft: "auto", fontSize: 10, padding: "2px 7px", borderRadius: 5, background: "rgba(214,73,51,0.15)", color: C.action }}>no key</span>}
+
+      <AnimatePresence>
+        {open && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            className="absolute top-full left-0 right-0 mt-2 z-[100] glass-panel rounded-3xl overflow-hidden shadow-2xl p-2 border-white/5"
+          >
+            {Array.from(new Set(models.map(m => m.provider))).map((prov) => (
+              <div key={prov} className="mb-2 last:mb-0">
+                <div className="px-4 py-2 flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{prov}</span>
+                </div>
+                {models.filter(m => m.provider === prov).map(m => {
+                  const active = value === m.modelId;
+                  return (
+                    <button 
+                      key={m.modelId} 
+                      onClick={() => { onChange(m.modelId); setOpen(false); }} 
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm transition-all",
+                        active ? "bg-white text-black font-black" : "text-white/60 hover:bg-white/5 hover:text-white"
+                      )}
+                    >
+                      {m.label}
+                      {active && <Check className="w-4 h-4" />}
+                    </button>
+                  );
+                })}
               </div>
-              {models.filter(m => m.provider === prov).map(m => {
-                const active = value === m.modelId;
-                return (
-                  <button key={m.modelId} onClick={() => { onChange(m.modelId); setOpen(false); }} style={{
-                    width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "12px 16px 12px 30px", border: "none",
-                    background: active ? "rgba(146,220,229,0.08)" : "transparent",
-                    color: active ? C.text : C.text2, fontSize: 14, cursor: "pointer", textAlign: "left",
-                  }}>
-                    {m.label}
-                    {active && <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke={C.accent} strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 function RefSlot({ label, icon, image, onUpload, onClear }: {
-  label: string; icon: string; image?: string; onUpload: (d: string) => void; onClear: () => void;
+  label: string; icon: React.ReactNode; image?: string; onUpload: (d: string) => void; onClear: () => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
   return (
-    <div onClick={() => !image && ref.current?.click()} style={{
-      flex: 1, aspectRatio: "1", borderRadius: 14, overflow: "hidden",
-      cursor: image ? "default" : "pointer",
-      background: image ? "transparent" : C.surface2,
-      border: `1px solid ${C.border}`,
-      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      gap: 5, position: "relative", minWidth: 0,
-    }}>
+    <div 
+      onClick={() => !image && ref.current?.click()} 
+      className={cn(
+        "flex-1 aspect-square rounded-2xl border transition-all cursor-pointer overflow-hidden relative group",
+        image ? "border-transparent" : "border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10"
+      )}
+    >
       {image ? (
         <>
-          <img src={image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          <button onClick={e => { e.stopPropagation(); onClear(); }} style={{
-            position: "absolute", top: 5, right: 5, width: 22, height: 22, borderRadius: "50%",
-            background: "rgba(0,0,0,0.85)", border: "none", color: "#fff", fontSize: 13, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>×</button>
+          <img src={image} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <button 
+              onClick={e => { e.stopPropagation(); onClear(); }} 
+              className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </>
       ) : (
-        <>
-          <span style={{ fontSize: 22, opacity: 0.4 }}>{icon}</span>
-          <span style={{ fontSize: 11, color: C.text3 }}>{label}</span>
-        </>
+        <div className="flex flex-col items-center justify-center h-full gap-2">
+          <div className="text-white/20 group-hover:text-white/40 transition-colors">{icon}</div>
+          <span className="text-[10px] font-bold uppercase tracking-tight text-white/20 group-hover:text-white/40">{label}</span>
+        </div>
       )}
-      <input ref={ref} type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={e => {
         const f = e.target.files?.[0]; if (!f) return;
         const r = new FileReader(); r.onload = ev => onUpload(ev.target?.result as string); r.readAsDataURL(f);
       }} />
@@ -176,72 +177,83 @@ function RefSlot({ label, icon, image, onUpload, onClear }: {
   );
 }
 
-/* ── Screens ───────────────────────────────────────────────── */
+/* ── Screen Components ────────────────────────────────────── */
 
 function HomeScreen({ onStart, onTemplate }: { onStart: (tab: Tab) => void; onTemplate: () => void }) {
   return (
-    <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-        <div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, color: C.text, margin: 0, letterSpacing: "-0.03em" }}>Create</h1>
-          <p style={{ fontSize: 13, color: C.text3, margin: "4px 0 0" }}>What will you make today?</p>
-        </div>
-        <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg, #92dce5, #d64933)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "#0a0a0c" }}>P</div>
-      </div>
+    <div className="flex-1 overflow-y-auto px-8 pt-12 pb-32 lg:px-20 lg:pt-20">
+      <div className="max-w-7xl mx-auto space-y-24">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="space-y-4"
+        >
+          <h1 className="text-6xl lg:text-8xl font-black text-white tracking-tighter leading-none">Studio.</h1>
+          <p className="text-white/30 text-xs lg:text-sm font-black uppercase tracking-[0.3em] max-w-lg">
+            A high-performance neural engine for elite tier media synthesis.
+          </p>
+        </motion.div>
 
-      {/* Quick create */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 28 }}>
-        {TABS.map(t => (
-          <button key={t} onClick={() => onStart(t)} style={{
-            padding: "20px 16px", borderRadius: 18, border: `1px solid ${C.border}`,
-            background: C.surface, cursor: "pointer", textAlign: "left",
-            display: "flex", flexDirection: "column", gap: 8,
-            transition: "all 0.15s",
-          }}>
-            <span style={{ fontSize: 28 }}>{TAB_ICONS[t]}</span>
-            <div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{t}</div>
-              <div style={{ fontSize: 12, color: C.text3, marginTop: 2 }}>
-                {t === "Image" ? "Generate images" : t === "Video" ? "Create videos" : t === "Audio" ? "Make music" : "Build 3D models"}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {TABS.map((t, idx) => (
+            <motion.button 
+              key={t} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 + idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              onClick={() => onStart(t)} 
+              className="group p-8 lg:p-12 rounded-[48px] border border-white/5 bg-white/5 hover:bg-white/10 transition-all text-left flex flex-col gap-12 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-white/10 transition-colors">
+                {TAB_ICONS[t]}
               </div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Templates CTA */}
-      <button onClick={onTemplate} style={{
-        width: "100%", padding: "16px 20px", borderRadius: 18, border: `1px solid ${C.border}`,
-        background: `linear-gradient(135deg, rgba(146,220,229,0.08), rgba(214,73,51,0.08))`,
-        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between",
-        marginBottom: 28,
-      }}>
-        <div style={{ textAlign: "left" }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: C.text }}>Browse Templates</div>
-          <div style={{ fontSize: 12, color: C.text3, marginTop: 2 }}>{TEMPLATES.length} ready-to-use prompts</div>
-        </div>
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke={C.accent} strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-        </svg>
-      </button>
-
-      {/* Recent */}
-      <div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <p style={{ fontSize: 15, fontWeight: 600, color: C.text, margin: 0 }}>Recent</p>
-          <span style={{ fontSize: 12, color: C.accent }}>See all</span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-          {GALLERY_ITEMS.map((g, i) => (
-            <div key={i} style={{ borderRadius: 14, overflow: "hidden", background: g.bg, border: `1px solid ${C.border}`, aspectRatio: "1", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 10, position: "relative" }}>
-              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-60%)", fontSize: 28, opacity: 0.25 }}>{g.emoji}</div>
-              <div style={{ position: "relative" }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.text }}>{g.title}</div>
-                <div style={{ fontSize: 10, color: C.text3 }}>{g.mode}</div>
+              <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/10 transition-all shadow-inner">
+                {TAB_ICONS[t]}
               </div>
-            </div>
+              <div>
+                <div className="text-2xl lg:text-3xl font-black text-white tracking-tighter mb-2">{t}</div>
+                <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] leading-relaxed">
+                  {t === "Image" ? "Photorealistic Neural Capture" : t === "Video" ? "Cinematic Temporal Synthesis" : t === "Audio" ? "Spatial Acoustic Engineering" : "Volumetric 3D Reconstruction"}
+                </div>
+              </div>
+            </motion.button>
           ))}
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          <motion.button 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            onClick={onTemplate} 
+            className="p-10 lg:p-16 rounded-[64px] border border-white/5 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-between group relative overflow-hidden"
+          >
+            <div className="text-left relative z-10">
+              <div className="text-3xl font-black text-white tracking-tighter mb-3">Explore Vaults</div>
+              <div className="text-sm font-bold text-white/20 tracking-tight max-w-xs leading-relaxed">Leverage community-driven neural presets and workflows.</div>
+            </div>
+            <div className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all transform group-hover:rotate-45 relative z-10">
+              <ArrowRight className="w-8 h-8" />
+            </div>
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          </motion.button>
+
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="p-10 lg:p-16 rounded-[64px] border border-white/5 bg-gradient-to-br from-white/5 to-transparent flex flex-col justify-between relative overflow-hidden group"
+          >
+            <div>
+              <div className="text-3xl font-black text-white tracking-tighter mb-3">Batch Engine</div>
+              <div className="text-sm font-bold text-white/20 tracking-tight max-w-xs leading-relaxed">Automate high-volume synthesis with multi-node processing.</div>
+            </div>
+            <div className="mt-12 flex gap-3">
+               <span className="text-[10px] font-black uppercase tracking-widest text-white/40 bg-white/10 px-6 py-2.5 rounded-full border border-white/5 backdrop-blur-md">PRO ACCESS</span>
+            </div>
+            <Zap className="absolute top-10 right-10 w-12 h-12 text-white/5 group-hover:text-amber-400/20 transition-colors" />
+          </motion.div>
         </div>
       </div>
     </div>
@@ -252,7 +264,6 @@ function GenerateScreen({ tab, setTab, onBack, getKey }: {
   tab: Tab; setTab: (t: Tab) => void; onBack: () => void; getKey: (p: string) => string | null;
 }) {
   const [prompt, setPrompt] = useState("");
-  const [aiPrompt, setAiPrompt] = useState(true);
   const [refImage, setRefImage] = useState<string | null>(null);
   const [styleImage, setStyleImage] = useState<string | null>(null);
   const [modelId, setModelId] = useState(MODELS.filter(m => m.tabs.includes(tab))[0]?.modelId || "");
@@ -260,7 +271,6 @@ function GenerateScreen({ tab, setTab, onBack, getKey }: {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const providerSettings = useWorkflowStore(s => s.providerSettings);
 
   const tabModels = MODELS.filter(m => m.tabs.includes(tab));
   const selModel = tabModels.find(m => m.modelId === modelId) || tabModels[0];
@@ -272,16 +282,16 @@ function GenerateScreen({ tab, setTab, onBack, getKey }: {
     setResult(null); setError(null); setShowResult(false);
   }, [tab]);
 
-  const canGenerate = !loading && prompt.trim().length > 0;
+  const generate = async (customPrompt?: string) => {
+    const finalPrompt = customPrompt || prompt;
+    if (!finalPrompt.trim()) return;
 
-  const generate = async () => {
-    if (!canGenerate) return;
     setLoading(true); setError(null); setResult(null); setShowResult(false);
     try {
       const provider = selModel?.provider || "gemini";
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       const body: Record<string, unknown> = {
-        prompt: prompt.trim(),
+        prompt: finalPrompt.trim(),
         selectedModel: { provider, modelId: selModel?.modelId, displayName: selModel?.label },
         aspectRatio: "1:1",
       };
@@ -293,6 +303,7 @@ function GenerateScreen({ tab, setTab, onBack, getKey }: {
       const res = await fetch("/api/generate", { method: "POST", headers, body: JSON.stringify(body) });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Generation failed");
+      
       let out = null;
       if (data.video) out = `data:video/mp4;base64,${data.video}`;
       else if (data.videoUrl) out = data.videoUrl;
@@ -300,6 +311,7 @@ function GenerateScreen({ tab, setTab, onBack, getKey }: {
       else if (data.audio) out = `data:audio/mp3;base64,${data.audio}`;
       else if (data.image) out = data.image;
       else throw new Error("No output received");
+
       setResult(out); setShowResult(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
@@ -309,137 +321,142 @@ function GenerateScreen({ tab, setTab, onBack, getKey }: {
   };
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      {/* Result overlay */}
-      {showResult && result && (
-        <div style={{ position: "absolute", inset: 0, zIndex: 100, background: C.bg, display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 16px 0" }}>
-            <button onClick={() => setShowResult(false)} style={{ background: "none", border: "none", color: C.text2, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-              Back
-            </button>
-            <a href={result} download="output.png" style={{ padding: "8px 16px", borderRadius: 10, background: C.accent, color: "#0a0a0c", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>Save</a>
-          </div>
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-            {outputType === "video"
-              ? <video src={result} controls autoPlay loop style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 16 }} />
-              : <img src={result} alt="output" style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 16, objectFit: "contain" }} />
-            }
-          </div>
-          <div style={{ padding: "0 16px 32px", display: "flex", gap: 10 }}>
-            <button onClick={() => { setShowResult(false); setResult(null); }} style={{ flex: 1, padding: "14px 0", borderRadius: 14, border: `1px solid ${C.border}`, background: C.surface2, color: C.text2, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>New</button>
-            <button onClick={generate} style={{ flex: 1, padding: "14px 0", borderRadius: 14, border: "none", background: C.accent, color: "#0a0a0c", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Regenerate</button>
-          </div>
-        </div>
-      )}
-
-      {/* Tab bar */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 3, padding: "12px 16px 0", background: C.bg, flexShrink: 0 }}>
-        {TABS.map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            padding: "10px 0", borderRadius: 12, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600,
-            background: tab === t ? "#fff" : "transparent",
-            color: tab === t ? "#0a0a0c" : C.text2,
-            transition: "all 0.15s",
-          }}>{t}</button>
-        ))}
-      </div>
-
-      {/* Scrollable form */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 16px" }}>
-
-        {/* Model */}
-        <div style={{ marginBottom: 20 }}>
-          <Label>Model</Label>
-          <ModelDropdown models={tabModels} value={modelId} onChange={setModelId} getKey={getKey} />
+    <div className="flex-1 flex flex-col h-full bg-[#0A0A0A] relative overflow-hidden lg:flex-row">
+      {/* Properties Panel (Desktop) */}
+      <div className="hidden lg:flex w-[400px] flex-col border-r border-white/5 bg-[#0D0D0D] p-10 overflow-y-auto">
+        <div className="mb-10 flex items-center gap-4">
+          <button onClick={onBack} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h2 className="text-2xl font-black text-white tracking-tighter">Properties</h2>
         </div>
 
-        {/* References */}
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-            <Label>References</Label>
-            <span style={{ fontSize: 12, color: C.text3 }}>{(refImage ? 1 : 0) + (styleImage ? 1 : 0)}/4</span>
+        <div className="space-y-12">
+          <div>
+            <Label>Engine Configuration</Label>
+            <ModelDropdown models={tabModels} value={modelId} onChange={setModelId} />
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
-            <RefSlot label="Style" icon="★" image={styleImage || undefined} onUpload={setStyleImage} onClear={() => setStyleImage(null)} />
-            <RefSlot label="Character" icon="👤" image={undefined} onUpload={() => {}} onClear={() => {}} />
-            <RefSlot label="Image" icon="🖼" image={refImage || undefined} onUpload={setRefImage} onClear={() => setRefImage(null)} />
-            <div style={{ flex: 1, aspectRatio: "1", borderRadius: 14, border: `1px dashed rgba(255,255,255,0.12)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, cursor: "pointer", minWidth: 0 }}>
-              <span style={{ fontSize: 22, color: C.text3 }}>+</span>
-              <span style={{ fontSize: 11, color: C.text3 }}>Add</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Prompt */}
-        <div style={{ marginBottom: 16 }}>
-          <Label>Prompt</Label>
-          <textarea
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-            placeholder={tab === "Image" ? "Describe the image..." : tab === "Video" ? "Describe the video scene..." : tab === "Audio" ? "Describe the sound..." : "Describe the 3D object..."}
-            rows={5}
-            style={{
-              width: "100%", resize: "none", background: C.surface2,
-              border: `1px solid ${C.border}`, borderRadius: 16,
-              padding: "14px 16px", color: C.text, fontSize: 15, lineHeight: 1.65,
-              outline: "none", fontFamily: "inherit", boxSizing: "border-box",
-              transition: "border-color 0.15s",
-            }}
-            onFocus={e => (e.target.style.borderColor = "rgba(146,220,229,0.5)")}
-            onBlur={e => (e.target.style.borderColor = C.border)}
-          />
-          {/* AI prompt toggle row */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div onClick={() => setAiPrompt(!aiPrompt)} style={{
-                width: 42, height: 24, borderRadius: 12, cursor: "pointer", position: "relative",
-                background: aiPrompt ? C.accent : "rgba(255,255,255,0.15)", transition: "background 0.2s",
-              }}>
-                <div style={{ position: "absolute", top: 3, left: aiPrompt ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+          <div>
+            <Label>Creative Direction</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <RefSlot label="Composition" icon={<LayoutGrid className="w-5 h-5" />} image={styleImage || undefined} onUpload={setStyleImage} onClear={() => setStyleImage(null)} />
+              <RefSlot label="Subject" icon={<User className="w-5 h-5" />} image={undefined} onUpload={() => {}} onClear={() => {}} />
+              <RefSlot label="Lighting" icon={<Sparkles className="w-5 h-5" />} image={refImage || undefined} onUpload={setRefImage} onClear={() => setRefImage(null)} />
+              <div className="aspect-square rounded-2xl border border-dashed border-white/10 flex items-center justify-center text-white/20 hover:text-white/40 hover:border-white/20 transition-all cursor-pointer">
+                <Plus className="w-6 h-6" />
               </div>
-              <span style={{ fontSize: 13, color: C.text2 }}>AI prompt</span>
             </div>
-            <div style={{ display: "flex", gap: 16 }}>
-              {["✦", "⟳", "⊞"].map((icon, i) => (
-                <button key={i} style={{ background: "none", border: "none", color: C.text3, cursor: "pointer", fontSize: 16, padding: 0 }}>{icon}</button>
+          </div>
+
+          <div className="p-6 rounded-3xl bg-white/5 border border-white/5">
+            <Label className="mb-4 text-white/60">Active Tab</Label>
+            <div className="flex gap-2">
+              {TABS.map(t => (
+                <button 
+                  key={t} 
+                  onClick={() => setTab(t)}
+                  className={cn(
+                    "flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                    tab === t ? "bg-white text-black" : "text-white/20 hover:text-white/40"
+                  )}
+                >
+                  {t}
+                </button>
               ))}
-              <button onClick={() => setPrompt("")} style={{ background: "none", border: "none", color: C.text3, cursor: "pointer", fontSize: 16, padding: 0 }}>✕</button>
             </div>
           </div>
         </div>
-
-        {/* API key warning */}
-        {selModel && selModel.provider !== "gemini" && !getKey(selModel.provider) && (
-          <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(214,73,51,0.08)", border: "1px solid rgba(214,73,51,0.2)", fontSize: 13, color: C.action, marginBottom: 16 }}>
-            No {selModel.provider} API key. <Link href="/studio" style={{ color: C.action, textDecoration: "underline" }}>Add in Settings</Link>
-          </div>
-        )}
-
-        {error && (
-          <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(214,73,51,0.08)", border: "1px solid rgba(214,73,51,0.2)", fontSize: 13, color: C.action, marginBottom: 16, lineHeight: 1.5 }}>{error}</div>
-        )}
       </div>
 
-      {/* Fixed bottom actions */}
-      <div style={{ padding: "12px 16px", background: C.bg, borderTop: `1px solid ${C.border}`, flexShrink: 0 }}>
-        <button onClick={generate} disabled={!canGenerate} style={{
-          width: "100%", padding: "16px 0", borderRadius: 16, border: "none",
-          background: loading ? "rgba(146,220,229,0.3)" : canGenerate ? C.accent : C.surface2,
-          color: canGenerate ? "#0a0a0c" : C.text3,
-          fontSize: 16, fontWeight: 700, cursor: canGenerate ? "pointer" : "not-allowed",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-          transition: "all 0.15s",
-          boxShadow: canGenerate && !loading ? "0 4px 24px rgba(146,220,229,0.3)" : "none",
-        }}>
-          {loading ? (
-            <>
-              <div style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid rgba(10,10,12,0.3)", borderTopColor: "#0a0a0c", animation: "spin 0.8s linear infinite" }} />
-              Generating...
-            </>
-          ) : `Generate ${tab}`}
-        </button>
-        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      {/* Main Canvas Area */}
+      <div className="flex-1 flex flex-col relative bg-[#0A0A0A]">
+        {/* Mobile Tabs */}
+        <div className="lg:hidden flex items-center justify-center gap-1 p-2 bg-white/5 rounded-full mx-6 mt-4">
+          {TABS.map(t => (
+            <button 
+              key={t} 
+              onClick={() => setTab(t)} 
+              className={cn(
+                "flex-1 py-2 px-4 rounded-full text-xs font-black transition-all",
+                tab === t ? "bg-white text-black" : "text-white/40 hover:text-white"
+              )}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto px-6 py-8 pb-40 lg:p-20 lg:pb-52 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div 
+                key="loading"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.1 }}
+                className="flex flex-col items-center justify-center gap-8"
+              >
+                <div className="w-20 h-20 lg:w-32 lg:h-32 rounded-full border-4 border-white/5 border-t-white animate-spin shadow-[0_0_80px_rgba(255,255,255,0.1)]" />
+                <div className="text-center">
+                  <p className="text-xs lg:text-sm font-black uppercase tracking-[0.3em] text-white">Synthesizing {tab}...</p>
+                  <p className="text-[10px] font-bold text-white/20 mt-2 uppercase tracking-widest">Applying neural weights</p>
+                </div>
+              </motion.div>
+            ) : showResult && result ? (
+              <motion.div 
+                key="result"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-4xl w-full flex flex-col gap-8"
+              >
+                <div className="aspect-square lg:aspect-video glass-panel rounded-[48px] overflow-hidden shadow-2xl border-white/10 relative group">
+                  {outputType === "video"
+                    ? <video src={result} controls autoPlay loop className="w-full h-full object-contain" />
+                    : <img src={result} alt="output" className="w-full h-full object-contain" />
+                  }
+                  <div className="absolute top-8 right-8 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                      <Maximize2 className="w-5 h-5" />
+                    </button>
+                    <button className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                      <Share2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex gap-4 items-center justify-center">
+                  <button onClick={() => { setShowResult(false); setResult(null); }} className="btn-minimal btn-minimal-secondary px-10 py-4 text-sm tracking-widest uppercase font-black">Discard</button>
+                  <a href={result} download="pixza_export" className="btn-minimal btn-minimal-primary px-12 py-4 text-sm tracking-widest uppercase font-black flex items-center gap-3">
+                    <Download className="w-5 h-5" /> Export Artifact
+                  </a>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="idle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center text-center max-w-md"
+              >
+                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-[40px] bg-white/5 border border-white/5 flex items-center justify-center text-white/10 mb-8">
+                  {TAB_ICONS[tab]}
+                </div>
+                <h3 className="text-2xl font-black text-white mb-2">Ready to Imagine</h3>
+                <p className="text-sm font-bold text-white/20">Provide a descriptive prompt below to begin the generation process.</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Floating V0-style Chat Box */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-3xl px-6 z-[150]">
+          <VercelV0Chat 
+            isLoading={loading}
+            onSend={(msg) => { setPrompt(msg); generate(msg); }}
+            placeholder={`What can I help you ship in ${tab.toLowerCase()}?`}
+          />
+        </div>
       </div>
     </div>
   );
@@ -451,41 +468,40 @@ function TemplatesScreen({ onSelect }: { onSelect: (t: typeof TEMPLATES[0]) => v
   const filtered = activeTab === "All" ? TEMPLATES : TEMPLATES.filter(t => t.tab === activeTab);
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ padding: "20px 16px 0", flexShrink: 0 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: C.text, margin: "0 0 16px", letterSpacing: "-0.02em" }}>Templates</h2>
-        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 12 }}>
-          {tabs.map(t => (
-            <button key={t} onClick={() => setActiveTab(t)} style={{
-              padding: "7px 16px", borderRadius: 99, border: "none", cursor: "pointer", whiteSpace: "nowrap",
-              background: activeTab === t ? C.accent : C.surface2,
-              color: activeTab === t ? "#0a0a0c" : C.text2,
-              fontSize: 13, fontWeight: activeTab === t ? 700 : 400,
-              transition: "all 0.15s", flexShrink: 0,
-            }}>{t}</button>
-          ))}
-        </div>
+    <div className="flex-1 flex flex-col overflow-hidden px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
+      <h2 className="text-4xl lg:text-6xl font-black text-white mb-8 tracking-tighter">Explore</h2>
+      <div className="flex gap-3 overflow-x-auto pb-8 scrollbar-hide">
+        {tabs.map(t => (
+          <button 
+            key={t} 
+            onClick={() => setActiveTab(t)} 
+            className={cn(
+              "px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all",
+              activeTab === t ? "bg-white text-black" : "bg-white/5 text-white/40 hover:text-white"
+            )}
+          >
+            {t}
+          </button>
+        ))}
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "8px 16px 100px" }}>
+      <div className="flex-1 overflow-y-auto grid lg:grid-cols-2 gap-6 pr-2">
         {filtered.map(t => (
-          <button key={t.id} onClick={() => onSelect(t)} style={{
-            width: "100%", display: "flex", alignItems: "flex-start", gap: 14,
-            padding: "16px", borderRadius: 18, border: `1px solid ${C.border}`,
-            background: C.surface, cursor: "pointer", textAlign: "left", marginBottom: 10,
-            transition: "all 0.15s",
-          }}>
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: `${t.color}18`, border: `1px solid ${t.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{t.emoji}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{t.title}</span>
-                <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 99, background: `${t.color}18`, color: t.color, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{t.tab}</span>
-              </div>
-              <div style={{ fontSize: 12, color: C.text3, marginBottom: 6 }}>{t.model}</div>
-              <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.5, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{t.prompt}</div>
+          <button 
+            key={t.id} 
+            onClick={() => onSelect(t)} 
+            className="group p-8 lg:p-10 rounded-[48px] border border-white/5 bg-white/5 hover:bg-white/10 transition-all text-left flex items-start gap-8"
+          >
+            <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-3xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-white group-hover:bg-white/10 transition-all">
+              {t.icon}
             </div>
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={C.text3} strokeWidth={2} style={{ flexShrink: 0, marginTop: 4 }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-xl lg:text-2xl font-black text-white">{t.title}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/20 bg-white/5 px-3 py-1 rounded-full">{t.tab}</span>
+              </div>
+              <p className="text-xs font-bold text-white/40 mb-4">{t.model}</p>
+              <p className="text-sm lg:text-base text-white/60 line-clamp-2 leading-relaxed">{t.prompt}</p>
+            </div>
           </button>
         ))}
       </div>
@@ -495,15 +511,20 @@ function TemplatesScreen({ onSelect }: { onSelect: (t: typeof TEMPLATES[0]) => v
 
 function GalleryScreen() {
   return (
-    <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: C.text, margin: "0 0 20px", letterSpacing: "-0.02em" }}>Gallery</h2>
-      <div style={{ columns: 2, columnGap: 10 }}>
-        {[...GALLERY_ITEMS, ...GALLERY_ITEMS].map((g, i) => (
-          <div key={i} style={{ breakInside: "avoid", marginBottom: 10, borderRadius: 16, overflow: "hidden", background: g.bg, border: `1px solid ${C.border}`, aspectRatio: i % 3 === 0 ? "3/4" : "1", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 12, position: "relative" }}>
-            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-60%)", fontSize: 36, opacity: 0.2 }}>{g.emoji}</div>
-            <div style={{ position: "relative" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{g.title}</div>
-              <div style={{ fontSize: 10, color: C.text3 }}>{g.mode}</div>
+    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
+      <h2 className="text-4xl lg:text-6xl font-black text-white mb-12 tracking-tighter">Vault</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...GALLERY_ITEMS, ...GALLERY_ITEMS, ...GALLERY_ITEMS].map((g, i) => (
+          <div key={i} className={cn(
+            "rounded-[40px] bg-white/5 border border-white/5 overflow-hidden flex flex-col justify-end p-8 relative group aspect-square",
+            i % 5 === 0 && "lg:col-span-2 lg:row-span-2 aspect-auto"
+          )}>
+            <div className="absolute inset-0 flex items-center justify-center text-white/5 group-hover:scale-110 group-hover:text-white/10 transition-all transform scale-[2] opacity-10">
+              {g.icon}
+            </div>
+            <div className="relative z-10">
+              <div className="text-lg lg:text-xl font-black text-white mb-1">{g.title}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">{g.mode}</div>
             </div>
           </div>
         ))}
@@ -512,142 +533,145 @@ function GalleryScreen() {
   );
 }
 
-function SettingsScreen({ getKey }: { getKey: (p: string) => string | null }) {
+function SettingsScreen() {
+  const providerSettings = useWorkflowStore(s => s.providerSettings);
+  const updateProviderApiKey = useWorkflowStore(s => s.updateProviderApiKey);
+
   const PROVIDERS = [
-    { id: "gemini", name: "Google Gemini", color: "#4285f4", placeholder: "AIza...", free: true },
-    { id: "fal", name: "fal.ai", color: "#a855f7", placeholder: "fal_..." },
-    { id: "replicate", name: "Replicate", color: "#ef4444", placeholder: "r8_..." },
-    { id: "wavespeed", name: "WaveSpeed", color: "#f97316", placeholder: "ws_..." },
-  ];
-  const [keys, setKeys] = useState<Record<string, string>>({});
+    { id: "gemini", name: "Google Gemini", color: "white", placeholder: "AIza...", icon: <Globe className="w-5 h-5" /> },
+    { id: "fal", name: "fal.ai", color: "white", placeholder: "fal_...", icon: <Terminal className="w-5 h-5" /> },
+    { id: "replicate", name: "Replicate", color: "white", placeholder: "r8_...", icon: <Code className="w-5 h-5" /> },
+    { id: "wavespeed", name: "WaveSpeed", color: "white", placeholder: "ws_...", icon: <Terminal className="w-5 h-5" /> },
+  ] as const;
+
   const [show, setShow] = useState<Record<string, boolean>>({});
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: C.text, margin: "0 0 6px", letterSpacing: "-0.02em" }}>Settings</h2>
-      <p style={{ fontSize: 13, color: C.text3, margin: "0 0 24px" }}>Keys stored locally in your browser only.</p>
+    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-4xl lg:text-6xl font-black text-white mb-4 tracking-tighter text-center lg:text-left">Auth</h2>
+        <p className="text-sm lg:text-base font-bold text-white/20 mb-16 uppercase tracking-widest text-center lg:text-left">Manage your creative engine access.</p>
 
-      <Label>API Keys</Label>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-        {PROVIDERS.map(p => (
-          <div key={p.id} style={{ padding: "16px", borderRadius: 16, background: C.surface, border: `1px solid ${C.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 9, background: `${p.color}18`, border: `1px solid ${p.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: p.color }}>{p.name[0]}</div>
-                <span style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{p.name}</span>
+        <div className="grid lg:grid-cols-2 gap-6 mb-16">
+          {PROVIDERS.map(p => {
+            const currentKey = providerSettings.providers[p.id as keyof typeof providerSettings.providers]?.apiKey || "";
+            return (
+              <div key={p.id} className="p-10 rounded-[48px] bg-white/5 border border-white/5 group hover:bg-white/10 transition-all">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/10 transition-all">
+                      {p.icon}
+                    </div>
+                    <span className="text-xl font-black text-white">{p.name}</span>
+                  </div>
+                  {currentKey && <Check className="text-green-500 w-5 h-5" />}
+                </div>
+                <div className="relative">
+                  <input
+                    type={show[p.id] ? "text" : "password"}
+                    value={currentKey}
+                    onChange={e => updateProviderApiKey(p.id, e.target.value)}
+                    placeholder={p.placeholder}
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-sm font-mono text-white outline-none focus:border-white/20 transition-all pr-20"
+                  />
+                  <button 
+                    onClick={() => setShow(s => ({ ...s, [p.id]: !s[p.id] }))} 
+                    className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
+                  >
+                    {show[p.id] ? "Hide" : "Show"}
+                  </button>
+                </div>
               </div>
-              {p.free && <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 99, background: "rgba(16,185,129,0.15)", color: "#10b981", fontWeight: 700 }}>FREE</span>}
-            </div>
-            <div style={{ position: "relative" }}>
-              <input
-                type={show[p.id] ? "text" : "password"}
-                value={keys[p.id] || ""}
-                onChange={e => setKeys(k => ({ ...k, [p.id]: e.target.value }))}
-                placeholder={p.placeholder}
-                style={{ width: "100%", padding: "11px 44px 11px 14px", borderRadius: 12, background: C.surface2, border: `1px solid ${C.border}`, color: C.text, fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "monospace" }}
-              />
-              <button onClick={() => setShow(s => ({ ...s, [p.id]: !s[p.id] }))} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: C.text3, cursor: "pointer", fontSize: 12 }}>
-                {show[p.id] ? "hide" : "show"}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
 
-      <div style={{ padding: "16px", borderRadius: 16, background: "linear-gradient(135deg, rgba(146,220,229,0.06), rgba(214,73,51,0.06))", border: `1px solid ${C.border}` }}>
-        <div style={{ fontSize: 15, fontWeight: 600, color: C.text, marginBottom: 4 }}>Upgrade to Pro</div>
-        <div style={{ fontSize: 13, color: C.text2, marginBottom: 14 }}>Unlimited generations, priority queue, advanced models.</div>
-        <button style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #f97316, #d64933)", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-          👑 Upgrade — $9/mo
-        </button>
+        <div className="p-12 lg:p-20 rounded-[64px] bg-white text-black flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="text-center lg:text-left">
+            <div className="text-4xl lg:text-5xl font-black mb-4 tracking-tighter">Enterprise Access</div>
+            <div className="text-lg font-bold opacity-40 leading-tight max-w-md">Unlimited computational priority and custom model weights.</div>
+          </div>
+          <button className="whitespace-nowrap px-12 py-6 rounded-3xl bg-black text-white text-sm font-black tracking-[0.2em] uppercase hover:scale-[0.98] transition-transform flex items-center gap-3">
+            <Crown className="w-5 h-5" /> Start Trial
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ── Morphic bottom nav ────────────────────────────────────── */
-function BottomNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
-  const items: { id: Screen; icon: string; label: string }[] = [
-    { id: "home",      icon: "⊞", label: "Home"      },
-    { id: "generate",  icon: "✦", label: "Create"    },
-    { id: "templates", icon: "◈", label: "Templates" },
-    { id: "gallery",   icon: "🖼", label: "Gallery"   },
-    { id: "settings",  icon: "⚙", label: "Settings"  },
+/* ── Navigation Components ─────────────────────────────────── */
+
+function SidebarNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
+  const items: { id: Screen; icon: any; label: string }[] = [
+    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Dashboard"      },
+    { id: "generate",  icon: <Plus className="w-5 h-5" />, label: "Studio"    },
+    { id: "templates", icon: <Compass className="w-5 h-5" />, label: "Explore" },
+    { id: "gallery",   icon: <ImageIcon className="w-5 h-5" />, label: "Vault"   },
+    { id: "settings",  icon: <Settings className="w-5 h-5" />, label: "Engine"  },
   ];
 
-  const activeIdx = items.findIndex(i => i.id === screen);
-
   return (
-    <div style={{
-      position: "relative", zIndex: 50, flexShrink: 0,
-      background: "rgba(10,10,12,0.98)", backdropFilter: "blur(24px)",
-      borderTop: `1px solid ${C.border}`,
-      paddingBottom: "env(safe-area-inset-bottom, 8px)",
-      paddingTop: 8, paddingLeft: 12, paddingRight: 12,
-      display: "flex", alignItems: "center", justifyContent: "center",
-    }}>
-      {/* Morphic pill container */}
-      <div style={{
-        display: "flex", alignItems: "center",
-        background: C.surface2,
-        borderRadius: 16,
-        border: `1px solid ${C.border}`,
-        overflow: "hidden",
-        width: "100%",
-        maxWidth: 400,
-      }}>
-        {items.map((item, idx) => {
+    <div className="hidden lg:flex flex-col items-center py-8 w-24 flex-shrink-0 bg-[#0A0A0A] border-r border-white/5 z-50">
+      <Link href="/landing" className="mb-12 group">
+        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+          <img src="/pixza-logo.png" alt="" className="w-6 h-6 invert" />
+        </div>
+      </Link>
+      <div className="flex-1 flex flex-col gap-4">
+        {items.map((item) => {
           const active = screen === item.id;
-          const prevActive = idx > 0 && items[idx - 1].id === screen;
-          const nextActive = idx < items.length - 1 && items[idx + 1].id === screen;
-          const isFirst = idx === 0;
-          const isLast = idx === items.length - 1;
-
-          // Neighbor rounding logic — same as morphic pattern
-          const roundLeft  = active || prevActive || isFirst;
-          const roundRight = active || nextActive || isLast;
-
-          const borderRadius = active
-            ? 12
-            : `${roundLeft ? 12 : 0}px ${roundRight ? 12 : 0}px ${roundRight ? 12 : 0}px ${roundLeft ? 12 : 0}px`;
-
           return (
             <button
               key={item.id}
               onClick={() => setScreen(item.id)}
-              style={{
-                flex: 1,
-                display: "flex", flexDirection: "column",
-                alignItems: "center", justifyContent: "center",
-                gap: 3,
-                padding: active ? "10px 6px" : "10px 4px",
-                border: "none", cursor: "pointer",
-                background: active ? C.accent : "transparent",
-                borderRadius,
-                margin: active ? "4px 2px" : "0",
-                transition: "all 0.25s cubic-bezier(0.34,1.56,0.64,1)",
-                minWidth: 0,
-              }}
+              className={cn(
+                "w-14 h-14 rounded-2xl transition-all flex items-center justify-center group relative",
+                active ? "bg-white text-black shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]" : "text-white/20 hover:text-white hover:bg-white/5"
+              )}
             >
-              <span style={{
-                fontSize: active ? 16 : 18,
-                color: active ? "#0a0a0c" : C.text3,
-                transition: "all 0.2s",
-                lineHeight: 1,
-              }}>
-                {item.icon}
-              </span>
-              <span style={{
-                fontSize: 9,
-                fontWeight: active ? 700 : 400,
-                color: active ? "#0a0a0c" : C.text3,
-                transition: "all 0.2s",
-                letterSpacing: active ? "0.03em" : 0,
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-              }}>
+              {item.icon}
+              <div className="absolute left-full ml-4 px-3 py-1.5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-2xl z-[100]">
                 {item.label}
-              </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <Link 
+        href="/profile"
+        className="mb-8 w-12 h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all cursor-pointer overflow-hidden group"
+      >
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lekh" alt="User" className="w-full h-full grayscale group-hover:grayscale-0 transition-all" />
+      </Link>
+    </div>
+  );
+}
+
+function BottomNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
+  const items: { id: Screen; icon: any; label: string }[] = [
+    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Home"      },
+    { id: "generate",  icon: <Plus className="w-5 h-5" />, label: "Create"    },
+    { id: "templates", icon: <Compass className="w-5 h-5" />, label: "Explore" },
+    { id: "gallery",   icon: <ImageIcon className="w-5 h-5" />, label: "Gallery"   },
+    { id: "settings",  icon: <Settings className="w-5 h-5" />, label: "Auth"  },
+  ];
+
+  return (
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] lg:hidden">
+      <div className="glass-panel p-2 rounded-full flex items-center gap-1 shadow-2xl border-white/10">
+        {items.map((item) => {
+          const active = screen === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setScreen(item.id)}
+              className={cn(
+                "flex flex-col items-center justify-center w-14 h-14 rounded-full transition-all",
+                active ? "bg-white text-black" : "text-white/40 hover:text-white hover:bg-white/5"
+              )}
+            >
+              {item.icon}
             </button>
           );
         })}
@@ -656,189 +680,8 @@ function BottomNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Scree
   );
 }
 
-/* ── Desktop layout ────────────────────────────────────────── */
-function DesktopLayout({ getKey }: { getKey: (p: string) => string | null }) {
-  const [tab, setTab] = useState<Tab>("Image");
-  const [view, setView] = useState<"generate" | "templates">("generate");
-  const [prompt, setPrompt] = useState("");
-  const [aiPrompt, setAiPrompt] = useState(true);
-  const [refImage, setRefImage] = useState<string | null>(null);
-  const [styleImage, setStyleImage] = useState<string | null>(null);
-  const [modelId, setModelId] = useState("fal-ai/flux-pro");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [title, setTitle] = useState("New generation");
-
-  const tabModels = MODELS.filter(m => m.tabs.includes(tab));
-  const selModel = tabModels.find(m => m.modelId === modelId) || tabModels[0];
-  const outputType = tab === "Video" ? "video" : tab === "3D" ? "3d" : tab === "Audio" ? "audio" : "image";
-
-  useEffect(() => {
-    const first = tabModels[0];
-    if (first && !tabModels.find(m => m.modelId === modelId)) setModelId(first.modelId);
-    setResult(null); setError(null);
-  }, [tab]);
-
-  const canGenerate = !loading && prompt.trim().length > 0;
-
-  const generate = async () => {
-    if (!canGenerate) return;
-    setLoading(true); setError(null); setResult(null);
-    try {
-      const provider = selModel?.provider || "gemini";
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      const body: Record<string, unknown> = {
-        prompt: prompt.trim(),
-        selectedModel: { provider, modelId: selModel?.modelId, displayName: selModel?.label },
-        aspectRatio: "1:1",
-      };
-      if (refImage) { body.images = [refImage]; body.dynamicInputs = { image_url: refImage }; }
-      if (tab === "Video") body.mediaType = "video";
-      if (tab === "3D") body.mediaType = "3d";
-      if (tab === "Audio") body.mediaType = "audio";
-      const res = await fetch("/api/generate", { method: "POST", headers, body: JSON.stringify(body) });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || "Generation failed");
-      if (data.video) setResult(`data:video/mp4;base64,${data.video}`);
-      else if (data.videoUrl) setResult(data.videoUrl);
-      else if (data.model3dUrl) setResult(data.model3dUrl);
-      else if (data.audio) setResult(`data:audio/mp3;base64,${data.audio}`);
-      else if (data.image) setResult(data.image);
-      else throw new Error("No output received");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Inter', system-ui, sans-serif", display: "flex", flexDirection: "column" }}>
-      {/* Top bar */}
-      <header style={{ height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", borderBottom: `1px solid ${C.border}`, background: "rgba(10,10,12,0.95)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 50, flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Link href="/landing" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-            <img src="/pixza-logo.png" alt="Pixza" style={{ width: 28, height: 28, borderRadius: 7, objectFit: "contain" }} />
-            <span style={{ fontSize: 14, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>Pixza Studio</span>
-          </Link>
-          <span style={{ color: C.text3, fontSize: 16, margin: "0 4px" }}>/</span>
-          <input value={title} onChange={e => setTitle(e.target.value)} style={{ background: "none", border: "none", color: C.text2, fontSize: 13, outline: "none", fontFamily: "inherit", width: 200 }} />
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => setView(view === "templates" ? "generate" : "templates")} style={{ padding: "5px 14px", borderRadius: 8, border: `1px solid ${C.border}`, background: view === "templates" ? "rgba(146,220,229,0.1)" : "transparent", color: view === "templates" ? C.accent : C.text2, fontSize: 12, cursor: "pointer" }}>Templates</button>
-          <Link href="/studio" style={{ padding: "5px 14px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.text2, fontSize: 12, textDecoration: "none" }}>Node Studio →</Link>
-        </div>
-      </header>
-
-      {/* Body */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
-        {/* Left panel */}
-        <div style={{ width: 340, flexShrink: 0, display: "flex", flexDirection: "column", borderRight: `1px solid ${C.border}`, background: "#0e0e11", overflow: "hidden" }}>
-          {/* Tab bar */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 2, padding: "12px 12px 0", position: "sticky", top: 0, background: "#0e0e11", zIndex: 10 }}>
-            {TABS.map(t => (
-              <button key={t} onClick={() => setTab(t)} style={{ padding: "9px 0", borderRadius: 9, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, background: tab === t ? "#fff" : "transparent", color: tab === t ? "#0a0a0c" : C.text2, transition: "all 0.15s" }}>{t}</button>
-            ))}
-          </div>
-
-          {view === "templates" ? (
-            <div style={{ padding: "16px 12px" }}>
-              <Label>Templates</Label>
-              {TEMPLATES.filter(t => t.tab === tab).map(t => (
-                <button key={t.id} onClick={() => { setPrompt(t.prompt); setModelId(t.modelId); setTitle(t.title); setView("generate"); }} style={{ width: "100%", display: "flex", alignItems: "flex-start", gap: 12, padding: "12px", borderRadius: 12, border: `1px solid ${C.border}`, background: C.surface, cursor: "pointer", textAlign: "left", marginBottom: 8 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 9, background: `${t.color}18`, border: `1px solid ${t.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{t.emoji}</div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 2 }}>{t.title}</div>
-                    <div style={{ fontSize: 11, color: C.text3, marginBottom: 4 }}>{t.model}</div>
-                    <div style={{ fontSize: 11, color: C.text2, lineHeight: 1.5, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{t.prompt}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <>
-            <div style={{ flex: 1, overflowY: "auto", padding: "16px 12px", display: "flex", flexDirection: "column", gap: 18 }}>
-              <div><Label>Model</Label><ModelDropdown models={tabModels} value={modelId} onChange={setModelId} getKey={getKey} /></div>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}><Label>References</Label><span style={{ fontSize: 11, color: C.text3 }}>{(refImage ? 1 : 0) + (styleImage ? 1 : 0)}/4</span></div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <RefSlot label="Style" icon="★" image={styleImage || undefined} onUpload={setStyleImage} onClear={() => setStyleImage(null)} />
-                  <RefSlot label="Character" icon="👤" image={undefined} onUpload={() => {}} onClear={() => {}} />
-                  <RefSlot label="@img1" icon="🖼" image={refImage || undefined} onUpload={setRefImage} onClear={() => setRefImage(null)} />
-                  <div style={{ width: 72, height: 72, borderRadius: 10, border: `1px dashed rgba(255,255,255,0.12)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, cursor: "pointer", flexShrink: 0 }}>
-                    <span style={{ fontSize: 20, color: C.text3 }}>+</span>
-                    <span style={{ fontSize: 10, color: C.text3 }}>Add</span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <Label>Prompt</Label>
-                <textarea value={prompt} onChange={e => setPrompt(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generate(); }} placeholder={tab === "Image" ? "Describe the image..." : tab === "Video" ? "Describe the video scene..." : tab === "Audio" ? "Describe the sound..." : "Describe the 3D object..."} rows={6} style={{ width: "100%", resize: "none", background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, borderRadius: 12, padding: "12px 14px", color: C.text, fontSize: 13, lineHeight: 1.65, outline: "none", fontFamily: "inherit", boxSizing: "border-box", transition: "border-color 0.15s" }} onFocus={e => (e.target.style.borderColor = "rgba(146,220,229,0.4)")} onBlur={e => (e.target.style.borderColor = C.border)} />
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div onClick={() => setAiPrompt(!aiPrompt)} style={{ width: 36, height: 20, borderRadius: 10, cursor: "pointer", position: "relative", background: aiPrompt ? C.accent : "rgba(255,255,255,0.15)", transition: "background 0.2s" }}>
-                      <div style={{ position: "absolute", top: 2, left: aiPrompt ? 18 : 2, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />
-                    </div>
-                    <span style={{ fontSize: 12, color: C.text2 }}>AI prompt</span>
-                  </div>
-                  <div style={{ display: "flex", gap: 12 }}>
-                    {["✦", "⟳", "⊞"].map((icon, i) => <button key={i} style={{ background: "none", border: "none", color: C.text3, cursor: "pointer", fontSize: 14, padding: 0 }}>{icon}</button>)}
-                    <button onClick={() => setPrompt("")} style={{ background: "none", border: "none", color: C.text3, cursor: "pointer", fontSize: 14, padding: 0 }}>✕</button>
-                  </div>
-                </div>
-              </div>
-              {selModel && selModel.provider !== "gemini" && !getKey(selModel.provider) && (
-                <div style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(214,73,51,0.08)", border: "1px solid rgba(214,73,51,0.2)", fontSize: 12, color: C.action }}>
-                  No {selModel.provider} API key. <Link href="/studio" style={{ color: C.action, textDecoration: "underline" }}>Add in Settings</Link>
-                </div>
-              )}
-              {error && <div style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(214,73,51,0.08)", border: "1px solid rgba(214,73,51,0.2)", fontSize: 12, color: C.action, lineHeight: 1.5 }}>{error}</div>}
-            </div>
-
-            {/* Sticky bottom buttons */}
-            <div style={{ padding: "12px", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8, flexShrink: 0, background: "#0e0e11" }}>
-              <button onClick={generate} disabled={!canGenerate} style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: canGenerate ? C.accent : C.surface2, color: canGenerate ? "#0a0a0c" : C.text3, fontSize: 14, fontWeight: 700, cursor: canGenerate ? "pointer" : "not-allowed", transition: "all 0.15s", boxShadow: canGenerate ? "0 4px 20px rgba(146,220,229,0.25)" : "none" }}>
-                {loading ? "Generating..." : `Generate ${tab}`}
-              </button>
-              <button style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #f97316, #d64933)", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", paddingLeft: 16, paddingRight: 16 }}>
-                <span>👑 Upgrade</span><span>✨</span>
-              </button>
-            </div>
-            </>
-          )}
-        </div>
-
-        {/* Right: output */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", background: C.bg, minWidth: 0 }}>
-          {loading ? (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-              <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(146,220,229,0.2)", borderTopColor: C.accent, animation: "spin 0.8s linear infinite" }} />
-              <p style={{ color: C.text3, fontSize: 13, margin: 0 }}>Generating...</p>
-              <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-            </div>
-          ) : !result ? (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
-              <div style={{ width: 56, height: 56, borderRadius: 14, background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: C.text3 }}>✦</div>
-              <p style={{ color: C.text3, fontSize: 13, margin: 0 }}>Output appears here</p>
-            </div>
-          ) : outputType === "video" ? (
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-              <video src={result} controls autoPlay loop style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 12 }} />
-            </div>
-          ) : (
-            <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-              <img src={result} alt="output" style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 12, objectFit: "contain" }} />
-              <a href={result} download="output.png" style={{ position: "absolute", bottom: 28, right: 28, padding: "7px 14px", borderRadius: 8, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", color: "#fff", fontSize: 12, fontWeight: 500, textDecoration: "none", border: `1px solid rgba(255,255,255,0.15)` }}>Download</a>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ── Root ──────────────────────────────────────────────────── */
+
 export default function CreatePage() {
   const [screen, setScreen] = useState<Screen>("home");
   const [tab, setTab] = useState<Tab>("Image");
@@ -846,7 +689,7 @@ export default function CreatePage() {
   const providerSettings = useWorkflowStore(s => s.providerSettings);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
+    const check = () => setIsMobile(window.innerWidth < 1024);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -859,54 +702,60 @@ export default function CreatePage() {
   const handleStart = (t: Tab) => { setTab(t); setScreen("generate"); };
   const handleTemplate = (t: typeof TEMPLATES[0]) => { setTab(t.tab); setScreen("generate"); };
 
-  // Avoid flash — render nothing until we know screen size
-  if (isMobile === null) return <div style={{ minHeight: "100vh", background: C.bg }} suppressHydrationWarning />;
+  if (isMobile === null) return <div className="min-h-screen bg-[#0A0A0A]" />;
 
-  // Desktop: original two-panel layout
-  if (!isMobile) return <DesktopLayout getKey={getKey} />;
-
-  // Mobile: app layout
   return (
-    <div style={{
-    width: "100%", maxWidth: 430, margin: "0 auto",
-      minHeight: "100vh", height: "100dvh",
-      background: C.bg, color: C.text,
-      fontFamily: "'Inter', system-ui, sans-serif",
-      display: "flex", flexDirection: "column",
-      position: "relative", overflow: "hidden",
-    }}>
-      {/* Status bar spacer */}
-      <div style={{ height: "env(safe-area-inset-top, 0px)", background: C.bg, flexShrink: 0 }} />
+    <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-white selection:text-black flex font-sans antialiased">
+      {/* Sidebar for Desktop */}
+      <SidebarNav screen={screen} setScreen={setScreen} />
 
-      {/* Top bar */}
-      <header style={{
-        height: 52, display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "0 16px", flexShrink: 0,
-      }}>
-        <Link href="/landing" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #92dce5, #d64933)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <img src="/pixza-logo.png" alt="" style={{ width: 15, height: 15 }} />
-          </div>
-          <span style={{ fontSize: 16, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>Pixza</span>
-        </Link>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Link href="/studio" style={{ padding: "6px 14px", borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.text2, fontSize: 12, textDecoration: "none" }}>
-            Studio ↗
+      <div className="flex-1 flex flex-col h-screen relative overflow-hidden">
+        {/* Header (Mobile Only) */}
+        <header className="lg:hidden px-6 h-16 flex items-center justify-between flex-shrink-0 bg-[#0A0A0A] z-50">
+          <Link href="/landing" className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+              <img src="/pixza-logo.png" alt="" className="w-4 h-4" />
+            </div>
+            <span className="text-xl font-black tracking-tighter">Pixza</span>
           </Link>
-        </div>
-      </header>
+          <div className="flex items-center gap-4">
+            <Link href="/studio" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
+              Studio
+            </Link>
+          </div>
+        </header>
 
-      {/* Screen content */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-        {screen === "home" && <HomeScreen onStart={handleStart} onTemplate={() => setScreen("templates")} />}
-        {screen === "generate" && <GenerateScreen tab={tab} setTab={setTab} onBack={() => setScreen("home")} getKey={getKey} />}
-        {screen === "templates" && <TemplatesScreen onSelect={t => { handleTemplate(t); }} />}
-        {screen === "gallery" && <GalleryScreen />}
-        {screen === "settings" && <SettingsScreen getKey={getKey} />}
+        {/* Content Area */}
+        <main className="flex-1 flex flex-col relative overflow-hidden bg-[#0A0A0A]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={screen}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.02 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="flex-1 flex flex-col overflow-hidden"
+            >
+              {screen === "home" && <HomeScreen onStart={handleStart} onTemplate={() => setScreen("templates")} />}
+              {screen === "generate" && <GenerateScreen tab={tab} setTab={setTab} onBack={() => setScreen("home")} getKey={getKey} />}
+              {screen === "templates" && <TemplatesScreen onSelect={handleTemplate} />}
+              {screen === "gallery" && <GalleryScreen />}
+              {screen === "settings" && <SettingsScreen />}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+        {/* Bottom Nav (Mobile Only) */}
+        <BottomNav screen={screen} setScreen={setScreen} />
       </div>
 
-      {/* Bottom nav */}
-      <BottomNav screen={screen} setScreen={setScreen} />
+      {/* Grain Overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-[300] opacity-[0.03]" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` 
+        }} 
+      />
     </div>
   );
 }

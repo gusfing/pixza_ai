@@ -94,6 +94,7 @@ export function PromptNode({ id, data, selected }: NodeProps<PromptNodeType>) {
         id={id}
         selected={selected}
         fullBleed
+        accentColor="#3b82f6"
       >
         {/* Text input handle - for receiving text from LLM nodes */}
         <Handle

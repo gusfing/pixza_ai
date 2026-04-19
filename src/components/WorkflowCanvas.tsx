@@ -15,8 +15,10 @@ import {
   Node,
   OnSelectionChangeParams,
   ViewportPortal,
+  useViewport,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { DashedBackground } from "@/components/ui/demo";
 
 import { useWorkflowStore, WorkflowFile } from "@/store/workflowStore";
 import { useShallow } from "zustand/shallow";
@@ -279,6 +281,7 @@ export const isPanningRef = { current: false };
 export const isDraggingNodeRef = { current: false };
 
 export function WorkflowCanvas() {
+  const { x, y, zoom } = useViewport();
   const { nodes, edges, groups, isModalOpen, showQuickstart, navigationTarget, canvasNavigationSettings, dimmedNodeIds, skippedNodeIds } =
     useWorkflowStore(useShallow((state) => ({
       nodes: state.nodes,
@@ -400,6 +403,25 @@ export function WorkflowCanvas() {
     switch: 'Switch',
     conditionalSwitch: 'Conditional Switch',
     glbViewer: '3D Viewer',
+  };
+
+  // Helper to get node accent color
+  const getNodeAccentColor = (type: string) => {
+    switch (type) {
+      case 'imageInput': return '#0d9668';
+      case 'audioInput': return '#f97316';
+      case 'videoInput': return '#a855f7';
+      case 'prompt':
+      case 'promptConstructor': return '#2563eb';
+      case 'nanoBanana':
+      case 'generateVideo':
+      case 'llmGenerate': return '#8b5cf6';
+      case 'output':
+      case 'outputGallery': return '#10b981';
+      case 'glbViewer':
+      case 'generate3d': return '#06b6d4';
+      default: return '#64748b';
+    }
   };
 
   // Helper to get node title (used for FloatingNodeHeader)
@@ -1938,11 +1960,12 @@ export function WorkflowCanvas() {
   return (
     <div
       ref={reactFlowWrapper}
-      className={`flex-1 bg-[#0A0A0A] relative ${isDragOver ? "ring-2 ring-inset ring-white/20" : ""}`}
+      className={`flex-1 bg-transparent relative ${isDragOver ? "ring-2 ring-inset ring-white/20" : ""}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      <DashedBackground x={x} y={y} zoom={zoom} />
       {/* Drop overlay indicator */}
       {isDragOver && (
         <div className="absolute inset-0 bg-blue-500/10 z-50 pointer-events-none flex items-center justify-center">
@@ -2045,7 +2068,7 @@ export function WorkflowCanvas() {
         selectNodesOnDrag={false}
         nodeDragThreshold={5}
         nodeClickDistance={5}
-        zoomOnScroll={false}
+        zoomOnScroll={!isModalOpen}
         zoomOnPinch={!isModalOpen}
         minZoom={0.1}
         maxZoom={4}
@@ -2060,7 +2083,7 @@ export function WorkflowCanvas() {
         nodesDraggable={!isModalOpen}
         nodesConnectable={!isModalOpen}
         elementsSelectable={!isModalOpen}
-        className="bg-[#0A0A0A]"
+        className="bg-transparent"
         proOptions={{ hideAttribution: true }}
         defaultEdgeOptions={{
           type: "editable",
@@ -2070,7 +2093,6 @@ export function WorkflowCanvas() {
         <SharedEdgeGradients />
         <GroupBackgroundsPortal />
         <GroupControlsOverlay />
-        <Background color="#111111" gap={40} size={1} />
         <Controls className="glass-panel !border-none !shadow-none !bg-transparent [&>button]:!bg-transparent [&>button]:!border-white/5 [&>button]:fill-white/40 [&>button:hover]:fill-white" />
         <MiniMap
           className="rounded-xl overflow-hidden"
@@ -2193,6 +2215,7 @@ export function WorkflowCanvas() {
                 onCommentChange={handleCommentChange}
                 onRunNode={handleRunNode}
                 onExpandNode={handleExpandNode}
+                accentColor={getNodeAccentColor(node.type || '')}
               />
             );
           })}

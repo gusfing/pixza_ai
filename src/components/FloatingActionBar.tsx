@@ -56,7 +56,7 @@ function BarDropdown({ trigger, children, icon }: { trigger: string; children: R
       <button
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
-          open ? "bg-white text-black" : "text-white/40 hover:text-white hover:bg-white/5"
+          open ? "bg-white text-black" : trigger === "Input" ? "text-cyan-400/70 hover:text-cyan-400 hover:bg-cyan-400/5" : trigger === "Generate" ? "text-violet-400/70 hover:text-violet-400 hover:bg-violet-400/5" : "text-white/70 hover:text-white hover:bg-white/5"
         }`}
       >
         {icon}
@@ -105,7 +105,7 @@ export function FloatingActionBar() {
             <button 
               key={n.type} 
               onClick={() => addAt(n.type)}
-              className="w-full text-left px-4 py-2 text-xs font-bold text-white/50 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+              className="w-full text-left px-4 py-2 text-xs font-bold text-white/70 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
             >
               {n.label}
             </button>
@@ -128,7 +128,7 @@ export function FloatingActionBar() {
 
         <button 
           onClick={() => setModelSearchOpen(true)}
-          className="p-3 text-white/40 hover:text-white hover:bg-white/5 rounded-full transition-all"
+          className="p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all"
           title="Search Models"
         >
           <Search className="w-4 h-4" />
@@ -136,7 +136,7 @@ export function FloatingActionBar() {
 
         <button 
           onClick={() => setEdgeStyle(edgeStyle === "angular" ? "curved" : "angular")}
-          className="p-3 text-white/40 hover:text-white hover:bg-white/5 rounded-full transition-all"
+          className="p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all"
           title="Toggle Edge Style"
         >
           <Spline className="w-4 h-4" />
@@ -148,11 +148,11 @@ export function FloatingActionBar() {
         <button
           onClick={() => isRunning ? stopWorkflow() : executeWorkflow()}
           disabled={!valid && !isRunning}
-          className={`flex items-center gap-2 px-6 py-3 rounded-full font-black uppercase tracking-tighter text-sm transition-all duration-500 ${
+          className={`flex items-center gap-2 px-7 py-3 rounded-full font-black uppercase tracking-tighter text-sm transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.1)] ${
             isRunning 
-              ? "bg-white/10 text-white animate-pulse" 
+              ? "bg-red-500 text-white animate-pulse" 
               : valid 
-                ? "bg-white text-black hover:scale-105 active:scale-95" 
+                ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:scale-105 active:scale-95 hover:shadow-[0_0_40px_rgba(139,92,246,0.5)]" 
                 : "bg-white/5 text-white/20"
           }`}
         >
@@ -169,7 +169,7 @@ export function FloatingActionBar() {
           )}
         </button>
 
-        <button className="p-3 text-white/40 hover:text-white hover:bg-white/5 rounded-full transition-all">
+        <button className="p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all">
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>

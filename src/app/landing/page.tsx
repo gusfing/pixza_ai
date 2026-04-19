@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Play, Layers, Zap } from "lucide-react";
+import { ArrowRight, Play, Layers, Zap, ShieldCheck, Target, Cpu, Check, Box, Sparkles } from "lucide-react";
+import { GLSLHills } from "@/components/ui/glsl-hills";
 
 /* ── Minimal Navigation ── */
 function Nav() {
@@ -26,8 +27,8 @@ function Nav() {
       </div>
 
       <div className="hidden md:flex items-center gap-8">
-        {["Features", "Showcase", "Docs"].map((item) => (
-          <a key={item} href={`#${item.toLowerCase()}`} className="text-white/50 hover:text-white text-sm font-medium transition-colors">
+        {["Features", "Showcase", "Edge", "Journal", "Pricing", "FAQ"].map((item) => (
+          <a key={item} href={`#${item === "Journal" ? "blog" : item === "Edge" ? "compare" : item.toLowerCase()}`} className="text-white/50 hover:text-white text-sm font-medium transition-colors">
             {item}
           </a>
         ))}
@@ -48,50 +49,390 @@ function Nav() {
 /* ── Hero Section ── */
 function Hero() {
   return (
-    <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
-      {/* Cinematic Background Visual */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[#0A0A0A]/60 z-10" />
-        <img 
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=2564" 
-          alt="Abstract" 
-          className="w-full h-full object-cover scale-105"
-        />
+        <GLSLHills speed={0.4} cameraZ={140} />
+        {/* Vignette overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-80" />
       </div>
 
-      <div className="relative z-20 text-center max-w-4xl flex flex-col items-center animate-obsidian">
-        <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white mb-6 leading-[0.9]">
-          Create without <br/> limits.
-        </h1>
-        <p className="text-white/50 text-lg md:text-xl max-w-xl mb-10 font-medium">
-          The next-generation neural engine for image, video, and 3D workflows. All in one minimalist canvas.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <Link href="/studio" className="btn-minimal btn-minimal-primary text-lg px-8 py-4 group">
-            Get Started
-            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <button className="btn-minimal btn-minimal-secondary text-lg px-8 py-4">
-            View Showcase
-          </button>
+      <div className="relative z-10 text-center max-w-5xl px-6 animate-obsidian">
+        <div className="space-y-8 flex flex-col items-center">
+          <h1 className="font-black text-6xl md:text-8xl tracking-tight text-white leading-[0.85]">
+            <span className="italic font-thin text-5xl md:text-7xl block mb-2 opacity-50">Designs That Speak</span>
+            Louder Than Words
+          </h1>
+          
+          <p className="text-white/40 text-base md:text-lg max-w-xl font-medium leading-relaxed">
+            We craft stunning visuals and user-friendly experiences that help your brand stand out and connect with your audience.
+          </p>
+
+          <div className="pt-8 flex flex-col sm:flex-row gap-4 items-center">
+            <Link href="/studio" className="btn-minimal btn-minimal-primary text-lg px-10 py-4 group">
+              Start Creating
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link href="/examples" className="btn-minimal btn-minimal-secondary text-lg px-10 py-4">
+              Explore Showcase
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Hero Visual Float */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white/30 text-xs font-bold tracking-widest uppercase">
-        <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
-        Neural Pulse: Active
+      {/* Atmospheric detail */}
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3 text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-20"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-white/40"></span>
+        </span>
+        Neural Interface Active
       </div>
     </section>
+  );
+}
+
+/* ── Gallery / Showcase Section ── */
+function Gallery() {
+  const images = [
+    { url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1000", title: "Abstract Flow", category: "Generation" },
+    { url: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80&w=1000", title: "Neural Networks", category: "Concept" },
+    { url: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?auto=format&fit=crop&q=80&w=1000", title: "Digital Bloom", category: "Art" },
+    { url: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1000", title: "Ethereal Light", category: "Visuals" },
+    { url: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=1000", title: "Prismatic Wave", category: "Design" },
+    { url: "https://images.unsplash.com/photo-1620121692029-d088224efc74?auto=format&fit=crop&q=80&w=1000", title: "Cybernetic Pulse", category: "Tech" },
+  ];
+
+  return (
+    <section id="showcase" className="py-32 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-20 text-center">
+          <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter italic">Showcase</h2>
+          <p className="text-white/40 text-lg font-medium max-w-2xl mx-auto">
+            Witness the convergence of human creativity and neural processing.
+          </p>
+        </div>
+        
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+          {images.map((img, i) => (
+            <div key={i} className="obsidian-card group relative break-inside-avoid">
+              <img src={img.url} alt={img.title} className="w-full h-auto object-cover grayscale transition-all duration-700 group-hover:grayscale-0" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
+                <span className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-2">{img.category}</span>
+                <h4 className="text-2xl font-bold text-white">{img.title}</h4>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Blog Preview Section ── */
+function BlogPreview() {
+  const posts = [
+    { title: "The Future of Generative Art", excerpt: "Exploring how AI is redefining the boundaries of human creativity.", date: "April 15, 2026", img: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=1000" },
+    { title: "Chaining Models for Success", excerpt: "A guide to building complex multi-stage generation pipelines.", date: "April 12, 2026", img: "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000" },
+    { title: "Obsidian Design Principles", excerpt: "Behind the minimalist aesthetic of our high-performance studio.", date: "April 08, 2026", img: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=1000" },
+  ];
+
+  return (
+    <section id="blog" className="py-32 px-6 bg-white/[0.01]">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+          <div className="max-w-2xl">
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter">Journal</h2>
+            <p className="text-white/40 text-lg font-medium">
+              Insights, tutorials, and deep dives into the world of AI-driven design.
+            </p>
+          </div>
+          <Link href="/blog" className="btn-minimal btn-minimal-secondary px-8 py-3 mb-2">
+            View All Posts
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {posts.map((post, i) => (
+            <div key={i} className="group cursor-pointer">
+              <div className="aspect-[16/10] overflow-hidden rounded-[30px] mb-8 glass-panel border-white/5">
+                <img src={post.img} alt={post.title} className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" />
+              </div>
+              <span className="text-white/20 text-xs font-bold uppercase tracking-widest mb-3 block">{post.date}</span>
+              <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-white/80 transition-colors">{post.title}</h3>
+              <p className="text-white/40 text-sm font-medium leading-relaxed">{post.excerpt}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Testimonials ── */
+function Testimonials() {
+  const testimonials = [
+    { name: "Alex Rivera", role: "Creative Director", text: "Pixza has completely transformed our workflow. The speed and quality are unprecedented." },
+    { name: "Sarah Chen", role: "Independent Artist", text: "The obsidian aesthetic isn't just a look, it's a feeling of pure performance and focus." },
+    { name: "Marcus Thorne", role: "Product Designer", text: "Finally, an AI tool that respects the designer's intent while providing infinite inspiration." },
+  ];
+
+  return (
+    <section id="testimonials" className="py-32 px-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {testimonials.map((t, i) => (
+          <div key={i} className="glass-panel p-12 rounded-[40px] flex flex-col justify-between h-[350px]">
+            <p className="text-white/60 text-xl font-medium leading-relaxed italic">"{t.text}"</p>
+            <div>
+              <h4 className="text-white font-bold text-lg">{t.name}</h4>
+              <p className="text-white/30 text-sm font-medium">{t.role}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ── Pricing ── */
+function Pricing() {
+  const plans = [
+    { name: "Starter", price: "$0", features: ["100 Generations/mo", "Standard Models", "Community Discord", "Web Export"] },
+    { name: "Pro", price: "$29", features: ["Unlimited Generations", "Custom Finetunes", "Priority Support", "High-Res Export", "Commercial License"], popular: true },
+    { name: "Enterprise", price: "Custom", features: ["API Access", "SSO/SAML", "Private Models", "Dedicated Manager", "Custom SLA"] },
+  ];
+
+  return (
+    <section id="pricing" className="py-32 px-6 bg-white/[0.01]">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter">Tiered Access</h2>
+          <p className="text-white/40 text-lg font-medium max-w-xl mx-auto">Choose the path that fits your creative scale.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+          {plans.map((plan, i) => (
+            <div key={i} className={`glass-panel p-12 rounded-[40px] relative flex flex-col ${plan.popular ? "border-white/20 bg-white/5 py-16" : "border-white/5"}`}>
+              {plan.popular && <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full">Most Popular</span>}
+              <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+              <div className="flex items-baseline gap-1 mb-8">
+                <span className="text-5xl font-black text-white tracking-tighter">{plan.price}</span>
+                {plan.price !== "Custom" && <span className="text-white/20 font-bold text-sm">/mo</span>}
+              </div>
+              <ul className="space-y-4 mb-10 flex-grow">
+                {plan.features.map((f, j) => (
+                  <li key={j} className="flex items-center gap-3 text-white/40 text-sm font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <button className={`btn-minimal w-full py-4 text-base ${plan.popular ? "btn-minimal-primary" : "btn-minimal-secondary"}`}>
+                {plan.price === "Custom" ? "Contact Sales" : "Get Started"}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Competitive Edge Section ── */
+function CompetitiveEdge() {
+  const edges = [
+    { title: "Precision Studio", desc: "Unlike 'aesthetic-only' tools, we prioritize product fidelity and brand accuracy.", icon: <Target className="w-6 h-6" /> },
+    { title: "Neural Pipelines", desc: "Complex model chaining that enterprise tools offer, but with an intuitive interface.", icon: <Cpu className="w-6 h-6" /> },
+    { title: "Performance First", desc: "Built for speed and batch processing without the enterprise-level overhead.", icon: <Zap className="w-6 h-6" /> },
+    { title: "Brand Sovereignty", desc: "Full commercial rights and logo preservation on all generations.", icon: <ShieldCheck className="w-6 h-6" /> },
+  ];
+
+  return (
+    <section id="compare" className="py-32 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center gap-20">
+          <div className="lg:w-1/2">
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter italic">The Pixza Edge</h2>
+            <p className="text-white/40 text-lg font-medium leading-relaxed mb-10">
+              In a market filled with rigid templates and overly technical enterprise software, Pixza stands as the bridge: **High-end output with total creative control.**
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {edges.map((edge, i) => (
+                <div key={i} className="flex flex-col gap-4">
+                  <div className="w-10 h-10 glass-panel rounded-lg flex items-center justify-center text-white">
+                    {edge.icon}
+                  </div>
+                  <h4 className="text-xl font-bold text-white">{edge.title}</h4>
+                  <p className="text-white/30 text-sm font-medium leading-relaxed">{edge.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="lg:w-1/2 w-full">
+            <div className="glass-panel p-1 rounded-[40px] overflow-hidden">
+              <div className="bg-[#0A0A0A] p-10 rounded-[38px] border border-white/5">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="py-6 text-white/20 text-xs font-black uppercase tracking-widest">Feature</th>
+                      <th className="py-6 text-white/20 text-xs font-black uppercase tracking-widest">Market Leaders</th>
+                      <th className="py-6 text-white text-xs font-black uppercase tracking-widest italic">Pixza Studio</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm font-medium">
+                    <tr className="border-b border-white/5">
+                      <td className="py-6 text-white/60">Creative Engine</td>
+                      <td className="py-6 text-white/20">Image Only</td>
+                      <td className="py-6 text-white flex items-center gap-2">Multi-Modal <Check className="w-4 h-4 text-white" /></td>
+                    </tr>
+                    <tr className="border-b border-white/5">
+                      <td className="py-6 text-white/60">Workflow</td>
+                      <td className="py-6 text-white/20">Templates</td>
+                      <td className="py-6 text-white flex items-center gap-2">Node-Based <Check className="w-4 h-4 text-white" /></td>
+                    </tr>
+                    <tr className="border-b border-white/5">
+                      <td className="py-6 text-white/60">Accuracy</td>
+                      <td className="py-6 text-white/20">Variable</td>
+                      <td className="py-6 text-white flex items-center gap-2">Neural Fidelity <Check className="w-4 h-4 text-white" /></td>
+                    </tr>
+                    <tr>
+                      <td className="py-6 text-white/60">Target</td>
+                      <td className="py-6 text-white/20">Broad/General</td>
+                      <td className="py-6 text-white flex items-center gap-2">Elite Creators <Check className="w-4 h-4 text-white" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── FAQ ── */
+function FAQ() {
+  const faqs = [
+    { q: "How does the neural engine work?", a: "Pixza uses a proprietary blend of diffusion models and visual transformers, optimized for high-fidelity creative output." },
+    { q: "Can I use generated media commercially?", a: "Yes, all generations on our Pro and Enterprise plans include a full commercial license." },
+    { q: "What models are supported?", a: "We currently support Stable Diffusion XL, Flux.1, and several custom-trained cinematic models." },
+    { q: "Do you offer API access?", a: "API access is exclusively available for our Enterprise partners. Contact us for integration details." },
+  ];
+
+  return (
+    <section id="faq" className="py-32 px-6">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-4xl font-black text-white mb-16 tracking-tighter text-center italic">Questions?</h2>
+        <div className="space-y-6">
+          {faqs.map((faq, i) => (
+            <div key={i} className="glass-panel p-8 rounded-[30px] border-white/5">
+              <h4 className="text-lg font-bold text-white mb-3">{faq.q}</h4>
+              <p className="text-white/40 text-sm font-medium leading-relaxed">{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Minimal Footer ── */
+/* ── Expanded Footer ── */
+function Footer() {
+  const sections = [
+    {
+      title: "Product",
+      links: [
+        { label: "Workflow Studio", href: "/studio" },
+        { label: "Simple Mode", href: "/create" },
+        { label: "Neural Vault", href: "#" },
+        { label: "Pricing", href: "#pricing" },
+        { label: "Showcase", href: "#showcase" },
+      ],
+    },
+    {
+      title: "Resources",
+      links: [
+        { label: "Contact Us", href: "/contact" },
+        { label: "Documentation", href: "#" },
+        { label: "API Reference", href: "#" },
+        { label: "Journal", href: "#blog" },
+        { label: "Status", href: "#" },
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+        { label: "Cookie Policy", href: "#" },
+        { label: "License", href: "#" },
+      ],
+    },
+  ];
+
+  return (
+    <footer className="py-32 px-6 border-t border-white/5 bg-[#0A0A0A]">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-16 mb-24 bg-white text-black p-[50px_30px] rounded-[20px]">
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-black rounded-2xl flex items-center justify-center">
+                <img src="/pixza-logo.png" alt="Pixza" className="w-6 h-6" />
+              </div>
+              <span className="text-[#080808] text-2xl font-black tracking-tighter">Pixza Studio</span>
+            </div>
+            <p className="text-[#080808] text-sm font-medium leading-relaxed max-w-xs mb-10">
+              The high-performance neural engine for elite tier media synthesis. Precision-built for the next generation of creators.
+            </p>
+            <div className="flex items-center gap-3 text-black text-[10px] font-black uppercase tracking-widest">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-20"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
+              </span>
+              All Systems Operational
+            </div>
+          </div>
+
+          {sections.map((section) => (
+            <div key={section.title}>
+              <h4 className="text-black font-bold text-sm mb-8 uppercase tracking-widest">{section.title}</h4>
+              <ul className="space-y-4">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <Link href={link.href} className="text-black/60 hover:text-black text-sm font-medium transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <p className="text-white/20 text-xs font-medium">
+            &copy; 2026 Pixza Studio. All rights reserved. Built by elite tier creators.
+          </p>
+          <div className="flex gap-8 text-white/30 text-sm font-medium">
+            <a href="#" className="hover:text-white transition-colors">Twitter / X</a>
+            <a href="#" className="hover:text-white transition-colors">Discord</a>
+            <a href="#" className="hover:text-white transition-colors">GitHub</a>
+            <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
 
 /* ── Minimalist Feature Grid ── */
 function Features() {
   const features = [
-    { title: "Automate", desc: "Chain complex models into seamless pipelines.", icon: <Zap className="w-6 h-6" />, img: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1000" },
-    { title: "Chain", desc: "Connect generative agents visually.", icon: <Layers className="w-6 h-6" />, img: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80&w=1000" },
-    { title: "Generate", desc: "High-fidelity output at the speed of thought.", icon: <Play className="w-6 h-6" />, img: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?auto=format&fit=crop&q=80&w=1000" },
+    { title: "Multi-Modal", desc: "Synthesis across Image, Video, Audio, and 3D reconstruction.", icon: <Box className="w-6 h-6" />, img: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1000" },
+    { title: "Workflow Canvas", desc: "Visual node-based chaining for complex creative pipelines.", icon: <Layers className="w-6 h-6" />, img: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80&w=1000" },
+    { title: "Vaults", desc: "Access community-driven neural presets and elite workflows.", icon: <Sparkles className="w-6 h-6" />, img: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?auto=format&fit=crop&q=80&w=1000" },
   ];
 
   return (
@@ -120,36 +461,18 @@ function Features() {
   );
 }
 
-/* ── Minimal Footer ── */
-function Footer() {
-  return (
-    <footer className="py-20 px-6 border-t border-white/5 bg-[#0A0A0A]">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-        <div className="flex items-center gap-3">
-          <img src="/pixza-logo.png" alt="Pixza" className="w-6 h-6 invert" />
-          <span className="text-white font-bold tracking-tight">Pixza Studio</span>
-        </div>
-        
-        <div className="flex gap-10 text-white/30 text-sm font-medium">
-          <a href="#" className="hover:text-white transition-colors">Twitter</a>
-          <a href="#" className="hover:text-white transition-colors">Discord</a>
-          <a href="#" className="hover:text-white transition-colors">Documentation</a>
-        </div>
-        
-        <p className="text-white/20 text-xs font-medium">
-          &copy; 2026 Pixza Studio. All rights reserved.
-        </p>
-      </div>
-    </footer>
-  );
-}
-
 export default function LandingPage() {
   return (
     <main className="bg-[#0A0A0A] selection:bg-white selection:text-black">
       <Nav />
       <Hero />
       <Features />
+      <Gallery />
+      <CompetitiveEdge />
+      <BlogPreview />
+      <Testimonials />
+      <Pricing />
+      <FAQ />
       
       {/* Minimalist CTA Section */}
       <section className="py-40 px-6 text-center">

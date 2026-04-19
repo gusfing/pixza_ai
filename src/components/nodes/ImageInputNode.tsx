@@ -90,6 +90,7 @@ export function ImageInputNode({ id, data, selected }: NodeProps<ImageInputNodeT
       contentClassName="flex-1 min-h-0"
       aspectFitMedia={nodeData.image}
       fullBleed
+      accentColor="#06b6d4"
     >
       <input
         ref={fileInputRef}

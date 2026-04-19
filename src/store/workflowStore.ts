@@ -599,12 +599,14 @@ const workflowStoreImpl: StateCreator<WorkflowStore> = (set, get) => ({
       const models: ProviderModel[] = await response.json();
       const pricingMap = new Map<string, ModelPricing>();
 
-      models.forEach((model) => {
-        const cost = getModelCost(model.pricing);
-        if (cost) {
-          pricingMap.set(model.id, cost);
-        }
-      });
+      if (Array.isArray(models)) {
+        models.forEach((model) => {
+          const cost = getModelCost(model.pricing);
+          if (cost) {
+            pricingMap.set(model.id, cost);
+          }
+        });
+      }
 
       set({ modelPricingMap: pricingMap });
     } catch (error) {
@@ -2409,7 +2411,8 @@ const workflowStoreImpl: StateCreator<WorkflowStore> = (set, get) => ({
 
   // Cost tracking actions
   addIncurredCost: (cost: number) => {
-    set((state) => ({ incurredCost: state.incurredCost + cost }));
+    const safeCost = typeof cost === 'number' && !isNaN(cost) ? cost : 0;
+    set((state) => ({ incurredCost: (state.incurredCost || 0) + safeCost }));
     get().saveIncurredCost();
   },
 

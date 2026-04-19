@@ -120,6 +120,7 @@ export function OutputNode({ id, data, selected }: NodeProps<OutputNodeType>) {
         contentClassName="flex-1 min-h-0 relative"
         className="min-w-[200px]"
         aspectFitMedia={isAudio ? null : contentSrc}
+        accentColor="#10b981"
       >
         <Handle
           type="target"

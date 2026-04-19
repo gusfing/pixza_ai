@@ -375,6 +375,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
       isExecuting={isRunning}
       hasError={nodeData.status === "error"}
       fullBleed
+      accentColor="#a855f7"
       settingsExpanded={inlineParametersEnabled && isParamsExpanded}
       aspectFitMedia={nodeData.outputVideo}
       settingsPanel={inlineParametersEnabled ? (

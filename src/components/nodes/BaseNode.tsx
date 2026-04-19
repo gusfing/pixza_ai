@@ -22,6 +22,7 @@ interface BaseNodeProps {
   aspectFitMedia?: string | null;
   settingsExpanded?: boolean;
   settingsPanel?: ReactNode;
+  accentColor?: string;
 }
 
 function getNodeDimension(node: Node, axis: "width" | "height"): number {
@@ -56,6 +57,7 @@ export function BaseNode({
   aspectFitMedia,
   settingsExpanded = false,
   settingsPanel,
+  accentColor,
 }: BaseNodeProps) {
   const currentNodeIds = useWorkflowStore((state) => state.currentNodeIds);
   const setHoveredNodeId = useWorkflowStore((state) => state.setHoveredNodeId);
@@ -250,12 +252,14 @@ export function BaseNode({
       
       <div
         className={`
-          relative flex flex-col overflow-hidden transition-all duration-300
-          ${fullBleed ? "bg-transparent" : "bg-white"}
-          ${settingsExpanded ? "rounded-t-[24px]" : "rounded-[24px]"}
-          ${selected ? "ring-[6px] ring-white/10 shadow-[0_0_80px_rgba(255,255,255,0.1)]" : "shadow-2xl shadow-black/50"}
-          ${isCurrentlyExecuting || isExecuting ? "ring-2 ring-white animate-pulse" : ""}
-          ${hasError ? "ring-2 ring-red-500" : ""}
+          relative flex flex-col overflow-hidden transition-all duration-500 backdrop-blur-xl
+          ${fullBleed ? "bg-black/20" : "bg-neutral-950/40"}
+          ${settingsExpanded ? "rounded-t-[28px]" : "rounded-[28px]"}
+          ${selected 
+            ? "ring-[2px] ring-white/40 shadow-[0_0_50px_rgba(255,255,255,0.15),0_0_100px_rgba(255,255,255,0.05)] border-white/20" 
+            : "border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"}
+          ${isCurrentlyExecuting || isExecuting ? "ring-[3px] ring-indigo-500 animate-pulse shadow-[0_0_30px_rgba(99,102,241,0.4)]" : "border"}
+          ${hasError ? "ring-[3px] ring-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]" : ""}
           ${className}
         `}
         onMouseEnter={(e) => {
@@ -267,6 +271,16 @@ export function BaseNode({
           setHoveredNodeId(null);
         }}
       >
+        {/* Top Categorical Glow */}
+        {accentColor && (
+          <div 
+            className="absolute top-0 left-0 right-0 h-1 z-10"
+            style={{ 
+              background: `linear-gradient(to right, transparent, ${accentColor}, transparent)`,
+              boxShadow: `0 0 15px ${accentColor}`
+            }} 
+          />
+        )}
         <div 
           ref={contentRef} 
           className={contentClassName ?? (fullBleed ? "flex-1 min-h-0 relative" : "px-6 py-6 flex-1 min-h-0 flex flex-col")}

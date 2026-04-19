@@ -64,7 +64,7 @@ export function QuotaIndicator() {
       <div className="flex flex-col items-end hidden sm:flex">
         <div className="flex items-center gap-1.5 mb-1">
           <Zap size={10} className={isExhausted ? "text-red-400 fill-red-400" : "text-yellow-400 fill-yellow-400"} />
-          <span className="text-[10px] font-medium text-neutral-400 tracking-wide uppercase">
+          <span className="text-[10px] font-medium text-neutral-300 tracking-wide uppercase">
             {remaining} / {limit} Generations
           </span>
         </div>

@@ -88,7 +88,7 @@ export default function StudioPage() {
   return (
     <ReactFlowProvider>
       {showMobileGate && <MobileGate onContinue={() => setShowMobileGate(false)} />}
-      <div className="h-screen flex flex-col bg-[#0A0A0A] overflow-hidden">
+      <div className="h-screen flex flex-col bg-[#0A0A0A] overflow-hidden relative">
         <Header />
         <WorkflowCanvas />
         <FloatingActionBar />

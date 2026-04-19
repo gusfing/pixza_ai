@@ -1,37 +1,83 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  User, 
+  CreditCard, 
+  Bell, 
+  Palette, 
+  LogOut, 
+  ChevronRight, 
+  Shield, 
+  Trash2,
+  Check,
+  Zap,
+  Globe,
+  Settings as SettingsIcon,
+  Crown
+} from "lucide-react";
 import { useWPAuth } from "@/lib/wp-auth-context";
 import { wpCancelSubscription, wpUpdateUserMeta } from "@/lib/wordpress";
-
-const C = { bg: "#040406", surface: "#0e0e10", surface2: "#161618", border: "rgba(255,255,255,0.08)", text: "#fff", text2: "rgba(255,255,255,0.5)", text3: "rgba(255,255,255,0.25)", accent: "#92dce5", action: "#d64933" };
+import { cn } from "@/lib/utils";
 
 type Tab = "profile" | "subscription" | "notifications" | "appearance";
 
-
-const PLANS = [
-  { id: "free",   name: "Free",   price: "$0",  period: "",     features: ["20 generations/day", "Basic models", "Community templates"], color: C.text3 },
-  { id: "pro",    name: "Pro",    price: "$9",  period: "/mo",  features: ["200 generations/day", "All models", "Priority queue", "R2 storage", "API access"], color: C.accent },
-  { id: "agency", name: "Agency", price: "$29", period: "/mo",  features: ["Unlimited generations", "Team seats", "White-label", "Custom domain", "SLA support"], color: "#f97316" },
+const TABS: { id: Tab; label: string; icon: any }[] = [
+  { id: "profile", label: "Profile", icon: User },
+  { id: "subscription", label: "Billing", icon: CreditCard },
+  { id: "notifications", label: "Alerts", icon: Bell },
+  { id: "appearance", label: "Preferences", icon: Palette },
 ];
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 style={{ fontSize: 13, fontWeight: 600, color: C.text, margin: "0 0 16px", letterSpacing: "-0.01em" }}>{children}</h3>;
+/* ── UI Components ────────────────────────────────────────── */
+
+function SettingSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-6">
+      <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">{title}</h3>
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
 }
 
-function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return <div style={{ background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, ...style }}>{children}</div>;
+function SettingCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn("p-8 rounded-[32px] glass-panel border border-white/5", className)}>
+      {children}
+    </div>
+  );
 }
 
-// ── Profile tab ──────────────────────────────────────────────
+function SettingInput({ label, value, onChange, disabled, type = "text" }: { label: string; value: string; onChange?: (v: string) => void; disabled?: boolean; type?: string }) {
+  return (
+    <div className="space-y-3">
+      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 block ml-1">{label}</label>
+      <input 
+        type={type}
+        value={value}
+        onChange={e => onChange?.(e.target.value)}
+        disabled={disabled}
+        className={cn(
+          "w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-white outline-none transition-all focus:border-white/20 focus:bg-white/10",
+          disabled && "opacity-40 cursor-not-allowed"
+        )}
+      />
+    </div>
+  );
+}
+
+/* ── Tab Components ────────────────────────────────────────── */
+
 function ProfileTab() {
   const { user, token } = useWPAuth();
   const [name, setName] = useState(user?.name ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const save = async () => {
+  const handleSave = async () => {
     if (!token) return;
     setSaving(true);
     try {
@@ -45,220 +91,122 @@ function ProfileTab() {
     }
   };
 
-  const inp: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <Card>
-        <SectionTitle>Personal Info</SectionTitle>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div>
-            <label style={{ fontSize: 11, color: C.text3, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.07em" }}>Display Name</label>
-            <input value={name} onChange={e => setName(e.target.value)} style={inp} />
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <SettingSection title="Personal Identity">
+        <SettingCard>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <SettingInput label="Display Name" value={name} onChange={setName} />
+            <SettingInput label="Email Address" value={user?.email ?? ""} disabled />
           </div>
-          <div>
-            <label style={{ fontSize: 11, color: C.text3, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.07em" }}>Email</label>
-            <input value={user?.email ?? ""} disabled style={{ ...inp, opacity: 0.5, cursor: "not-allowed" }} />
+          <div className="mt-10 flex items-center justify-between">
+            <p className="text-xs text-white/30 font-medium">Your display name is visible to other studio members.</p>
+            <button 
+              onClick={handleSave} 
+              disabled={saving}
+              className={cn(
+                "btn-minimal px-8 py-3 rounded-2xl text-xs flex items-center gap-2",
+                saved ? "bg-green-500 text-white" : "btn-minimal-primary"
+              )}
+            >
+              {saving ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : saved ? <Check className="w-4 h-4" /> : null}
+              {saving ? "Syncing..." : saved ? "Updated" : "Update Profile"}
+            </button>
           </div>
-          <button onClick={save} disabled={saving} style={{ alignSelf: "flex-start", padding: "9px 20px", borderRadius: 9, border: "none", background: saved ? "#10b981" : C.accent, color: "#080808", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-            {saving ? "Saving…" : saved ? "✓ Saved" : "Save changes"}
-          </button>
-        </div>
-      </Card>
+        </SettingCard>
+      </SettingSection>
 
-      <Card>
-        <SectionTitle>Danger Zone</SectionTitle>
-        <p style={{ fontSize: 13, color: C.text3, margin: "0 0 14px" }}>Permanently delete your account and all data.</p>
-        <button style={{ padding: "9px 18px", borderRadius: 9, background: "rgba(214,73,51,0.1)", border: "1px solid rgba(214,73,51,0.25)", color: C.action, fontSize: 13, cursor: "pointer" }}>
-          Delete account
-        </button>
-      </Card>
-    </div>
-  );
-}
-
-
-// ── Subscription tab ─────────────────────────────────────────
-function SubscriptionTab() {
-  const { user, token } = useWPAuth();
-  const [sub, setSub] = useState<any | null>(null);
-  const [coupon, setCoupon] = useState("");
-  const [couponMsg, setCouponMsg] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // In WordPress version, the subscription info is often in the user meta or 
-    // fetched via wpGetSubscription in wordpress.ts
-  }, [user]);
-
-  const currentPlan = user?.meta?.plan?.toLowerCase() ?? "free";
-
-  const handleCancel = async () => {
-    if (!token) return;
-    if (!confirm("Are you sure you want to cancel your subscription?")) return;
-    setLoading(true);
-    try {
-      await wpCancelSubscription(token);
-      alert("Subscription cancelled successfully.");
-    } catch (e) {
-      alert("Failed to cancel subscription");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpgrade = async (plan: string) => {
-    setLoading(true);
-    try {
-      // Future Stripe integration
-      alert("Redirecting to checkout...");
-    } catch (e) {
-      alert("Checkout failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const validateCoupon = async () => {
-    setCouponMsg("Coupons currently disabled");
-  };
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Current plan */}
-      {sub && (
-        <Card>
-          <SectionTitle>Current Subscription</SectionTitle>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: C.text, textTransform: "capitalize" }}>{sub.plan} Plan</div>
-              <div style={{ fontSize: 12, color: C.text3, marginTop: 4 }}>
-                {sub.status === "active" ? `Renews ${new Date(sub.next_payment).toLocaleDateString()}` : `Status: ${sub.status}`}
+      <SettingSection title="Security & Access">
+        <SettingCard className="border-red-500/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="font-bold text-white">Deactivate Account</h4>
+                <p className="text-xs text-white/30">Permanently remove your studio data and generations.</p>
               </div>
             </div>
-            <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 99, background: sub.status === "active" ? "rgba(16,185,129,0.15)" : "rgba(214,73,51,0.15)", color: sub.status === "active" ? "#10b981" : C.action, fontWeight: 600, textTransform: "uppercase" }}>{sub.status}</span>
-          </div>
-          {sub.status === "active" && (
-            <button onClick={handleCancel} style={{ marginTop: 14, padding: "8px 16px", borderRadius: 8, background: "transparent", border: `1px solid rgba(214,73,51,0.3)`, color: C.action, fontSize: 12, cursor: "pointer" }}>
-              Cancel subscription
+            <button className="px-6 py-2.5 rounded-xl border border-red-500/20 text-red-500 text-[11px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+              Initiate Deletion
             </button>
-          )}
-        </Card>
-      )}
-
-      {/* Promo code */}
-      <Card>
-        <SectionTitle>Promo Code</SectionTitle>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input value={coupon} onChange={e => setCoupon(e.target.value)} placeholder="Enter code" style={{ flex: 1, padding: "9px 12px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: 13, outline: "none", fontFamily: "inherit" }} />
-          <button onClick={validateCoupon} style={{ padding: "9px 16px", borderRadius: 9, border: `1px solid ${C.border}`, background: "transparent", color: C.text2, fontSize: 12, cursor: "pointer" }}>Apply</button>
-        </div>
-        {couponMsg && <p style={{ fontSize: 12, color: couponMsg.startsWith("✓") ? "#10b981" : C.action, margin: "8px 0 0" }}>{couponMsg}</p>}
-      </Card>
-
-      {/* Plan cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-        {PLANS.map(plan => {
-          const isCurrent = currentPlan === plan.id;
-          return (
-            <div key={plan.id} style={{ padding: 20, borderRadius: 14, border: `1px solid ${isCurrent ? plan.color : C.border}`, background: isCurrent ? `${plan.color}08` : C.surface2, position: "relative" }}>
-              {isCurrent && <span style={{ position: "absolute", top: 12, right: 12, fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${plan.color}20`, color: plan.color, fontWeight: 700 }}>CURRENT</span>}
-              <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 4 }}>{plan.name}</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: plan.color, marginBottom: 14 }}>{plan.price}<span style={{ fontSize: 13, color: C.text3 }}>{plan.period}</span></div>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", display: "flex", flexDirection: "column", gap: 6 }}>
-                {plan.features.map(f => (
-                  <li key={f} style={{ fontSize: 12, color: C.text2, display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ color: plan.color }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              {!isCurrent && plan.id !== "free" && (
-                <button onClick={() => handleUpgrade(plan.id as "pro" | "agency")} disabled={loading} style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "none", background: plan.color === C.accent ? C.accent : plan.color, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                  {loading ? "…" : `Upgrade to ${plan.name}`}
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
+          </div>
+        </SettingCard>
+      </SettingSection>
     </div>
   );
 }
 
-// ── Notifications tab ────────────────────────────────────────
-function NotificationsTab() {
-  const [prefs, setPrefs] = useState({ generation_done: true, weekly_digest: true, product_updates: true, promotions: false });
-  const [saved, setSaved] = useState(false);
+function SubscriptionTab() {
+  const { user, token } = useWPAuth();
+  const [loading, setLoading] = useState(false);
 
-  const save = async () => {
-    setSaved(true); setTimeout(() => setSaved(false), 2000);
-  };
+  const currentPlan = user?.meta?.plan?.toLowerCase() ?? "free";
+  const isPro = currentPlan !== "free";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <Card>
-        <SectionTitle>Email Notifications</SectionTitle>
-        {Object.entries({ generation_done: "Generation complete", weekly_digest: "Weekly digest", product_updates: "Product updates", promotions: "Promotions & offers" }).map(([key, label]) => (
-          <div key={key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `1px solid ${C.border}` }}>
-            <div>
-              <div style={{ fontSize: 13, color: C.text }}>{label}</div>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <SettingSection title="Active Pipeline">
+        <SettingCard className={cn(isPro && "bg-gradient-to-br from-white/5 to-transparent border-white/10")}>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className={cn(
+                "w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl",
+                isPro ? "bg-white text-black" : "bg-white/5 text-white/20"
+              )}>
+                <Crown className="w-8 h-8" />
+              </div>
+              <div>
+                <h4 className="text-2xl font-black tracking-tighter text-white capitalize">{currentPlan} Tier</h4>
+                <p className="text-xs text-white/40 font-medium">Next billing cycle starts June 12, 2026</p>
+              </div>
             </div>
-            <div onClick={() => setPrefs(p => ({ ...p, [key]: !p[key as keyof typeof p] }))} style={{ width: 40, height: 22, borderRadius: 11, cursor: "pointer", position: "relative", background: prefs[key as keyof typeof prefs] ? C.accent : "rgba(255,255,255,0.15)", transition: "background 0.2s" }}>
-              <div style={{ position: "absolute", top: 3, left: prefs[key as keyof typeof prefs] ? 20 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />
-            </div>
+            {isPro && (
+              <span className="px-4 py-1 rounded-full bg-green-500/20 text-green-400 text-[10px] font-black uppercase tracking-widest border border-green-500/10">
+                Active
+              </span>
+            )}
           </div>
-        ))}
-        <button onClick={save} style={{ marginTop: 16, padding: "9px 20px", borderRadius: 9, border: "none", background: saved ? "#10b981" : C.accent, color: "#080808", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-          {saved ? "✓ Saved" : "Save preferences"}
-        </button>
-      </Card>
-    </div>
-  );
-}
-
-// ── Appearance tab ───────────────────────────────────────────
-function AppearanceTab() {
-  const { user } = useWPAuth();
-  const [model, setModel] = useState(user?.meta?.preferred_model ?? "fal-ai/flux-pro");
-  const [tab, setTab] = useState(user?.meta?.preferred_tab ?? "Image");
-  const [saved, setSaved] = useState(false);
-
-  const save = async () => {
-    setSaved(true); setTimeout(() => setSaved(false), 2000);
-  };
-
-  const sel: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: 13, outline: "none", fontFamily: "inherit" };
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <Card>
-        <SectionTitle>Default Preferences</SectionTitle>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div>
-            <label style={{ fontSize: 11, color: C.text3, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.07em" }}>Default Tab</label>
-            <select value={tab} onChange={e => setTab(e.target.value)} style={sel}>
-              {["Image", "Video", "Audio", "3D"].map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { label: "Usage", val: "842/2000", sub: "Generations" },
+              { label: "Credits", val: "12.4k", sub: "Remaining" },
+              { label: "Storage", val: "1.2 GB", sub: "of 10GB used" }
+            ].map(s => (
+              <div key={s.label} className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/20 block mb-2">{s.label}</span>
+                <span className="text-xl font-black text-white">{s.val}</span>
+                <p className="text-[10px] text-white/40 mt-1">{s.sub}</p>
+              </div>
+            ))}
           </div>
-          <div>
-            <label style={{ fontSize: 11, color: C.text3, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.07em" }}>Default Model</label>
-            <select value={model} onChange={e => setModel(e.target.value)} style={sel}>
-              <option value="fal-ai/flux-pro">FLUX.1 Pro</option>
-              <option value="fal-ai/flux/schnell">FLUX.1 Schnell</option>
-              <option value="nano-banana-2">Gemini Imagen 4</option>
-              <option value="fal-ai/kling-video/v1.6/pro/text-to-video">Kling 1.6 Pro</option>
-            </select>
-          </div>
-          <button onClick={save} style={{ alignSelf: "flex-start", padding: "9px 20px", borderRadius: 9, border: "none", background: saved ? "#10b981" : C.accent, color: "#080808", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-            {saved ? "✓ Saved" : "Save preferences"}
-          </button>
+        </SettingCard>
+      </SettingSection>
+
+      <SettingSection title="Tier Management">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SettingCard className="flex flex-col h-full">
+            <h4 className="font-black text-white text-lg mb-2">Upgrade Engine</h4>
+            <p className="text-xs text-white/30 mb-8 leading-relaxed">Unlock priority queuing, unlimited 4K exports, and hyper-speed generation.</p>
+            <button className="mt-auto btn-minimal btn-minimal-primary w-full py-4 text-[11px] font-black uppercase tracking-widest">
+              Compare Plans
+            </button>
+          </SettingCard>
+          <SettingCard className="flex flex-col h-full bg-transparent border-white/5">
+            <h4 className="font-black text-white/40 text-lg mb-2">Billing History</h4>
+            <p className="text-xs text-white/20 mb-8 leading-relaxed">Download invoices and manage payment methods.</p>
+            <button className="mt-auto px-6 py-4 rounded-3xl border border-white/10 text-white/40 text-[11px] font-black uppercase tracking-widest hover:text-white hover:border-white/20 transition-all">
+              Manage Portal
+            </button>
+          </SettingCard>
         </div>
-      </Card>
+      </SettingSection>
     </div>
   );
 }
 
-// ── Main page ────────────────────────────────────────────────
 export default function SettingsPage() {
   const { user, loading: authLoading, logout } = useWPAuth();
   const router = useRouter();
@@ -268,34 +216,100 @@ export default function SettingsPage() {
     if (!authLoading && !user) router.push("/auth/signin");
   }, [authLoading, user, router]);
 
-  if (authLoading) return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ width: 32, height: 32, borderRadius: "50%", border: "2px solid rgba(146,220,229,0.2)", borderTopColor: C.accent, animation: "spin 0.8s linear infinite" }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>;
+  if (authLoading) return (
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-white/10 border-t-white rounded-full animate-spin" />
+    </div>
+  );
+
   if (!user) return null;
 
-  const TABS: { id: Tab; label: string }[] = [
-    { id: "profile", label: "Profile" },
-    { id: "subscription", label: "Subscription" },
-    { id: "notifications", label: "Notifications" },
-    { id: "appearance", label: "Appearance" },
-  ];
-
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
-      {/* Header */}
-      <header style={{ height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", borderBottom: `1px solid ${C.border}`, background: "rgba(4,4,6,0.9)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 50 }}>
-        <Link href="/create" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <img src="/pixza-logo.png" alt="" style={{ width: 26, height: 26, borderRadius: 7, objectFit: "contain" }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: C.text }}>Pixza Studio</span>
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans antialiased selection:bg-white selection:text-black">
+      {/* Grain Overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-[300] opacity-[0.02]" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` 
+        }} 
+      />
+
+      {/* Navigation */}
+      <nav className="h-16 border-b border-white/5 flex items-center justify-between px-8 sticky top-0 bg-[#0A0A0A]/80 backdrop-blur-xl z-[100]">
+        <Link href="/create" className="flex items-center gap-3 group">
+          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+            <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert" />
+          </div>
+          <span className="text-lg font-black tracking-tighter">Pixza Studio</span>
         </Link>
-        <button onClick={() => logout()} style={{ fontSize: 12, color: C.text3, background: "none", border: "none", cursor: "pointer" }}>Sign out</button>
-      </header>
+        <button 
+          onClick={logout}
+          className="text-xs font-bold text-white/40 hover:text-white transition-colors flex items-center gap-2"
+        >
+          <LogOut className="w-4 h-4" />
+          Terminate Session
+        </button>
+      </nav>
 
-      <div style={{ maxWidth: 800, margin: "0 auto", padding: "32px 16px" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.text, margin: "0 0 24px", letterSpacing: "-0.02em" }}>Settings</h1>
+      <div className="max-w-6xl mx-auto px-8 py-20 lg:py-32 flex flex-col lg:flex-row gap-20">
+        {/* Sidebar Navigation */}
+        <aside className="lg:w-64 shrink-0 space-y-12">
+          <div>
+            <h1 className="text-5xl font-black tracking-tighter mb-4">Settings.</h1>
+            <p className="text-white/30 text-xs font-bold uppercase tracking-widest leading-relaxed">
+              Studio Configuration & <br/> Pipeline Management.
+            </p>
+          </div>
 
-        {/* Tab bar */}
-        <div style={{ display: "flex", gap: 2, marginBottom: 28, overflowX: "auto", paddingBottom: 4 }}>
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: "7px 16px", borderRadius: 9, border: "none", cursor: "pointer", whiteSpace: "nowrap", background: tab === t.id ? C.surface2 : "transparent", color: tab === t.id ? C.text : C.text3, fontSize: 13, fontWeight: tab === t.id ? 600 : 400, outline: tab === t.id ? `1px solid ${C.border}` : "none" }}>
+          <nav className="flex lg:flex-col gap-1 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide">
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 font-bold whitespace-nowrap",
+                  tab === t.id 
+                    ? "bg-white text-[#0A0A0A] shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]" 
+                    : "text-white/30 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <t.icon className="w-5 h-5" />
+                <span className="text-sm">{t.label}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Content Area */}
+        <main className="flex-1 max-w-3xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {tab === "profile" && <ProfileTab />}
+              {tab === "subscription" && <SubscriptionTab />}
+              {(tab === "notifications" || tab === "appearance") && (
+                <div className="py-20 text-center">
+                  <div className="w-20 h-20 glass-panel rounded-[40px] flex items-center justify-center mx-auto mb-8 animate-pulse">
+                    <SettingsIcon className="w-10 h-10 text-white/20" />
+                  </div>
+                  <h2 className="text-3xl font-black tracking-tighter text-white mb-4">Neural Tuning.</h2>
+                  <p className="text-white/30 text-sm font-medium uppercase tracking-[0.2em] max-w-xs mx-auto leading-relaxed">
+                    This subsystem is being calibrated for optimal response.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+    </div>
+  );
+}: 13, fontWeight: tab === t.id ? 600 : 400, outline: tab === t.id ? `1px solid ${C.border}` : "none" }}>
               {t.label}
             </button>
           ))}

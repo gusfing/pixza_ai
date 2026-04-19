@@ -81,10 +81,14 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-outfit), var(--font-inter), sans-serif;
 }
 
 /* ─── Minimal Scrollbar ────────────────────────────────────── */
@@ -169,19 +173,30 @@ body {
 
 /* ─── React Flow Minimal ───────────────────────────────────── */
 .react-flow { background: var(--bg); }
-.react-flow__edge-path { stroke: rgba(255,255,255,0.1); stroke-width: 1.5; }
+.react-flow__edge-path { stroke-width: 2.5; transition: stroke-width 0.2s ease; }
 .react-flow__handle {
-  width: 8px; height: 8px;
+  width: 10px !important; 
+  height: 10px !important;
   background: #ffffff !important;
-  border: 2px solid var(--bg) !important;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+  border: 2px solid #0A0A0A !important;
+  box-shadow: 0 0 10px rgba(255,255,255,0.3) !important;
+  transition: all 0.2s ease !important;
+}
+.react-flow__handle:hover {
+  transform: scale(1.4) !important;
+  box-shadow: 0 0 15px rgba(255,255,255,0.6) !important;
+}
+.react-flow__handle-connecting {
+  background: #3b82f6 !important;
+  box-shadow: 0 0 15px rgba(59,130,246,0.6) !important;
 }
 
 .react-flow__node {
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-soft) !important;
+  /* Allow BaseNode to handle internal styling */
+  background: transparent !important;
   border: none !important;
-  background: var(--surface) !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 /* ─── Animations ───────────────────────────────────────────── */
@@ -189,9 +204,21 @@ body {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-15px) translateX(15px); }
+  50% { transform: translateY(5px) translateX(25px); }
+  75% { transform: translateY(20px) translateX(10px); }
+}
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.15); }
+}
 .animate-obsidian {
   animation: fadeInSlide 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
+.animate-float { animation: float 25s ease-in-out infinite; }
+.animate-pulse-slow { animation: pulse-slow 15s ease-in-out infinite; }
 
 /* ─── Responsive Adjustments ────────────────────────────────── */
 @media (max-width: 768px) {
@@ -201,4 +228,24 @@ body {
   .obsidian-card {
     border-radius: 16px; /* Slightly tighter on mobile */
   }
+}
+
+/* ─── User Specific Aesthetic Adjustments ───────────────────── */
+.h-16.flex.items-center.justify-between.px-6.bg-\[\#0A0A0A\].border-b.border-white\/5.shrink-0.z-50 {
+  border-radius: 20px !important;
+  margin: 10px 20px 0px !important;
+}
+
+.flex.items-center.gap-2.p-2.rounded-full.glass-panel.shadow-2xl {
+  padding: 8px !important;
+  border-radius: 10px !important;
+}
+
+.md\:flex.items-center.gap-1.p-1.rounded-full.glass-panel,
+.btn-minimal.btn-minimal-primary.px-5.py-2.text-xs {
+  border-radius: 10px !important;
+}
+
+.react-flow__pane.draggable {
+  opacity: 1 !important;
 }

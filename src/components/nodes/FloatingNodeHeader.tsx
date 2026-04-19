@@ -38,6 +38,7 @@ interface FloatingNodeHeaderProps {
   onCustomTitleChange?: (nodeId: string, title: string) => void;
   onCommentChange?: (nodeId: string, comment: string) => void;
   commentNavigation?: CommentNavigationProps;
+  accentColor?: string;
 }
 
 export const FloatingNodeHeader = memo(function FloatingNodeHeader({
@@ -308,88 +309,118 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
     document.addEventListener('pointerup', handlePointerUp);
   }, [id, getNodes, getViewport, setNodes]);
 
-  return (
-    <div
-      className="absolute pointer-events-none transition-opacity duration-200"
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y - 26}px`,
-        width: `${width}px`,
-        zIndex: selected ? 10000 : 9000,
-      }}
-    >
+    const isInput = ['imageInput', 'audioInput', 'videoInput', 'glbViewer', 'prompt', 'promptConstructor'].includes(type);
+    const isGenerate = ['nanoBanana', 'generateVideo', 'generate3d', 'generateAudio', 'llmGenerate', 'splitGrid', 'annotation'].includes(type);
+    const isOutput = ['output', 'outputGallery'].includes(type);
+
+    const accentColor = customAccentColor || (isInput ? "#06b6d4" : isGenerate ? "#8b5cf6" : isOutput ? "#10b981" : "#ffffff");
+
+    const themeClass = customAccentColor 
+      ? "" 
+      : isInput 
+      ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400" 
+      : isGenerate 
+      ? "bg-violet-500/10 border-violet-500/30 text-violet-400" 
+      : isOutput 
+      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+      : "bg-white/5 border-white/10 text-white/70";
+
+    return (
       <div
-        className="px-1 py-1 flex items-center justify-between w-full pointer-events-auto cursor-grab"
-        onMouseEnter={() => setIsHeaderHovered(true)}
-        onMouseLeave={() => setIsHeaderHovered(false)}
-        onPointerDown={handleHeaderPointerDown}
+        className="absolute pointer-events-none transition-all duration-300"
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y - 32}px`,
+          width: `${width}px`,
+          zIndex: selected ? 10000 : 9000,
+        }}
       >
-        {/* Title Section */}
-        <div className="flex-1 min-w-0 max-w-[60%] flex items-center gap-1.5 pl-2">
-          {provider && <ProviderBadge provider={provider} />}
-          {isEditingTitle ? (
-            <input
-              ref={titleInputRef}
-              type="text"
-              value={editTitleValue}
-              onChange={(e) => setEditTitleValue(e.target.value)}
-              onBlur={handleTitleSubmit}
-              onKeyDown={handleTitleKeyDown}
-              placeholder="Custom title..."
-              className="nodrag nopan w-full bg-transparent border-none outline-none text-xs font-semibold tracking-wide text-neutral-300 placeholder:text-neutral-500 uppercase"
-            />
-          ) : (
-            <span
-              className="nodrag text-xs font-semibold uppercase tracking-wide text-neutral-400 cursor-text truncate"
-              onClick={() => setIsEditingTitle(true)}
-              title="Click to edit title"
-            >
-              {customTitle ? `${customTitle} - ${title}` : title}
-            </span>
-          )}
-        </div>
+        <div
+          className={`px-4 py-2 flex items-center justify-between w-full pointer-events-auto cursor-grab backdrop-blur-xl rounded-full border shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all ${themeClass} ${selected ? 'ring-1 ring-white/20' : ''}`}
+          style={customAccentColor ? { 
+            backgroundColor: `${customAccentColor}10`, 
+            borderColor: `${customAccentColor}30`,
+            color: customAccentColor
+          } : undefined}
+          onMouseEnter={() => setIsHeaderHovered(true)}
+          onMouseLeave={() => setIsHeaderHovered(false)}
+          onPointerDown={handleHeaderPointerDown}
+        >
+          {/* Title Section */}
+          <div className="flex-1 min-w-0 max-w-[75%] flex items-center gap-2.5 pl-1">
+            {provider && <ProviderBadge provider={provider} />}
+            {isEditingTitle ? (
+              <input
+                ref={titleInputRef}
+                type="text"
+                value={editTitleValue}
+                onChange={(e) => setEditTitleValue(e.target.value)}
+                onBlur={handleTitleSubmit}
+                onKeyDown={handleTitleKeyDown}
+                placeholder="Custom title..."
+                className="nodrag nopan w-full bg-transparent border-none outline-none text-[11px] font-black tracking-tight text-white placeholder:text-white/20 uppercase"
+              />
+            ) : (
+              <span
+                className="nodrag text-[11px] font-black uppercase tracking-[0.15em] cursor-text truncate drop-shadow-sm"
+                onClick={() => setIsEditingTitle(true)}
+                title="Click to edit title"
+                style={{ color: selected ? '#ffffff' : undefined }}
+              >
+                {customTitle ? (
+                  <>
+                    <span className="text-white">{customTitle}</span>
+                    <span className="mx-2 opacity-30">/</span>
+                    <span className="opacity-50">{title}</span>
+                  </>
+                ) : (
+                  title
+                )}
+              </span>
+            )}
+          </div>
 
-        {/* Controls - right-aligned, fade in on hover/selected */}
-        <div className={`shrink-0 flex items-center gap-1 pr-1 transition-opacity duration-200 -translate-y-1 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-          {/* Header Action (e.g. Browse button) */}
-          {headerAction}
+          {/* Controls - right-aligned, fade in on hover/selected */}
+          <div className={`shrink-0 flex items-center gap-2 pr-1 transition-opacity duration-200 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+            {/* Header Action (e.g. Browse button) */}
+            {headerAction}
 
-          {/* Lock Badge for nodes in locked groups */}
-          {isInLockedGroup && (
-            <div className="shrink-0 flex items-center" title="This node is in a locked group and will be skipped during execution">
-              <svg className="w-3.5 h-3.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-          )}
-
-          {/* Custom Header Buttons */}
-          {headerButtons}
-
-          {/* Comment Icon */}
-          <div className="relative shrink-0 flex items-center gap-1" ref={commentPopoverRef}>
-            <button
-              ref={commentButtonRef}
-              onClick={() => setIsEditingComment(!isEditingComment)}
-              onMouseEnter={() => comment && !isCommentFocused && setShowCommentTooltip(true)}
-              onMouseLeave={() => setShowCommentTooltip(false)}
-              className={`nodrag nopan p-0.5 rounded transition-colors ${
-                comment
-                  ? "text-blue-400 hover:text-blue-200"
-                  : "text-neutral-500 hover:text-neutral-200 border border-neutral-600"
-              }`}
-              title={comment ? "Edit comment" : "Add comment"}
-            >
-              {comment ? (
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                  <path fillRule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97z" clipRule="evenodd" />
+            {/* Lock Badge for nodes in locked groups */}
+            {isInLockedGroup && (
+              <div className="shrink-0 flex items-center" title="This node is in a locked group and will be skipped during execution">
+                <svg className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-              ) : (
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
-                </svg>
-              )}
-            </button>
+              </div>
+            )}
+
+            {/* Custom Header Buttons */}
+            {headerButtons}
+
+            {/* Comment Icon */}
+            <div className="relative shrink-0 flex items-center gap-1" ref={commentPopoverRef}>
+              <button
+                ref={commentButtonRef}
+                onClick={() => setIsEditingComment(!isEditingComment)}
+                onMouseEnter={() => comment && !isCommentFocused && setShowCommentTooltip(true)}
+                onMouseLeave={() => setShowCommentTooltip(false)}
+                className={`nodrag nopan p-1 rounded-lg transition-all ${
+                  comment
+                    ? "text-cyan-400 bg-cyan-400/10 hover:bg-cyan-400/20"
+                    : "text-white/20 hover:text-white/40 border border-white/5"
+                }`}
+                title={comment ? "Edit comment" : "Add comment"}
+              >
+                {comment ? (
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
+                  </svg>
+                )}
+              </button>
 
             {/* Comment Tooltip with Navigation */}
             {(showCommentTooltip || isCommentFocused) && comment && !isEditingComment && tooltipPosition && createPortal(

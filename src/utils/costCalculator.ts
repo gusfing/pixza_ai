@@ -48,8 +48,9 @@ export interface ModelPricing {
 export function getModelCost(pricing: { type: 'per-run' | 'per-second'; amount: number } | null | undefined): ModelPricing | null {
   if (!pricing) return null;
   // Convert USD amount to credits
+  const amount = typeof pricing.amount === 'number' && !isNaN(pricing.amount) ? pricing.amount : 0;
   return {
-    unitCost: Math.ceil(pricing.amount * CREDIT_MULTIPLIER),
+    unitCost: Math.ceil(amount * CREDIT_MULTIPLIER),
     unit: pricing.type === 'per-run' ? 'image' : 'second',
   };
 }
@@ -243,10 +244,10 @@ export function calculatePredictedCost(
   });
 
   const breakdownArray = Array.from(breakdown.values());
-  const totalCost = breakdownArray.reduce(
-    (sum, item) => sum + (item.subtotal ?? 0),
-    0
-  );
+  const totalCost = breakdownArray.reduce((sum, item) => {
+    const subtotal = typeof item.subtotal === 'number' && !isNaN(item.subtotal) ? item.subtotal : 0;
+    return sum + subtotal;
+  }, 0);
 
   return {
     totalCost,
