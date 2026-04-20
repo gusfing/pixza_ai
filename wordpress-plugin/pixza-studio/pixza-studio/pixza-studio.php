@@ -61,6 +61,35 @@ add_action('rest_api_init', function () {
         'callback'            => 'pixza_get_post',
         'permission_callback' => '__return_true',
     ]);
+
+    // ── Credits ──────────────────────────────────────────────
+    register_rest_route($ns, '/credits/deduct', [
+        'methods'             => 'POST',
+        'callback'            => 'pixza_deduct_credits',
+        'permission_callback' => 'pixza_server_auth',
+    ]);
+
+    // ── Admin endpoints (server-secret protected) ─────────────
+    register_rest_route($ns, '/admin/stats', [
+        'methods'             => 'GET',
+        'callback'            => 'pixza_admin_get_stats',
+        'permission_callback' => 'pixza_server_auth',
+    ]);
+    register_rest_route($ns, '/admin/users', [
+        'methods'             => 'GET',
+        'callback'            => 'pixza_admin_get_users',
+        'permission_callback' => 'pixza_server_auth',
+    ]);
+    register_rest_route($ns, '/admin/users/(?P<id>\d+)', [
+        'methods'             => 'POST',
+        'callback'            => 'pixza_admin_update_user',
+        'permission_callback' => 'pixza_server_auth',
+    ]);
+    register_rest_route($ns, '/admin/users/(?P<id>\d+)/credits', [
+        'methods'             => 'POST',
+        'callback'            => 'pixza_admin_set_user_credits',
+        'permission_callback' => 'pixza_server_auth',
+    ]);
 });
 
 // ── Auth helpers ──────────────────────────────────────────────
@@ -136,6 +165,9 @@ function pixza_register_user(WP_REST_Request $req) {
 
     wp_update_user(['ID' => $user_id, 'display_name' => $name, 'first_name' => $name]);
     update_user_meta($user_id, 'pixza_plan', 'free');
+
+    // Initialise credits for free plan
+    pixza_init_credits($user_id, 'free');
 
     pixza_trigger_email($email, $name, 'welcome');
 
@@ -413,6 +445,192 @@ function pixza_format_post(WP_Post $post, bool $full = false): array {
     return $data;
 }
 
+// ── Credits ───────────────────────────────────────────────────
+
+$PIXZA_PLAN_LIMITS = ['free' => 50, 'pro' => 2000, 'agency' => 10000];
+
+function pixza_init_credits(int $user_id, string $plan): void {
+    global $PIXZA_PLAN_LIMITS;
+    $limit = $PIXZA_PLAN_LIMITS[$plan] ?? 50;
+    update_user_meta($user_id, 'pixza_credits', $limit);
+    update_user_meta($user_id, 'pixza_credits_limit', $limit);
+}
+
+function pixza_deduct_credits(WP_REST_Request $req) {
+    $data    = $req->get_json_params();
+    $user_id = (int) ($data['user_id'] ?? 0);
+    $amount  = (int) ($data['amount'] ?? 1);
+    $reason  = sanitize_text_field($data['reason'] ?? 'generation');
+
+    if (!$user_id || !get_userdata($user_id)) {
+        return new WP_Error('invalid_user', 'User not found', ['status' => 404]);
+    }
+
+    $credits = (int) get_user_meta($user_id, 'pixza_credits', true);
+    $limit   = (int) get_user_meta($user_id, 'pixza_credits_limit', true);
+
+    // Initialise if never set
+    if ($credits === 0 && $limit === 0) {
+        $plan = get_user_meta($user_id, 'pixza_plan', true) ?: 'free';
+        pixza_init_credits($user_id, $plan);
+        $credits = (int) get_user_meta($user_id, 'pixza_credits', true);
+        $limit   = (int) get_user_meta($user_id, 'pixza_credits_limit', true);
+    }
+
+    if ($credits < $amount) {
+        return new WP_Error('insufficient_credits', 'Insufficient credits', ['status' => 402]);
+    }
+
+    $new_credits = $credits - $amount;
+    update_user_meta($user_id, 'pixza_credits', $new_credits);
+
+    return rest_ensure_response(['credits' => $new_credits, 'limit' => $limit]);
+}
+
+// ── Admin ─────────────────────────────────────────────────────
+
+function pixza_admin_get_stats(WP_REST_Request $req) {
+    global $wpdb;
+
+    $total_users = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->users}");
+
+    $total_gen = (int) $wpdb->get_var(
+        "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'pixza_generation' AND post_status = 'publish'"
+    );
+
+    $pro_users    = (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->usermeta} WHERE meta_key = 'pixza_plan' AND meta_value = %s", 'pro'
+    ));
+    $agency_users = (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->usermeta} WHERE meta_key = 'pixza_plan' AND meta_value = %s", 'agency'
+    ));
+    $free_users   = $total_users - $pro_users - $agency_users;
+
+    $credits_issued = (int) $wpdb->get_var(
+        "SELECT SUM(meta_value) FROM {$wpdb->usermeta} WHERE meta_key = 'pixza_credits_limit'"
+    );
+
+    return rest_ensure_response([
+        'total_users'       => $total_users,
+        'total_generations' => $total_gen,
+        'pro_users'         => $pro_users,
+        'agency_users'      => $agency_users,
+        'free_users'        => max(0, $free_users),
+        'credits_issued'    => (int) $credits_issued,
+    ]);
+}
+
+function pixza_admin_get_users(WP_REST_Request $req) {
+    $per_page = min(50, (int) ($req->get_param('per_page') ?? 20));
+    $page     = max(1,  (int) ($req->get_param('page') ?? 1));
+    $search   = sanitize_text_field($req->get_param('search') ?? '');
+
+    $args = [
+        'number'  => $per_page,
+        'offset'  => ($page - 1) * $per_page,
+        'orderby' => 'registered',
+        'order'   => 'DESC',
+    ];
+    if ($search) {
+        $args['search']         = '*' . $search . '*';
+        $args['search_columns'] = ['user_login', 'user_email', 'display_name'];
+    }
+
+    $query      = new WP_User_Query($args);
+    $total      = $query->get_total();
+    $users_list = [];
+
+    foreach ($query->get_results() as $u) {
+        $plan    = get_user_meta($u->ID, 'pixza_plan', true) ?: 'free';
+        $credits = get_user_meta($u->ID, 'pixza_credits', true);
+        $limit   = get_user_meta($u->ID, 'pixza_credits_limit', true);
+        $gen_cnt = (int) get_user_meta($u->ID, 'pixza_generations_count', true);
+
+        // Initialise credits if never set
+        if ($credits === '' || $limit === '') {
+            pixza_init_credits($u->ID, $plan);
+            $credits = get_user_meta($u->ID, 'pixza_credits', true);
+            $limit   = get_user_meta($u->ID, 'pixza_credits_limit', true);
+        }
+
+        $users_list[] = [
+            'id'         => $u->ID,
+            'username'   => $u->user_login,
+            'name'       => $u->display_name,
+            'email'      => $u->user_email,
+            'registered' => $u->user_registered,
+            'roles'      => $u->roles,
+            'meta'       => [
+                'plan'              => $plan,
+                'credits'           => (int) $credits,
+                'credits_limit'     => (int) $limit,
+                'generations_count' => $gen_cnt,
+            ],
+        ];
+    }
+
+    return rest_ensure_response([
+        'users' => $users_list,
+        'total' => $total,
+        'pages' => (int) ceil($total / $per_page),
+    ]);
+}
+
+function pixza_admin_update_user(WP_REST_Request $req) {
+    global $PIXZA_PLAN_LIMITS;
+    $user_id = (int) $req->get_param('id');
+    $data    = $req->get_json_params();
+
+    if (!get_userdata($user_id)) {
+        return new WP_Error('not_found', 'User not found', ['status' => 404]);
+    }
+
+    if (isset($data['plan'])) {
+        $plan = sanitize_text_field($data['plan']);
+        update_user_meta($user_id, 'pixza_plan', $plan);
+    }
+    if (isset($data['credits'])) {
+        update_user_meta($user_id, 'pixza_credits', (int) $data['credits']);
+    }
+    if (isset($data['credits_limit'])) {
+        update_user_meta($user_id, 'pixza_credits_limit', (int) $data['credits_limit']);
+    }
+    if (isset($data['name'])) {
+        wp_update_user(['ID' => $user_id, 'display_name' => sanitize_text_field($data['name'])]);
+    }
+
+    return rest_ensure_response(['success' => true]);
+}
+
+function pixza_admin_set_user_credits(WP_REST_Request $req) {
+    $user_id = (int) $req->get_param('id');
+    $data    = $req->get_json_params();
+
+    if (!get_userdata($user_id)) {
+        return new WP_Error('not_found', 'User not found', ['status' => 404]);
+    }
+
+    if (isset($data['credits']))       update_user_meta($user_id, 'pixza_credits',       (int) $data['credits']);
+    if (isset($data['credits_limit'])) update_user_meta($user_id, 'pixza_credits_limit', (int) $data['credits_limit']);
+    if (isset($data['plan']))          update_user_meta($user_id, 'pixza_plan',           sanitize_text_field($data['plan']));
+
+    return rest_ensure_response(['success' => true]);
+}
+
+// ── WooCommerce: set credits on plan change ───────────────────
+// (also called from existing subscription hooks below)
+function pixza_set_plan_credits(int $user_id, string $plan): void {
+    global $PIXZA_PLAN_LIMITS;
+    update_user_meta($user_id, 'pixza_plan', $plan);
+    $limit = $PIXZA_PLAN_LIMITS[$plan] ?? 50;
+    update_user_meta($user_id, 'pixza_credits_limit', $limit);
+    // Only reset credits if upgrading (don't reduce existing balance)
+    $current = (int) get_user_meta($user_id, 'pixza_credits', true);
+    if ($current < $limit) {
+        update_user_meta($user_id, 'pixza_credits', $limit);
+    }
+}
+
 // ── Register CPTs ─────────────────────────────────────────────
 add_action('init', function () {
     register_post_type('pixza_generation', [
@@ -437,18 +655,45 @@ add_action('woocommerce_subscription_status_active', function ($subscription) {
     $user_id = $subscription->get_user_id();
     foreach ($subscription->get_items() as $item) {
         $pid = $item->get_product_id();
-        if ($pid == get_option('pixza_pro_product_id'))    update_user_meta($user_id, 'pixza_plan', 'pro');
-        if ($pid == get_option('pixza_agency_product_id')) update_user_meta($user_id, 'pixza_plan', 'agency');
+        if ($pid == get_option('pixza_pro_product_id'))    pixza_set_plan_credits($user_id, 'pro');
+        if ($pid == get_option('pixza_agency_product_id')) pixza_set_plan_credits($user_id, 'agency');
     }
     $user = get_userdata($user_id);
     if ($user) pixza_trigger_email($user->user_email, $user->display_name, 'upgrade');
 });
 
 add_action('woocommerce_subscription_status_cancelled', function ($subscription) {
-    update_user_meta($subscription->get_user_id(), 'pixza_plan', 'free');
+    pixza_set_plan_credits($subscription->get_user_id(), 'free');
 });
 
-// ── Admin settings ────────────────────────────────────────────
+// ── Expose credit meta via WP REST /wp/v2/users/me ───────────
+add_filter('rest_prepare_user', function ($response, $user, $request) {
+    if ($request->get_param('context') !== 'edit') return $response;
+    $uid  = $user->ID;
+    $plan = get_user_meta($uid, 'pixza_plan', true) ?: 'free';
+
+    $credits = get_user_meta($uid, 'pixza_credits', true);
+    $limit   = get_user_meta($uid, 'pixza_credits_limit', true);
+
+    if ($credits === '' || $limit === '') {
+        pixza_init_credits($uid, $plan);
+        $credits = get_user_meta($uid, 'pixza_credits', true);
+        $limit   = get_user_meta($uid, 'pixza_credits_limit', true);
+    }
+
+    $data = $response->get_data();
+    $data['meta'] = array_merge($data['meta'] ?? [], [
+        'plan'              => $plan,
+        'credits'           => (int) $credits,
+        'credits_limit'     => (int) $limit,
+        'generations_count' => (int) get_user_meta($uid, 'pixza_generations_count', true),
+        'onboarding_done'   => (bool) get_user_meta($uid, 'pixza_onboarding_done', true),
+        'preferred_model'   => get_user_meta($uid, 'pixza_preferred_model', true) ?: '',
+        'preferred_tab'     => get_user_meta($uid, 'pixza_preferred_tab', true) ?: '',
+    ]);
+    $response->set_data($data);
+    return $response;
+}, 10, 3);
 add_action('admin_menu', function () {
     add_options_page('Pixza Studio', 'Pixza Studio', 'manage_options', 'pixza-settings', 'pixza_settings_page');
 });
