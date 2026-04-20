@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Play, Layers, Zap, ShieldCheck, Target, Cpu, Check, Box, Sparkles } from "lucide-react";
 import { GLSLHills } from "@/components/ui/glsl-hills";
+import { ZoomParallax } from "@/components/ui/zoom-parallax";
 
 /* ── Minimal Navigation ── */
 function Nav() {
@@ -92,38 +93,29 @@ function Hero() {
 }
 
 /* ── Gallery / Showcase Section ── */
+/* ── Gallery / Showcase Section ── */
 function Gallery() {
   const images = [
-    { url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1000", title: "Abstract Flow", category: "Generation" },
-    { url: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80&w=1000", title: "Neural Networks", category: "Concept" },
-    { url: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?auto=format&fit=crop&q=80&w=1000", title: "Digital Bloom", category: "Art" },
-    { url: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1000", title: "Ethereal Light", category: "Visuals" },
-    { url: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=1000", title: "Prismatic Wave", category: "Design" },
-    { url: "https://images.unsplash.com/photo-1620121692029-d088224efc74?auto=format&fit=crop&q=80&w=1000", title: "Cybernetic Pulse", category: "Tech" },
+    { src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1280&h=720&fit=crop&auto=format&q=80", alt: "Abstract generative art" },
+    { src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1280&h=720&fit=crop&auto=format&q=80", alt: "Modern architecture" },
+    { src: "https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=800&fit=crop&auto=format&q=80", alt: "Abstract geometric pattern" },
+    { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&h=720&fit=crop&auto=format&q=80", alt: "Mountain landscape" },
+    { src: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?w=1280&h=720&fit=crop&auto=format&q=80", alt: "Digital bloom" },
+    { src: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=1280&h=720&fit=crop&auto=format&q=80", alt: "Ocean waves" },
+    { src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1280&h=720&fit=crop&auto=format&q=80", alt: "Forest and sunlight" },
   ];
 
   return (
-    <section id="showcase" className="py-32 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-20 text-center">
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter italic">Showcase</h2>
-          <p className="text-white/40 text-lg font-medium max-w-2xl mx-auto">
-            Witness the convergence of human creativity and neural processing.
-          </p>
-        </div>
-        
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-          {images.map((img, i) => (
-            <div key={i} className="obsidian-card group relative break-inside-avoid">
-              <img src={img.url} alt={img.title} className="w-full h-auto object-cover grayscale transition-all duration-700 group-hover:grayscale-0" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
-                <span className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-2">{img.category}</span>
-                <h4 className="text-2xl font-bold text-white">{img.title}</h4>
-              </div>
-            </div>
-          ))}
-        </div>
+    <section id="showcase">
+      {/* Section header — sits above the parallax */}
+      <div className="py-24 px-6 text-center">
+        <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter italic">Showcase</h2>
+        <p className="text-white/40 text-lg font-medium max-w-2xl mx-auto">
+          Witness the convergence of human creativity and neural processing.
+        </p>
       </div>
+
+      <ZoomParallax images={images} />
     </section>
   );
 }
@@ -491,6 +483,19 @@ function Features() {
 }
 
 export default function LandingPage() {
+  useEffect(() => {
+    let animId: number;
+    import("@studio-freight/lenis").then(({ default: Lenis }) => {
+      const lenis = new Lenis();
+      function raf(time: number) {
+        lenis.raf(time);
+        animId = requestAnimationFrame(raf);
+      }
+      animId = requestAnimationFrame(raf);
+    });
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
   return (
     <main className="bg-[#0A0A0A] selection:bg-white selection:text-black">
       <Nav />

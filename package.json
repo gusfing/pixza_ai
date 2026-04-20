@@ -29,6 +29,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@studio-freight/lenis": "1.0.42",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/pg": "^8.20.0",
     "@upstash/ratelimit": "^2.0.8",
