@@ -61,6 +61,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
   onCustomTitleChange,
   onCommentChange,
   commentNavigation,
+  accentColor: customAccentColor,
 }: FloatingNodeHeaderProps) {
   const canRun = RUNNABLE_TYPES.has(type);
   const canExpand = EXPANDABLE_TYPES.has(type);
