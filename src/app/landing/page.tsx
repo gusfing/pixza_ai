@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Play, Layers, Zap, ShieldCheck, Target, Cpu, Check, Box, Sparkles } from "lucide-react";
 import { GLSLHills } from "@/components/ui/glsl-hills";
 import { ZoomParallax } from "@/components/ui/zoom-parallax";
+import { PortfolioGallery } from "@/components/ui/portfolio-gallery";
 
 /* ── Minimal Navigation ── */
 function Nav() {
@@ -502,6 +503,7 @@ export default function LandingPage() {
       <Hero />
       <Features />
       <Gallery />
+      <PortfolioGallery />
       <CompetitiveEdge />
       <BlogPreview />
       <Testimonials />

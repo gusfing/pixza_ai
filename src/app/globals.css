@@ -220,6 +220,14 @@ h1, h2, h3, h4, h5, h6 {
 .animate-float { animation: float 25s ease-in-out infinite; }
 .animate-pulse-slow { animation: pulse-slow 15s ease-in-out infinite; }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-100% - var(--gap))); }
+}
+.animate-marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+
 /* ─── Responsive Adjustments ────────────────────────────────── */
 @media (max-width: 768px) {
   .radius-mobile-none { border-radius: 0 !important; }
