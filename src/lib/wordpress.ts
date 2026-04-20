@@ -1,6 +1,6 @@
 /**
  * WordPress REST API client
- * Handles auth, users, subscriptions, settings, emails via WP backend
+ * Handles auth, users, subscriptions, credits, admin via WP backend
  */
 
 const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://seashell-peafowl-234313.hostingersite.com";
@@ -16,8 +16,10 @@ export interface WPUser {
   avatar_urls: Record<string, string>;
   meta: {
     plan?: "free" | "pro" | "agency";
+    credits?: number;               // remaining credits
+    credits_limit?: number;         // monthly credit cap
+    generations_count?: number;     // lifetime total
     api_keys?: Record<string, string>;
-    generations_count?: number;
     onboarding_done?: boolean;
     preferred_model?: string;
     preferred_tab?: string;
@@ -59,6 +61,21 @@ export interface WPPromotion {
   usage_limit: number;
   usage_count: number;
 }
+
+// Credit costs per generation type
+export const CREDIT_COSTS: Record<string, number> = {
+  image: 1,
+  video: 10,
+  audio: 3,
+  "3d": 5,
+};
+
+// Default credit limits per plan
+export const PLAN_CREDIT_LIMITS: Record<string, number> = {
+  free: 50,
+  pro: 2000,
+  agency: 10000,
+};
 
 // ── Auth ─────────────────────────────────────────────────────
 
@@ -135,6 +152,137 @@ export async function wpGetApiKeys(token: string): Promise<Record<string, string
   const res = await wpFetch("/pixza/v1/api-keys", token);
   const data = await res.json();
   return data.keys ?? {};
+}
+
+// ── Credits ───────────────────────────────────────────────────
+
+/**
+ * Get current credit balance for the authenticated user.
+ * Falls back to plan default if meta not set yet.
+ */
+export async function wpGetCredits(token: string): Promise<{ credits: number; limit: number; plan: string }> {
+  const user = await wpGetMe(token);
+  const plan = user.meta?.plan ?? "free";
+  const limit = user.meta?.credits_limit ?? PLAN_CREDIT_LIMITS[plan] ?? 50;
+  const credits = user.meta?.credits ?? limit; // first time: full balance
+  return { credits, limit, plan };
+}
+
+/**
+ * Deduct credits from a user. Called server-side using WP_API_SECRET.
+ * Returns updated balance or throws if insufficient.
+ */
+export async function wpDeductCredits(
+  userId: number,
+  amount: number,
+  reason: string
+): Promise<{ credits: number; limit: number }> {
+  const res = await fetch(`${WP_API}/pixza/v1/credits/deduct`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-WP-Secret": process.env.WP_API_SECRET ?? "",
+    },
+    body: JSON.stringify({ user_id: userId, amount, reason }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Insufficient credits");
+  }
+  return res.json();
+}
+
+/**
+ * Admin: set credits and/or plan for any user.
+ */
+export async function wpAdminSetUserCredits(
+  userId: number,
+  data: { credits?: number; credits_limit?: number; plan?: string }
+): Promise<void> {
+  const res = await fetch(`${WP_API}/pixza/v1/admin/users/${userId}/credits`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-WP-Secret": process.env.WP_API_SECRET ?? "",
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update user credits");
+}
+
+// ── Admin ─────────────────────────────────────────────────────
+
+export interface WPAdminUser {
+  id: number;
+  username: string;
+  name: string;
+  email: string;
+  registered: string;
+  roles: string[];
+  meta: {
+    plan?: string;
+    credits?: number;
+    credits_limit?: number;
+    generations_count?: number;
+  };
+}
+
+/**
+ * Admin: list all users with their plan/credit data.
+ */
+export async function wpAdminGetUsers(params?: {
+  page?: number;
+  per_page?: number;
+  search?: string;
+}): Promise<{ users: WPAdminUser[]; total: number; pages: number }> {
+  const qs = new URLSearchParams({
+    per_page: String(params?.per_page ?? 20),
+    page: String(params?.page ?? 1),
+    context: "edit",
+  });
+  if (params?.search) qs.set("search", params.search);
+
+  const res = await fetch(`${WP_API}/pixza/v1/admin/users?${qs}`, {
+    headers: { "X-WP-Secret": process.env.WP_API_SECRET ?? "" },
+  });
+  if (!res.ok) return { users: [], total: 0, pages: 1 };
+  return res.json();
+}
+
+/**
+ * Admin: update a user's plan, credits, or role.
+ */
+export async function wpAdminUpdateUser(
+  userId: number,
+  data: { plan?: string; credits?: number; credits_limit?: number; role?: string; name?: string }
+): Promise<void> {
+  const res = await fetch(`${WP_API}/pixza/v1/admin/users/${userId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-WP-Secret": process.env.WP_API_SECRET ?? "",
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update user");
+}
+
+/**
+ * Admin: get platform stats.
+ */
+export async function wpAdminGetStats(): Promise<{
+  total_users: number;
+  total_generations: number;
+  pro_users: number;
+  agency_users: number;
+  free_users: number;
+  credits_issued: number;
+}> {
+  const res = await fetch(`${WP_API}/pixza/v1/admin/stats`, {
+    headers: { "X-WP-Secret": process.env.WP_API_SECRET ?? "" },
+  });
+  if (!res.ok) return { total_users: 0, total_generations: 0, pro_users: 0, agency_users: 0, free_users: 0, credits_issued: 0 };
+  return res.json();
 }
 
 // ── Subscriptions (WooCommerce) ───────────────────────────────

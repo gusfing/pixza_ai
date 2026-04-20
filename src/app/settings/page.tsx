@@ -141,9 +141,22 @@ function ProfileTab() {
 function SubscriptionTab() {
   const { user, token } = useWPAuth();
   const [loading, setLoading] = useState(false);
+  const [subscription, setSubscription] = useState<{ next_payment?: string } | null>(null);
 
   const currentPlan = user?.meta?.plan?.toLowerCase() ?? "free";
   const isPro = currentPlan !== "free";
+  const credits = user?.meta?.credits ?? (currentPlan === "pro" ? 2000 : currentPlan === "agency" ? 10000 : 50);
+  const creditsLimit = user?.meta?.credits_limit ?? (currentPlan === "pro" ? 2000 : currentPlan === "agency" ? 10000 : 50);
+  const generationsCount = user?.meta?.generations_count ?? 0;
+  const creditsUsed = creditsLimit - credits;
+  const creditsPct = Math.min(100, Math.round((creditsUsed / creditsLimit) * 100));
+
+  useEffect(() => {
+    if (!token) return;
+    import("@/lib/wordpress").then(({ wpGetSubscription }) =>
+      wpGetSubscription(token).then(s => setSubscription(s)).catch(() => {})
+    );
+  }, [token]);
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -159,7 +172,11 @@ function SubscriptionTab() {
               </div>
               <div>
                 <h4 className="text-2xl font-black tracking-tighter text-white capitalize">{currentPlan} Tier</h4>
-                <p className="text-xs text-white/40 font-medium">Next billing cycle starts June 12, 2026</p>
+                <p className="text-xs text-white/40 font-medium">
+                  {subscription?.next_payment
+                    ? `Next billing: ${new Date(subscription.next_payment).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`
+                    : isPro ? "Subscription active" : "Free plan"}
+                </p>
               </div>
             </div>
             {isPro && (
@@ -168,19 +185,25 @@ function SubscriptionTab() {
               </span>
             )}
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { label: "Usage", val: "842/2000", sub: "Generations" },
-              { label: "Credits", val: "12.4k", sub: "Remaining" },
-              { label: "Storage", val: "1.2 GB", sub: "of 10GB used" }
-            ].map(s => (
-              <div key={s.label} className="p-6 rounded-2xl bg-white/5 border border-white/5">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/20 block mb-2">{s.label}</span>
-                <span className="text-xl font-black text-white">{s.val}</span>
-                <p className="text-[10px] text-white/40 mt-1">{s.sub}</p>
+            <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/20 block mb-2">Credits Used</span>
+              <span className="text-xl font-black text-white">{creditsUsed.toLocaleString()}<span className="text-white/30 text-sm font-medium">/{creditsLimit.toLocaleString()}</span></span>
+              <div className="mt-3 h-1 rounded-full bg-white/5 overflow-hidden">
+                <div className="h-full rounded-full bg-white/40 transition-all" style={{ width: `${creditsPct}%` }} />
               </div>
-            ))}
+            </div>
+            <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/20 block mb-2">Credits Left</span>
+              <span className="text-xl font-black text-white">{credits.toLocaleString()}</span>
+              <p className="text-[10px] text-white/40 mt-1">Remaining this period</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/20 block mb-2">All Time</span>
+              <span className="text-xl font-black text-white">{generationsCount.toLocaleString()}</span>
+              <p className="text-[10px] text-white/40 mt-1">Total generations</p>
+            </div>
           </div>
         </SettingCard>
       </SettingSection>
