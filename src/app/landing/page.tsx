@@ -35,7 +35,7 @@ function Nav() {
       </div>
 
       <div className="flex items-center gap-4">
-        <Link href="/auth/login" className="text-white/50 hover:text-white text-sm font-medium transition-colors">
+        <Link href="/auth/signin" className="text-white/50 hover:text-white text-sm font-medium transition-colors">
           Sign In
         </Link>
         <Link href="/studio" className="btn-minimal btn-minimal-primary text-sm px-5 py-2">
