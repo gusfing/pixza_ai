@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useWPAuth } from "@/lib/wp-auth-context";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { AuthInput } from "@/components/auth/AuthInput";
@@ -9,6 +9,7 @@ import { CircularAuthButton } from "@/components/auth/CircularAuthButton";
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useWPAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +22,8 @@ export default function SignInPage() {
     setLoading(true); setError("");
     try {
       await login(username, password);
-      router.push("/create");
+      const next = searchParams.get("next") || "/create";
+      router.push(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {

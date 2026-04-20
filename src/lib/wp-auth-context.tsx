@@ -13,6 +13,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Sync token to cookie so middleware can read it
+function setTokenCookie(token: string) {
+  document.cookie = `pixza_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+}
+
+function clearTokenCookie() {
+  document.cookie = "pixza_token=; path=/; max-age=0; SameSite=Lax";
+}
+
 export function WPAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<WPUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -23,18 +32,20 @@ export function WPAuthProvider({ children }: { children: React.ReactNode }) {
       const savedToken = localStorage.getItem("pixza_token");
       if (savedToken) {
         try {
-          // Verify token
           const isValid = await wpValidateToken(savedToken);
           if (isValid) {
             const userData = await wpGetMe(savedToken);
             setToken(savedToken);
             setUser(userData);
+            setTokenCookie(savedToken);
           } else {
             localStorage.removeItem("pixza_token");
+            clearTokenCookie();
           }
         } catch (error) {
           console.error("Failed to load user:", error);
           localStorage.removeItem("pixza_token");
+          clearTokenCookie();
         }
       }
       setLoading(false);
@@ -47,8 +58,8 @@ export function WPAuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { token, user } = await wpLogin(username, password);
       localStorage.setItem("pixza_token", token);
-      
-      // Fetch full user data after login
+      setTokenCookie(token);
+
       const fullUser = await wpGetMe(token);
       setToken(token);
       setUser(fullUser);
@@ -59,6 +70,7 @@ export function WPAuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem("pixza_token");
+    clearTokenCookie();
     setToken(null);
     setUser(null);
   };
