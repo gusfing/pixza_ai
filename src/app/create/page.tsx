@@ -7,7 +7,7 @@ import {
   Plus, ChevronLeft, ChevronRight, Settings, Image as ImageIcon, 
   Video, Music, Box, Sparkles, LayoutGrid, Compass, Crown, 
   ArrowRight, Download, RefreshCw, X, Globe, BrainCog, Code, Terminal,
-  User, Check, Search, Palette, Maximize2, Share2
+  User, Check, Search, Palette, Maximize2, Share2, Zap
 } from "lucide-react";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
