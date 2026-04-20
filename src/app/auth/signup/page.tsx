@@ -24,8 +24,8 @@ export default function SignUpPage() {
     setLoading(true); setError("");
     try {
       const username = email.split("@")[0].replace(/[^a-z0-9]/gi, "").toLowerCase() + Math.floor(Math.random() * 999);
-      await wpRegister({ username, email, password, name });
-      await login(username, password);
+      const registered = await wpRegister({ username, email, password, name });
+      await login(registered.username, password);
       router.push("/onboarding");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
