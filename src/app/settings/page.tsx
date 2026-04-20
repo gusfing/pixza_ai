@@ -309,19 +309,4 @@ export default function SettingsPage() {
       </div>
     </div>
   );
-}: 13, fontWeight: tab === t.id ? 600 : 400, outline: tab === t.id ? `1px solid ${C.border}` : "none" }}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        {tab === "profile"      && <ProfileTab />}
-
-        {tab === "subscription" && <SubscriptionTab />}
-        {tab === "notifications" && <NotificationsTab />}
-        {tab === "appearance"   && <AppearanceTab />}
-      </div>
-    </div>
-  );
 }

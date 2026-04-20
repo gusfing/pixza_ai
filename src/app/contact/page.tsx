@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Send, Mail, MapPin, MessageSquare, Twitter, Discord, Github } from "lucide-react";
+import { ArrowLeft, Send, Mail, MapPin, MessageSquare, Share2, MessageCircle, GitBranch } from "lucide-react";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -59,9 +59,9 @@ export default function ContactPage() {
                 <div>
                   <h4 className="text-white font-bold text-lg mb-1">Community</h4>
                   <div className="flex gap-4 mt-2">
-                    <Twitter className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
-                    <Discord className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
-                    <Github className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
+                    <Share2 className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
+                    <MessageCircle className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
+                    <GitBranch className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
                   </div>
                 </div>
               </div>
