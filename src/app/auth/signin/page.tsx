@@ -34,7 +34,7 @@ export default function SignInPage() {
       heading="Login" 
       topRightLink={{ label: "Create an account", href: "/auth/signup" }}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col relative">
+      <form onSubmit={handleSubmit} className="flex flex-col relative pb-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
           <AuthInput 
             label="Email or Username"

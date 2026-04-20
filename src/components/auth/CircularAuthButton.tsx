@@ -10,7 +10,7 @@ export function CircularAuthButton({ label, loading, ...props }: CircularAuthBut
     <button
       {...props}
       disabled={loading || props.disabled}
-      className="w-24 h-24 rounded-full bg-white text-black font-bold text-[10px] uppercase tracking-widest hover:bg-neutral-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-center px-2 leading-tight"
+      className="w-24 h-24 rounded-[20px] bg-white text-black font-bold text-[10px] uppercase tracking-widest hover:bg-neutral-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-center px-2 leading-tight"
     >
       {loading ? "..." : label}
     </button>
