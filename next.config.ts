@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      { source: "/auth/login", destination: "/auth/signin", permanent: true },
+      { source: "/login", destination: "/auth/signin", permanent: true },
+      { source: "/signup", destination: "/auth/signup", permanent: true },
+      { source: "/register", destination: "/auth/signup", permanent: true },
+    ];
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "100mb", // Increased for large media files
