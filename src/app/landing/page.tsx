@@ -130,11 +130,25 @@ function Gallery() {
 
 /* ── Blog Preview Section ── */
 function BlogPreview() {
-  const posts = [
-    { title: "The Future of Generative Art", excerpt: "Exploring how AI is redefining the boundaries of human creativity.", date: "April 15, 2026", img: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=1000" },
-    { title: "Chaining Models for Success", excerpt: "A guide to building complex multi-stage generation pipelines.", date: "April 12, 2026", img: "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000" },
-    { title: "Obsidian Design Principles", excerpt: "Behind the minimalist aesthetic of our high-performance studio.", date: "April 08, 2026", img: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=1000" },
+  const [posts, setPosts] = useState<Array<{ id: number; slug: string; title: string; excerpt: string; date: string; thumbnail: string; categories: string[] }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/blog?per_page=3&page=1")
+      .then(r => r.json())
+      .then(d => setPosts(d.items?.slice(0, 3) ?? []))
+      .catch(() => setPosts([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Fallback posts shown while loading or if WP has no posts yet
+  const fallback = [
+    { id: 1, slug: "#", title: "The Future of Generative Art", excerpt: "Exploring how AI is redefining the boundaries of human creativity.", date: "April 15, 2026", thumbnail: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=1000", categories: [] },
+    { id: 2, slug: "#", title: "Chaining Models for Success", excerpt: "A guide to building complex multi-stage generation pipelines.", date: "April 12, 2026", thumbnail: "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1000", categories: [] },
+    { id: 3, slug: "#", title: "Obsidian Design Principles", excerpt: "Behind the minimalist aesthetic of our high-performance studio.", date: "April 08, 2026", thumbnail: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=1000", categories: [] },
   ];
+
+  const display = posts.length > 0 ? posts : fallback;
 
   return (
     <section id="blog" className="py-32 px-6 bg-white/[0.01]">
@@ -152,16 +166,31 @@ function BlogPreview() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {posts.map((post, i) => (
-            <div key={i} className="group cursor-pointer">
-              <div className="aspect-[16/10] overflow-hidden rounded-[30px] mb-8 glass-panel border-white/5">
-                <img src={post.img} alt={post.title} className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" />
-              </div>
-              <span className="text-white/20 text-xs font-bold uppercase tracking-widest mb-3 block">{post.date}</span>
-              <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-white/80 transition-colors">{post.title}</h3>
-              <p className="text-white/40 text-sm font-medium leading-relaxed">{post.excerpt}</p>
-            </div>
-          ))}
+          {loading
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-[16/10] rounded-[30px] bg-white/5 mb-8" />
+                  <div className="h-3 bg-white/5 rounded w-1/3 mb-4" />
+                  <div className="h-6 bg-white/5 rounded w-3/4 mb-3" />
+                  <div className="h-4 bg-white/5 rounded w-full" />
+                </div>
+              ))
+            : display.map((post) => (
+                <Link key={post.id} href={post.slug === "#" ? "/blog" : `/blog/${post.slug}`} className="group cursor-pointer no-underline">
+                  <div className="aspect-[16/10] overflow-hidden rounded-[30px] mb-8 glass-panel border-white/5">
+                    {post.thumbnail
+                      ? <img src={post.thumbnail} alt={post.title} className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" />
+                      : <div className="w-full h-full flex items-center justify-center text-white/10 text-5xl">✦</div>
+                    }
+                  </div>
+                  <span className="text-white/20 text-xs font-bold uppercase tracking-widest mb-3 block">
+                    {new Date(post.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </span>
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-white/80 transition-colors">{post.title}</h3>
+                  <p className="text-white/40 text-sm font-medium leading-relaxed">{post.excerpt}</p>
+                </Link>
+              ))
+          }
         </div>
       </div>
     </section>
