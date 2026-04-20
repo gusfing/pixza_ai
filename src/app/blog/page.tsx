@@ -119,7 +119,7 @@ export default function BlogPage() {
     const params = new URLSearchParams({ per_page: "7", page: String(page) });
     if (debouncedSearch) params.set("search", debouncedSearch);
 
-    fetch(`${process.env.NEXT_PUBLIC_WP_URL}/wp-json/pixza/v1/posts?${params}`)
+    fetch(`/api/blog?${params}`)
       .then(r => r.json())
       .then(d => { setPosts(d.items ?? []); setTotalPages(d.pages ?? 1); })
       .catch(() => setPosts([]))

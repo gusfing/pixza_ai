@@ -241,11 +241,32 @@ export async function wpGetGenerations(
 
 // ── Blog / Content ────────────────────────────────────────────
 
-export async function wpGetPosts(params?: { per_page?: number; category?: string }) {
-  const qs = new URLSearchParams({ per_page: String(params?.per_page ?? 6) });
-  const res = await fetch(`${WP_API}/wp/v2/posts?${qs}&_embed`);
-  if (!res.ok) return [];
-  return res.json();
+export async function wpGetPosts(params?: { per_page?: number; page?: number; search?: string }) {
+  const qs = new URLSearchParams({
+    per_page: String(params?.per_page ?? 6),
+    page: String(params?.page ?? 1),
+    _embed: "1",
+  });
+  if (params?.search) qs.set("search", params.search);
+  const res = await fetch(`${WP_API}/wp/v2/posts?${qs}`);
+  if (!res.ok) return { items: [], pages: 1 };
+  const totalPages = Number(res.headers.get("X-WP-TotalPages") ?? "1");
+  const raw: any[] = await res.json();
+  const items = raw.map((p: any) => {
+    const embedded = p._embedded ?? {};
+    return {
+      id: p.id,
+      slug: p.slug,
+      title: p.title?.rendered?.replace(/<[^>]*>/g, "") ?? "",
+      excerpt: p.excerpt?.rendered?.replace(/<[^>]*>/g, "").trim() ?? "",
+      thumbnail: embedded["wp:featuredmedia"]?.[0]?.source_url ?? "",
+      author: embedded["author"]?.[0]?.name ?? "Pixza Team",
+      date: p.date,
+      categories: (embedded["wp:term"]?.[0] ?? []).map((c: any) => c.name),
+      read_time: `${Math.max(1, Math.round((p.content?.rendered?.split(/\s+/).length ?? 0) / 200))} min read`,
+    };
+  });
+  return { items, pages: totalPages };
 }
 
 // ── Helpers ───────────────────────────────────────────────────
