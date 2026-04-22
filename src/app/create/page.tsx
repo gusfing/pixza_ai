@@ -1,83 +1,80 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Plus, ChevronLeft, ChevronRight, Settings, Image as ImageIcon, 
-  Video, Music, Box, Sparkles, LayoutGrid, Compass, Crown, 
-  ArrowRight, Download, RefreshCw, X, Globe, BrainCog, Code, Terminal,
-  User, Check, Search, Palette, Maximize2, Share2, Zap, Wand2
+import {
+  ImageIcon, Video, Music, Box, Sparkles, Settings, Compass,
+  Download, X, RefreshCw, Upload, ChevronDown, Check,
+  Wand2, LayoutGrid, Plus, Zap, Crown, ArrowRight, Maximize2
 } from "lucide-react";
 import { useWorkflowStore } from "@/store/workflowStore";
-import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 import { ImageTools } from "@/components/ui/image-tools";
 import { cn } from "@/lib/utils";
 
-/* ── Types & Data ────────────────────────────────────────── */
-
+/* ── Types ─────────────────────────────────────────────────── */
 type Tab = "Image" | "Video" | "Audio" | "3D";
-type Screen = "home" | "generate" | "templates" | "gallery" | "settings" | "tools";
+type NavScreen = "create" | "explore" | "tools" | "settings";
 
-interface Model { provider: string; modelId: string; label: string; tabs: Tab[]; }
+interface Model { provider: string; modelId: string; label: string; tabs: Tab[]; badge?: string; }
 
+/* ── Model Registry ─────────────────────────────────────────── */
 const MODELS: Model[] = [
-  { provider: "gemini", modelId: "nano-banana-pro", label: "Gemini Imagen 3", tabs: ["Image"] },
-  { provider: "gemini", modelId: "nano-banana-2", label: "Gemini Imagen 4", tabs: ["Image"] },
-  { provider: "fal", modelId: "fal-ai/flux-pro", label: "FLUX.1 Pro", tabs: ["Image"] },
-  { provider: "fal", modelId: "fal-ai/flux/schnell", label: "FLUX.1 Schnell", tabs: ["Image"] },
-  { provider: "fal", modelId: "fal-ai/flux-realism", label: "FLUX Realism", tabs: ["Image"] },
-  { provider: "wavespeed", modelId: "wavespeed-ai/flux-dev-ultra-fast", label: "FLUX Ultra Fast", tabs: ["Image"] },
-  { provider: "fal", modelId: "fal-ai/flux/dev/image-to-image", label: "FLUX Dev I2I", tabs: ["Image"] },
-  { provider: "gemini", modelId: "veo-2.0-generate-001", label: "Veo 2", tabs: ["Video"] },
-  { provider: "gemini", modelId: "veo-3.0-generate-preview", label: "Veo 3", tabs: ["Video"] },
-  { provider: "fal", modelId: "fal-ai/kling-video/v1.6/pro/text-to-video", label: "Kling 1.6 Pro", tabs: ["Video"] },
-  { provider: "fal", modelId: "fal-ai/wan-t2v", label: "Wan T2V", tabs: ["Video"] },
-  { provider: "fal", modelId: "fal-ai/minimax-video", label: "MiniMax Video", tabs: ["Video"] },
-  { provider: "fal", modelId: "fal-ai/kling-video/v1.6/pro/image-to-video", label: "Kling I2V", tabs: ["Video"] },
-  { provider: "fal", modelId: "fal-ai/stable-audio", label: "Stable Audio", tabs: ["Audio"] },
-  { provider: "fal", modelId: "fal-ai/trellis", label: "Trellis", tabs: ["3D"] },
-  { provider: "fal", modelId: "fal-ai/stable-zero123", label: "Zero123", tabs: ["3D"] },
-  { provider: "replicate", modelId: "stability-ai/triposr", label: "TripoSR", tabs: ["3D"] },
+  { provider: "gemini",    modelId: "nano-banana-2",                              label: "Imagen 4",        tabs: ["Image"], badge: "Fast" },
+  { provider: "gemini",    modelId: "nano-banana-pro",                            label: "Imagen 3",        tabs: ["Image"], badge: "Quality" },
+  { provider: "fal",       modelId: "fal-ai/flux-pro",                            label: "FLUX Pro",        tabs: ["Image"], badge: "Pro" },
+  { provider: "fal",       modelId: "fal-ai/flux/schnell",                        label: "FLUX Schnell",    tabs: ["Image"], badge: "Fast" },
+  { provider: "fal",       modelId: "fal-ai/flux-realism",                        label: "FLUX Realism",    tabs: ["Image"] },
+  { provider: "wavespeed", modelId: "wavespeed-ai/flux-dev-ultra-fast",           label: "FLUX Ultra",      tabs: ["Image"], badge: "Fastest" },
+  { provider: "fal",       modelId: "fal-ai/flux/dev/image-to-image",             label: "FLUX I2I",        tabs: ["Image"] },
+  { provider: "gemini",    modelId: "veo-3.0-generate-preview",                   label: "Veo 3",           tabs: ["Video"], badge: "Best" },
+  { provider: "gemini",    modelId: "veo-2.0-generate-001",                       label: "Veo 2",           tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/kling-video/v1.6/pro/text-to-video",  label: "Kling 1.6 Pro",   tabs: ["Video"], badge: "Popular" },
+  { provider: "fal",       modelId: "fal-ai/wan-t2v",                             label: "Wan T2V",         tabs: ["Video"], badge: "Fast" },
+  { provider: "fal",       modelId: "fal-ai/minimax-video",                       label: "MiniMax",         tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/kling-video/v1.6/pro/image-to-video", label: "Kling I2V",       tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/stable-audio",                        label: "Stable Audio",    tabs: ["Audio"] },
+  { provider: "fal",       modelId: "fal-ai/trellis",                             label: "Trellis",         tabs: ["3D"], badge: "Best" },
+  { provider: "fal",       modelId: "fal-ai/stable-zero123",                      label: "Zero123",         tabs: ["3D"] },
+  { provider: "replicate", modelId: "stability-ai/triposr",                       label: "TripoSR",         tabs: ["3D"], badge: "Fast" },
 ];
 
-const TEMPLATES = [
-  { id: "product-float", tab: "Image" as Tab, title: "Floating Product Shot", model: "FLUX.1 Pro", provider: "fal", modelId: "fal-ai/flux-pro", icon: <Box className="w-4 h-4" />, color: "white", prompt: "Isolate the product from its original background. Place it on a soft neutral background. Make it float slightly with a soft shadow underneath for elevation. Use balanced studio lighting and sharp focus to highlight details, preserving original logos, branding, colors, textures, and stitching." },
-  { id: "cinematic-portrait", tab: "Image" as Tab, title: "Cinematic Portrait", model: "FLUX Realism", provider: "fal", modelId: "fal-ai/flux-realism", icon: <ImageIcon className="w-4 h-4" />, color: "white", prompt: "Cinematic portrait photography, shallow depth of field, golden hour lighting, film grain, 35mm lens, professional color grading, bokeh background" },
-  { id: "concept-art", tab: "Image" as Tab, title: "Epic Concept Art", model: "Gemini Imagen 4", provider: "gemini", modelId: "nano-banana-2", icon: <Sparkles className="w-4 h-4" />, color: "white", prompt: "Epic fantasy concept art, dramatic lighting, detailed environment, professional illustration, cinematic composition, 8K resolution" },
-  { id: "product-video", tab: "Video" as Tab, title: "Product Reveal", model: "Kling 1.6 Pro", provider: "fal", modelId: "fal-ai/kling-video/v1.6/pro/text-to-video", icon: <Video className="w-4 h-4" />, color: "white", prompt: "Elegant product reveal, slow 360 rotation, studio lighting, dark background, luxury feel, smooth camera movement" },
-];
-
-const GALLERY_ITEMS = [
-  { icon: <ImageIcon />, title: "Product Shot", mode: "Image" },
-  { icon: <ImageIcon />, title: "Portrait", mode: "Image" },
-  { icon: <Video />, title: "City Video", mode: "Video" },
-  { icon: <Sparkles />, title: "Style Art", mode: "Image" },
-  { icon: <Box />, title: "3D Model", mode: "3D" },
-  { icon: <Music />, title: "Soundtrack", mode: "Audio" },
-];
-
-const TABS: Tab[] = ["Image", "Video", "Audio", "3D"];
-const TAB_ICONS: Record<Tab, any> = { 
-  Image: <ImageIcon className="w-6 h-6" />, 
-  Video: <Video className="w-6 h-6" />, 
-  Audio: <Music className="w-6 h-6" />, 
-  "3D": <Box className="w-6 h-6" /> 
+const QUICK_PROMPTS: Record<Tab, string[]> = {
+  Image: [
+    "A cinematic portrait of a woman in golden hour light",
+    "Futuristic city skyline at night, neon reflections",
+    "Product shot of a luxury watch on marble surface",
+    "Abstract fluid art in deep blue and gold",
+  ],
+  Video: [
+    "Slow motion ocean waves crashing on rocks",
+    "Timelapse of clouds over mountain peaks",
+    "Product reveal with dramatic lighting",
+    "Abstract particles flowing in space",
+  ],
+  Audio: [
+    "Cinematic orchestral score, epic and emotional",
+    "Lo-fi hip hop beat, relaxing study music",
+    "Ambient electronic soundscape",
+    "Upbeat corporate background music",
+  ],
+  "3D": [
+    "A detailed 3D model of a sports car",
+    "Futuristic helmet with visor",
+    "Ornate wooden chair with carved details",
+    "Abstract geometric sculpture",
+  ],
 };
 
-/* ── Shared Components ────────────────────────────────────── */
+const TAB_CONFIG: Record<Tab, { icon: any; color: string; desc: string }> = {
+  Image: { icon: ImageIcon, color: "text-cyan-400",   desc: "Generate stunning images" },
+  Video: { icon: Video,     color: "text-violet-400", desc: "Create AI videos" },
+  Audio: { icon: Music,     color: "text-amber-400",  desc: "Compose AI audio" },
+  "3D":  { icon: Box,       color: "text-emerald-400",desc: "Build 3D models" },
+};
 
-function Label({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <p className={cn("text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2", className)}>
-      {children}
-    </p>
-  );
-}
-
-function ModelDropdown({ models, value, onChange }: {
-  models: Model[]; value: string; onChange: (v: string) => void;
-}) {
+/* ── Model Picker ───────────────────────────────────────────── */
+function ModelPicker({ models, value, onChange }: { models: Model[]; value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const sel = models.find(m => m.modelId === value) || models[0];
@@ -91,47 +88,40 @@ function ModelDropdown({ models, value, onChange }: {
 
   return (
     <div ref={ref} className="relative">
-      <button 
+      <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all outline-none"
+        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-bold text-white"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_white]" />
-          <span className="text-sm font-bold text-white">{sel?.label || "Select model"}</span>
-        </div>
-        <Plus className={cn("w-4 h-4 text-white/20 transition-transform", open && "rotate-45")} />
+        <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+        {sel?.label}
+        {sel?.badge && <span className="text-[9px] font-black uppercase tracking-widest text-white/30 bg-white/5 px-1.5 py-0.5 rounded-md">{sel.badge}</span>}
+        <ChevronDown className={cn("w-3.5 h-3.5 text-white/30 transition-transform", open && "rotate-180")} />
       </button>
 
       <AnimatePresence>
         {open && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute top-full left-0 right-0 mt-2 z-[100] glass-panel rounded-3xl overflow-hidden shadow-2xl p-2 border-white/5"
+            exit={{ opacity: 0, y: 6, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-0 mt-2 z-50 bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden min-w-[200px]"
           >
-            {Array.from(new Set(models.map(m => m.provider))).map((prov) => (
-              <div key={prov} className="mb-2 last:mb-0">
-                <div className="px-4 py-2 flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{prov}</span>
+            {models.map(m => (
+              <button
+                key={m.modelId}
+                onClick={() => { onChange(m.modelId); setOpen(false); }}
+                className={cn(
+                  "w-full flex items-center justify-between px-4 py-3 text-sm transition-all hover:bg-white/5",
+                  value === m.modelId ? "text-white font-bold" : "text-white/50"
+                )}
+              >
+                <span>{m.label}</span>
+                <div className="flex items-center gap-2">
+                  {m.badge && <span className="text-[9px] font-black uppercase tracking-widest text-white/20">{m.badge}</span>}
+                  {value === m.modelId && <Check className="w-3.5 h-3.5 text-white" />}
                 </div>
-                {models.filter(m => m.provider === prov).map(m => {
-                  const active = value === m.modelId;
-                  return (
-                    <button 
-                      key={m.modelId} 
-                      onClick={() => { onChange(m.modelId); setOpen(false); }} 
-                      className={cn(
-                        "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm transition-all",
-                        active ? "bg-white text-black font-black" : "text-white/60 hover:bg-white/5 hover:text-white"
-                      )}
-                    >
-                      {m.label}
-                      {active && <Check className="w-4 h-4" />}
-                    </button>
-                  );
-                })}
-              </div>
+              </button>
             ))}
           </motion.div>
         )}
@@ -140,160 +130,36 @@ function ModelDropdown({ models, value, onChange }: {
   );
 }
 
-function RefSlot({ label, icon, image, onUpload, onClear }: {
-  label: string; icon: React.ReactNode; image?: string; onUpload: (d: string) => void; onClear: () => void;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-  return (
-    <div 
-      onClick={() => !image && ref.current?.click()} 
-      className={cn(
-        "flex-1 aspect-square rounded-2xl border transition-all cursor-pointer overflow-hidden relative group",
-        image ? "border-transparent" : "border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10"
-      )}
-    >
-      {image ? (
-        <>
-          <img src={image} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <button 
-              onClick={e => { e.stopPropagation(); onClear(); }} 
-              className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-full gap-2">
-          <div className="text-white/20 group-hover:text-white/40 transition-colors">{icon}</div>
-          <span className="text-[10px] font-bold uppercase tracking-tight text-white/20 group-hover:text-white/40">{label}</span>
-        </div>
-      )}
-      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={e => {
-        const f = e.target.files?.[0]; if (!f) return;
-        const r = new FileReader(); r.onload = ev => onUpload(ev.target?.result as string); r.readAsDataURL(f);
-      }} />
-    </div>
-  );
-}
-
-/* ── Screen Components ────────────────────────────────────── */
-
-function HomeScreen({ onStart, onTemplate }: { onStart: (tab: Tab) => void; onTemplate: () => void }) {
-  return (
-    <div className="flex-1 overflow-y-auto px-8 pt-12 pb-32 lg:px-20 lg:pt-20">
-      <div className="max-w-7xl mx-auto space-y-24">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="space-y-4"
-        >
-          <h1 className="text-6xl lg:text-8xl font-black text-white tracking-tighter leading-none">Studio.</h1>
-          <p className="text-white/30 text-xs lg:text-sm font-black uppercase tracking-[0.3em] max-w-lg">
-            A high-performance neural engine for elite tier media synthesis.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TABS.map((t, idx) => (
-            <motion.button 
-              key={t} 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 + idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
-              onClick={() => onStart(t)} 
-              className="group p-8 lg:p-12 rounded-[48px] border border-white/5 bg-white/5 hover:bg-white/10 transition-all text-left flex flex-col gap-12 relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-white/10 transition-colors">
-                {TAB_ICONS[t]}
-              </div>
-              <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/10 transition-all shadow-inner">
-                {TAB_ICONS[t]}
-              </div>
-              <div>
-                <div className="text-2xl lg:text-3xl font-black text-white tracking-tighter mb-2">{t}</div>
-                <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] leading-relaxed">
-                  {t === "Image" ? "Photorealistic Neural Capture" : t === "Video" ? "Cinematic Temporal Synthesis" : t === "Audio" ? "Spatial Acoustic Engineering" : "Volumetric 3D Reconstruction"}
-                </div>
-              </div>
-            </motion.button>
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-8">
-          <motion.button 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            onClick={onTemplate} 
-            className="p-10 lg:p-16 rounded-[64px] border border-white/5 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-between group relative overflow-hidden"
-          >
-            <div className="text-left relative z-10">
-              <div className="text-3xl font-black text-white tracking-tighter mb-3">Explore Vaults</div>
-              <div className="text-sm font-bold text-white/20 tracking-tight max-w-xs leading-relaxed">Leverage community-driven neural presets and workflows.</div>
-            </div>
-            <div className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all transform group-hover:rotate-45 relative z-10">
-              <ArrowRight className="w-8 h-8" />
-            </div>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-          </motion.button>
-
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="p-10 lg:p-16 rounded-[64px] border border-white/5 bg-gradient-to-br from-white/5 to-transparent flex flex-col justify-between relative overflow-hidden group"
-          >
-            <div>
-              <div className="text-3xl font-black text-white tracking-tighter mb-3">Batch Engine</div>
-              <div className="text-sm font-bold text-white/20 tracking-tight max-w-xs leading-relaxed">Automate high-volume synthesis with multi-node processing.</div>
-            </div>
-            <div className="mt-12 flex gap-3">
-               <span className="text-[10px] font-black uppercase tracking-widest text-white/40 bg-white/10 px-6 py-2.5 rounded-full border border-white/5 backdrop-blur-md">PRO ACCESS</span>
-            </div>
-            <Zap className="absolute top-10 right-10 w-12 h-12 text-white/5 group-hover:text-amber-400/20 transition-colors" />
-          </motion.div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function GenerateScreen({ tab, setTab, onBack, getKey }: {
-  tab: Tab; setTab: (t: Tab) => void; onBack: () => void; getKey: (p: string) => string | null;
-}) {
+/* ── Main Create Screen ─────────────────────────────────────── */
+function CreateScreen() {
+  const [tab, setTab] = useState<Tab>("Image");
   const [prompt, setPrompt] = useState("");
+  const [modelId, setModelId] = useState(MODELS.filter(m => m.tabs.includes("Image"))[0].modelId);
   const [refImage, setRefImage] = useState<string | null>(null);
-  const [styleImage, setStyleImage] = useState<string | null>(null);
-  const [modelId, setModelId] = useState(MODELS.filter(m => m.tabs.includes(tab))[0]?.modelId || "");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const tabModels = MODELS.filter(m => m.tabs.includes(tab));
   const selModel = tabModels.find(m => m.modelId === modelId) || tabModels[0];
-  const outputType = tab === "Video" ? "video" : tab === "3D" ? "3d" : tab === "Audio" ? "audio" : "image";
 
+  // Reset model when tab changes
   useEffect(() => {
     const first = tabModels[0];
     if (first && !tabModels.find(m => m.modelId === modelId)) setModelId(first.modelId);
-    setResult(null); setError(null); setShowResult(false);
+    setResult(null); setError(null);
   }, [tab]);
 
-  const generate = async (customPrompt?: string) => {
-    const finalPrompt = customPrompt || prompt;
-    if (!finalPrompt.trim()) return;
-
-    setLoading(true); setError(null); setResult(null); setShowResult(false);
+  const generate = useCallback(async (p?: string) => {
+    const finalPrompt = p ?? prompt;
+    if (!finalPrompt.trim() || loading) return;
+    setLoading(true); setError(null); setResult(null);
     try {
-      const provider = selModel?.provider || "gemini";
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
       const body: Record<string, unknown> = {
         prompt: finalPrompt.trim(),
-        selectedModel: { provider, modelId: selModel?.modelId, displayName: selModel?.label },
+        selectedModel: { provider: selModel.provider, modelId: selModel.modelId, displayName: selModel.label },
         aspectRatio: "1:1",
       };
       if (refImage) { body.images = [refImage]; body.dynamicInputs = { image_url: refImage }; }
@@ -301,283 +167,367 @@ function GenerateScreen({ tab, setTab, onBack, getKey }: {
       if (tab === "3D") body.mediaType = "3d";
       if (tab === "Audio") body.mediaType = "audio";
 
-      const res = await fetch("/api/generate", { method: "POST", headers, body: JSON.stringify(body) });
+      const res = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Generation failed");
-      
-      let out = null;
+
+      let out: string | null = null;
       if (data.video) out = `data:video/mp4;base64,${data.video}`;
       else if (data.videoUrl) out = data.videoUrl;
       else if (data.model3dUrl) out = data.model3dUrl;
       else if (data.audio) out = `data:audio/mp3;base64,${data.audio}`;
       else if (data.image) out = data.image;
       else throw new Error("No output received");
-
-      setResult(out); setShowResult(true);
+      setResult(out);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
+  }, [prompt, selModel, refImage, tab, loading]);
+
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generate();
   };
 
+  const handleFile = (file: File) => {
+    const r = new FileReader();
+    r.onload = (ev) => setRefImage(ev.target?.result as string);
+    r.readAsDataURL(file);
+  };
+
+  const outputType = tab === "Video" ? "video" : tab === "Audio" ? "audio" : "image";
+  const TabIcon = TAB_CONFIG[tab].icon;
+
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0A0A0A] relative overflow-hidden lg:flex-row">
-      {/* Properties Panel (Desktop) */}
-      <div className="hidden lg:flex w-[400px] flex-col border-r border-white/5 bg-[#0D0D0D] p-10 overflow-y-auto">
-        <div className="mb-10 flex items-center gap-4">
-          <button onClick={onBack} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <h2 className="text-2xl font-black text-white tracking-tighter">Properties</h2>
-        </div>
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
 
-        <div className="space-y-12">
-          <div>
-            <Label>Engine Configuration</Label>
-            <ModelDropdown models={tabModels} value={modelId} onChange={setModelId} />
-          </div>
+      {/* ── Tab Bar ── */}
+      <div className="flex items-center gap-1 px-6 pt-5 pb-0 flex-shrink-0">
+        {(["Image", "Video", "Audio", "3D"] as Tab[]).map(t => {
+          const Ic = TAB_CONFIG[t].icon;
+          const active = tab === t;
+          return (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all",
+                active ? "bg-white text-black" : "text-white/40 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Ic className="w-4 h-4" />
+              {t}
+            </button>
+          );
+        })}
+      </div>
 
-          <div>
-            <Label>Creative Direction</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <RefSlot label="Composition" icon={<LayoutGrid className="w-5 h-5" />} image={styleImage || undefined} onUpload={setStyleImage} onClear={() => setStyleImage(null)} />
-              <RefSlot label="Subject" icon={<User className="w-5 h-5" />} image={undefined} onUpload={() => {}} onClear={() => {}} />
-              <RefSlot label="Lighting" icon={<Sparkles className="w-5 h-5" />} image={refImage || undefined} onUpload={setRefImage} onClear={() => setRefImage(null)} />
-              <div className="aspect-square rounded-2xl border border-dashed border-white/10 flex items-center justify-center text-white/20 hover:text-white/40 hover:border-white/20 transition-all cursor-pointer">
-                <Plus className="w-6 h-6" />
-              </div>
+      {/* ── Main Area ── */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden gap-0">
+
+        {/* Left: Prompt + Controls */}
+        <div className="flex flex-col w-full lg:w-[420px] flex-shrink-0 border-r border-white/5 overflow-y-auto">
+
+          {/* Prompt Box */}
+          <div className="p-6 space-y-4">
+            <div className="relative">
+              <textarea
+                ref={textareaRef}
+                value={prompt}
+                onChange={e => setPrompt(e.target.value)}
+                onKeyDown={handleKey}
+                placeholder={`Describe your ${tab.toLowerCase()}…`}
+                rows={4}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-white/20 outline-none focus:border-white/30 resize-none transition-all leading-relaxed"
+              />
+              <div className="absolute bottom-3 right-3 text-[10px] text-white/15 font-medium">⌘↵</div>
             </div>
-          </div>
 
-          <div className="p-6 rounded-3xl bg-white/5 border border-white/5">
-            <Label className="mb-4 text-white/60">Active Tab</Label>
-            <div className="flex gap-2">
-              {TABS.map(t => (
-                <button 
-                  key={t} 
-                  onClick={() => setTab(t)}
-                  className={cn(
-                    "flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                    tab === t ? "bg-white text-black" : "text-white/20 hover:text-white/40"
-                  )}
+            {/* Quick prompts */}
+            <div className="flex flex-wrap gap-2">
+              {QUICK_PROMPTS[tab].map((qp, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setPrompt(qp); textareaRef.current?.focus(); }}
+                  className="text-[11px] text-white/30 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 px-3 py-1.5 rounded-lg transition-all text-left line-clamp-1 max-w-[180px]"
                 >
-                  {t}
+                  {qp}
                 </button>
               ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Main Canvas Area */}
-      <div className="flex-1 flex flex-col relative bg-[#0A0A0A]">
-        {/* Mobile Tabs */}
-        <div className="lg:hidden flex items-center justify-center gap-1 p-2 bg-white/5 rounded-full mx-6 mt-4">
-          {TABS.map(t => (
-            <button 
-              key={t} 
-              onClick={() => setTab(t)} 
+          {/* Model + Options */}
+          <div className="px-6 pb-4 space-y-4 border-t border-white/5 pt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Model</span>
+              <ModelPicker models={tabModels} value={selModel.modelId} onChange={setModelId} />
+            </div>
+
+            {/* Reference image */}
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Reference</span>
+              {refImage ? (
+                <div className="flex items-center gap-2">
+                  <img src={refImage} className="w-8 h-8 rounded-lg object-cover border border-white/10" alt="ref" />
+                  <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  className="flex items-center gap-1.5 text-[11px] text-white/30 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 px-3 py-1.5 rounded-lg transition-all"
+                >
+                  <Upload className="w-3.5 h-3.5" /> Upload
+                </button>
+              )}
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+            </div>
+          </div>
+
+          {/* Generate Button */}
+          <div className="px-6 pb-6">
+            <button
+              onClick={() => generate()}
+              disabled={!prompt.trim() || loading}
               className={cn(
-                "flex-1 py-2 px-4 rounded-full text-xs font-black transition-all",
-                tab === t ? "bg-white text-black" : "text-white/40 hover:text-white"
+                "w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3",
+                prompt.trim() && !loading
+                  ? "bg-white text-black hover:bg-white/90 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+                  : "bg-white/5 text-white/20 cursor-not-allowed"
               )}
             >
-              {t}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  Generating…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Generate {tab}
+                </>
+              )}
             </button>
-          ))}
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="mx-6 mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20">
+              <p className="text-xs text-red-400 font-medium leading-relaxed">{error}</p>
+              <button onClick={() => generate()} className="mt-2 text-[11px] font-bold text-red-400 hover:text-red-300 flex items-center gap-1">
+                <RefreshCw className="w-3 h-3" /> Retry
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto px-6 py-8 pb-40 lg:p-20 lg:pb-52 flex items-center justify-center">
+        {/* Right: Output Canvas */}
+        <div className="flex-1 flex items-center justify-center p-6 lg:p-10 overflow-hidden bg-[#080808]">
           <AnimatePresence mode="wait">
             {loading ? (
-              <motion.div 
+              <motion.div
                 key="loading"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                className="flex flex-col items-center justify-center gap-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-6 text-center"
               >
-                <div className="w-20 h-20 lg:w-32 lg:h-32 rounded-full border-4 border-white/5 border-t-white animate-spin shadow-[0_0_80px_rgba(255,255,255,0.1)]" />
-                <div className="text-center">
-                  <p className="text-xs lg:text-sm font-black uppercase tracking-[0.3em] text-white">Synthesizing {tab}...</p>
-                  <p className="text-[10px] font-bold text-white/20 mt-2 uppercase tracking-widest">Applying neural weights</p>
+                <div className="relative w-24 h-24">
+                  <div className="absolute inset-0 rounded-full border-2 border-white/5" />
+                  <div className="absolute inset-0 rounded-full border-2 border-t-white border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+                  <div className="absolute inset-3 rounded-full border border-white/10 animate-pulse" />
+                  <TabIcon className={cn("absolute inset-0 m-auto w-8 h-8", TAB_CONFIG[tab].color)} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Generating your {tab.toLowerCase()}…</p>
+                  <p className="text-xs text-white/30 mt-1">This may take a moment</p>
                 </div>
               </motion.div>
-            ) : showResult && result ? (
-              <motion.div 
+            ) : result ? (
+              <motion.div
                 key="result"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="max-w-4xl w-full flex flex-col gap-8"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-2xl flex flex-col gap-4"
               >
-                <div className="aspect-square lg:aspect-video glass-panel rounded-[48px] overflow-hidden shadow-2xl border-white/10 relative group">
-                  {outputType === "video"
-                    ? <video src={result} controls autoPlay loop className="w-full h-full object-contain" />
-                    : <img src={result} alt="output" className="w-full h-full object-contain" />
-                  }
-                  <div className="absolute top-8 right-8 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                      <Maximize2 className="w-5 h-5" />
-                    </button>
-                    <button className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                      <Share2 className="w-5 h-5" />
-                    </button>
+                <div className="relative rounded-3xl overflow-hidden bg-black border border-white/5 group">
+                  {outputType === "video" ? (
+                    <video src={result} controls autoPlay loop className="w-full max-h-[60vh] object-contain" />
+                  ) : outputType === "audio" ? (
+                    <div className="p-12 flex flex-col items-center gap-6">
+                      <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
+                        <Music className="w-10 h-10 text-amber-400" />
+                      </div>
+                      <audio src={result} controls className="w-full" />
+                    </div>
+                  ) : (
+                    <img src={result} alt="Generated" className="w-full max-h-[60vh] object-contain" />
+                  )}
+
+                  {/* Hover actions */}
+                  <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <a
+                      href={result}
+                      download={`pixza-${tab.toLowerCase()}`}
+                      className="w-9 h-9 rounded-xl bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all"
+                    >
+                      <Download className="w-4 h-4" />
+                    </a>
                   </div>
                 </div>
-                <div className="flex gap-4 items-center justify-center">
-                  <button onClick={() => { setShowResult(false); setResult(null); }} className="btn-minimal btn-minimal-secondary px-10 py-4 text-sm tracking-widest uppercase font-black">Discard</button>
-                  <a href={result} download="pixza_export" className="btn-minimal btn-minimal-primary px-12 py-4 text-sm tracking-widest uppercase font-black flex items-center gap-3">
-                    <Download className="w-5 h-5" /> Export Artifact
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { setResult(null); setPrompt(""); }}
+                    className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all"
+                  >
+                    New
+                  </button>
+                  <button
+                    onClick={() => generate()}
+                    className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" /> Regenerate
+                  </button>
+                  <a
+                    href={result}
+                    download={`pixza-${tab.toLowerCase()}`}
+                    className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-black text-center hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" /> Save
                   </a>
                 </div>
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 key="idle"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center text-center max-w-md"
+                className="flex flex-col items-center gap-4 text-center max-w-xs"
               >
-                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-[40px] bg-white/5 border border-white/5 flex items-center justify-center text-white/10 mb-8">
-                  {TAB_ICONS[tab]}
+                <div className={cn("w-20 h-20 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center", TAB_CONFIG[tab].color)}>
+                  <TabIcon className="w-10 h-10 opacity-30" />
                 </div>
-                <h3 className="text-2xl font-black text-white mb-2">Ready to Imagine</h3>
-                <p className="text-sm font-bold text-white/20">Provide a descriptive prompt below to begin the generation process.</p>
+                <div>
+                  <p className="text-white/40 text-sm font-medium">Write a prompt and hit Generate</p>
+                  <p className="text-white/20 text-xs mt-1">or pick a quick prompt on the left</p>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+      </div>
+    </div>
+  );
+}
 
-        {/* Floating V0-style Chat Box */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-3xl px-6 z-[150]">
-          <VercelV0Chat 
-            isLoading={loading}
-            onSend={(msg) => { setPrompt(msg); generate(msg); }}
-            placeholder={`What can I help you ship in ${tab.toLowerCase()}?`}
-          />
+/* ── Explore Screen ─────────────────────────────────────────── */
+const TEMPLATES = [
+  { id: "product",   tab: "Image" as Tab, title: "Floating Product Shot",  model: "FLUX Pro",      provider: "fal",    modelId: "fal-ai/flux-pro",                            prompt: "Isolate the product from its background. Place it floating on a soft neutral surface with a subtle shadow. Studio lighting, sharp focus, preserve all branding and textures." },
+  { id: "portrait",  tab: "Image" as Tab, title: "Cinematic Portrait",     model: "FLUX Realism",  provider: "fal",    modelId: "fal-ai/flux-realism",                        prompt: "Cinematic portrait photography, shallow depth of field, golden hour lighting, film grain, 35mm lens, professional color grading, bokeh background" },
+  { id: "concept",   tab: "Image" as Tab, title: "Epic Concept Art",       model: "Imagen 4",      provider: "gemini", modelId: "nano-banana-2",                              prompt: "Epic fantasy concept art, dramatic lighting, detailed environment, professional illustration, cinematic composition, 8K resolution" },
+  { id: "landscape", tab: "Image" as Tab, title: "Dramatic Landscape",     model: "Imagen 3",      provider: "gemini", modelId: "nano-banana-pro",                            prompt: "Dramatic mountain landscape at golden hour, volumetric light rays, ultra-detailed, photorealistic, 8K" },
+  { id: "video1",    tab: "Video" as Tab, title: "Product Reveal",         model: "Kling 1.6 Pro", provider: "fal",    modelId: "fal-ai/kling-video/v1.6/pro/text-to-video",  prompt: "Elegant product reveal, slow 360 rotation, studio lighting, dark background, luxury feel, smooth camera movement" },
+  { id: "video2",    tab: "Video" as Tab, title: "Nature Timelapse",       model: "Veo 2",         provider: "gemini", modelId: "veo-2.0-generate-001",                       prompt: "Timelapse of clouds moving over mountain peaks at sunset, cinematic, 4K" },
+];
+
+function ExploreScreen({ onUse }: { onUse: (t: typeof TEMPLATES[0]) => void }) {
+  const [filter, setFilter] = useState<Tab | "All">("All");
+  const filtered = filter === "All" ? TEMPLATES : TEMPLATES.filter(t => t.tab === filter);
+
+  return (
+    <div className="flex-1 overflow-y-auto px-6 pt-6 pb-24">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Templates</h2>
+        <p className="text-white/30 text-sm mb-6">Click any template to load it into the generator.</p>
+
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {(["All", "Image", "Video", "Audio", "3D"] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f as any)}
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
+                filter === f ? "bg-white text-black" : "bg-white/5 text-white/40 hover:text-white"
+              )}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          {filtered.map(t => (
+            <button
+              key={t.id}
+              onClick={() => onUse(t)}
+              className="group p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-left"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-bold text-white text-base">{t.title}</span>
+                <span className={cn(
+                  "text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg",
+                  t.tab === "Image" ? "bg-cyan-500/10 text-cyan-400" :
+                  t.tab === "Video" ? "bg-violet-500/10 text-violet-400" :
+                  "bg-white/5 text-white/30"
+                )}>{t.tab}</span>
+              </div>
+              <p className="text-xs text-white/30 font-medium mb-3">{t.model}</p>
+              <p className="text-xs text-white/50 line-clamp-2 leading-relaxed">{t.prompt}</p>
+              <div className="mt-4 flex items-center gap-1.5 text-[11px] font-bold text-white/20 group-hover:text-white/60 transition-colors">
+                <Sparkles className="w-3 h-3" /> Use this template
+              </div>
+            </button>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function TemplatesScreen({ onSelect }: { onSelect: (t: typeof TEMPLATES[0]) => void }) {
-  const [activeTab, setActiveTab] = useState<Tab | "All">("All");
-  const tabs: (Tab | "All")[] = ["All", "Image", "Video", "Audio", "3D"];
-  const filtered = activeTab === "All" ? TEMPLATES : TEMPLATES.filter(t => t.tab === activeTab);
-
-  return (
-    <div className="flex-1 flex flex-col overflow-hidden px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
-      <h2 className="text-4xl lg:text-6xl font-black text-white mb-8 tracking-tighter">Explore</h2>
-      <div className="flex gap-3 overflow-x-auto pb-8 scrollbar-hide">
-        {tabs.map(t => (
-          <button 
-            key={t} 
-            onClick={() => setActiveTab(t)} 
-            className={cn(
-              "px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all",
-              activeTab === t ? "bg-white text-black" : "bg-white/5 text-white/40 hover:text-white"
-            )}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-      <div className="flex-1 overflow-y-auto grid lg:grid-cols-2 gap-6 pr-2">
-        {filtered.map(t => (
-          <button 
-            key={t.id} 
-            onClick={() => onSelect(t)} 
-            className="group p-8 lg:p-10 rounded-[48px] border border-white/5 bg-white/5 hover:bg-white/10 transition-all text-left flex items-start gap-8"
-          >
-            <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-3xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-white group-hover:bg-white/10 transition-all">
-              {t.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-xl lg:text-2xl font-black text-white">{t.title}</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/20 bg-white/5 px-3 py-1 rounded-full">{t.tab}</span>
-              </div>
-              <p className="text-xs font-bold text-white/40 mb-4">{t.model}</p>
-              <p className="text-sm lg:text-base text-white/60 line-clamp-2 leading-relaxed">{t.prompt}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function GalleryScreen() {
-  return (
-    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
-      <h2 className="text-4xl lg:text-6xl font-black text-white mb-12 tracking-tighter">Vault</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        {[...GALLERY_ITEMS, ...GALLERY_ITEMS, ...GALLERY_ITEMS].map((g, i) => (
-          <div key={i} className={cn(
-            "rounded-[40px] bg-white/5 border border-white/5 overflow-hidden flex flex-col justify-end p-8 relative group aspect-square",
-            i % 5 === 0 && "lg:col-span-2 lg:row-span-2 aspect-auto"
-          )}>
-            <div className="absolute inset-0 flex items-center justify-center text-white/5 group-hover:scale-110 group-hover:text-white/10 transition-all transform scale-[2] opacity-10">
-              {g.icon}
-            </div>
-            <div className="relative z-10">
-              <div className="text-lg lg:text-xl font-black text-white mb-1">{g.title}</div>
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">{g.mode}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
+/* ── Settings Screen ────────────────────────────────────────── */
 function SettingsScreen() {
   const providerSettings = useWorkflowStore(s => s.providerSettings);
   const updateProviderApiKey = useWorkflowStore(s => s.updateProviderApiKey);
-
-  const PROVIDERS = [
-    { id: "gemini", name: "Google Gemini", color: "white", placeholder: "AIza...", icon: <Globe className="w-5 h-5" /> },
-    { id: "fal", name: "fal.ai", color: "white", placeholder: "fal_...", icon: <Terminal className="w-5 h-5" /> },
-    { id: "replicate", name: "Replicate", color: "white", placeholder: "r8_...", icon: <Code className="w-5 h-5" /> },
-    { id: "wavespeed", name: "WaveSpeed", color: "white", placeholder: "ws_...", icon: <Terminal className="w-5 h-5" /> },
-  ] as const;
-
   const [show, setShow] = useState<Record<string, boolean>>({});
 
-  return (
-    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl lg:text-6xl font-black text-white mb-4 tracking-tighter text-center lg:text-left">Auth</h2>
-        <p className="text-sm lg:text-base font-bold text-white/20 mb-16 uppercase tracking-widest text-center lg:text-left">Manage your creative engine access.</p>
+  const PROVIDERS = [
+    { id: "gemini",    name: "Google Gemini", placeholder: "AIza..." },
+    { id: "fal",       name: "fal.ai",        placeholder: "fal_..." },
+    { id: "replicate", name: "Replicate",     placeholder: "r8_..."  },
+    { id: "wavespeed", name: "WaveSpeed",     placeholder: "ws_..."  },
+  ] as const;
 
-        <div className="grid lg:grid-cols-2 gap-6 mb-16">
+  return (
+    <div className="flex-1 overflow-y-auto px-6 pt-6 pb-24">
+      <div className="max-w-2xl mx-auto">
+        <h2 className="text-3xl font-black text-white tracking-tighter mb-1">API Keys</h2>
+        <p className="text-white/30 text-sm mb-8">Add your own keys to use premium models. Keys are stored locally.</p>
+
+        <div className="space-y-3">
           {PROVIDERS.map(p => {
-            const currentKey = providerSettings.providers[p.id as keyof typeof providerSettings.providers]?.apiKey || "";
+            const key = providerSettings.providers[p.id as keyof typeof providerSettings.providers]?.apiKey || "";
             return (
-              <div key={p.id} className="p-10 rounded-[48px] bg-white/5 border border-white/5 group hover:bg-white/10 transition-all">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/10 transition-all">
-                      {p.icon}
-                    </div>
-                    <span className="text-xl font-black text-white">{p.name}</span>
-                  </div>
-                  {currentKey && <Check className="text-green-500 w-5 h-5" />}
+              <div key={p.id} className="p-5 rounded-2xl bg-white/5 border border-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-bold text-white text-sm">{p.name}</span>
+                  {key && <span className="text-[10px] font-black uppercase tracking-widest text-green-400 bg-green-500/10 px-2 py-1 rounded-lg">Connected</span>}
                 </div>
                 <div className="relative">
                   <input
                     type={show[p.id] ? "text" : "password"}
-                    value={currentKey}
+                    value={key}
                     onChange={e => updateProviderApiKey(p.id, e.target.value)}
                     placeholder={p.placeholder}
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-sm font-mono text-white outline-none focus:border-white/20 transition-all pr-20"
+                    className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm font-mono text-white outline-none focus:border-white/20 transition-all pr-16"
                   />
-                  <button 
-                    onClick={() => setShow(s => ({ ...s, [p.id]: !s[p.id] }))} 
-                    className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
+                  <button
+                    onClick={() => setShow(s => ({ ...s, [p.id]: !s[p.id] }))}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
                   >
                     {show[p.id] ? "Hide" : "Show"}
                   </button>
@@ -587,191 +537,143 @@ function SettingsScreen() {
           })}
         </div>
 
-        <div className="p-12 lg:p-20 rounded-[64px] bg-white text-black flex flex-col lg:flex-row items-center justify-between gap-12">
-          <div className="text-center lg:text-left">
-            <div className="text-4xl lg:text-5xl font-black mb-4 tracking-tighter">Enterprise Access</div>
-            <div className="text-lg font-bold opacity-40 leading-tight max-w-md">Unlimited computational priority and custom model weights.</div>
+        <div className="mt-8 p-6 rounded-2xl bg-white text-black">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-black text-lg tracking-tighter">Upgrade to Pro</p>
+              <p className="text-sm text-black/50 mt-1">Unlock all models, 2000 credits/month</p>
+            </div>
+            <button className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-black/80 transition-all">
+              <Crown className="w-4 h-4" /> Upgrade
+            </button>
           </div>
-          <button className="whitespace-nowrap px-12 py-6 rounded-3xl bg-black text-white text-sm font-black tracking-[0.2em] uppercase hover:scale-[0.98] transition-transform flex items-center gap-3">
-            <Crown className="w-5 h-5" /> Start Trial
-          </button>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Navigation Components ─────────────────────────────────── */
-
+/* ── Tools Screen ───────────────────────────────────────────── */
 function ToolsScreen() {
   return (
-    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
+    <div className="flex-1 overflow-y-auto px-6 pt-6 pb-24">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-4xl lg:text-6xl font-black text-white mb-3 tracking-tighter">Tools.</h2>
-        <p className="text-sm font-bold text-white/20 mb-12 uppercase tracking-widest">
-          Local AI — runs in your browser, zero API cost.
-        </p>
+        <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Image Tools</h2>
+        <p className="text-white/30 text-sm mb-8">Local AI — runs in your browser, zero API cost.</p>
         <ImageTools />
       </div>
     </div>
   );
 }
 
-function SidebarNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
-  const items: { id: Screen; icon: any; label: string }[] = [
-    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Dashboard" },
-    { id: "generate",  icon: <Plus className="w-5 h-5" />,       label: "Studio"    },
-    { id: "templates", icon: <Compass className="w-5 h-5" />,    label: "Explore"   },
-    { id: "tools",     icon: <Wand2 className="w-5 h-5" />,      label: "Tools"     },
-    { id: "gallery",   icon: <ImageIcon className="w-5 h-5" />, label: "Vault"   },
-    { id: "settings",  icon: <Settings className="w-5 h-5" />, label: "Engine"  },
-  ];
-
-  return (
-    <div className="hidden lg:flex flex-col items-center py-8 w-24 flex-shrink-0 bg-[#0A0A0A] border-r border-white/5 z-50">
-      <Link href="/landing" className="mb-12 group">
-        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-          <img src="/pixza-logo.png" alt="" className="w-6 h-6 invert" />
-        </div>
-      </Link>
-      <div className="flex-1 flex flex-col gap-4">
-        {items.map((item) => {
-          const active = screen === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setScreen(item.id)}
-              className={cn(
-                "w-14 h-14 rounded-2xl transition-all flex items-center justify-center group relative",
-                active ? "bg-white text-black shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]" : "text-white/20 hover:text-white hover:bg-white/5"
-              )}
-            >
-              {item.icon}
-              <div className="absolute left-full ml-4 px-3 py-1.5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-2xl z-[100]">
-                {item.label}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      <Link 
-        href="/profile"
-        className="mb-8 w-12 h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all cursor-pointer overflow-hidden group"
-      >
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lekh" alt="User" className="w-full h-full grayscale group-hover:grayscale-0 transition-all" />
-      </Link>
-    </div>
-  );
-}
-
-function BottomNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
-  const items: { id: Screen; icon: any; label: string }[] = [
-    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Home"    },
-    { id: "generate",  icon: <Plus className="w-5 h-5" />,       label: "Create"  },
-    { id: "templates", icon: <Compass className="w-5 h-5" />,    label: "Explore" },
-    { id: "tools",     icon: <Wand2 className="w-5 h-5" />,      label: "Tools"   },
-    { id: "settings",  icon: <Settings className="w-5 h-5" />,   label: "Auth"    },
-  ];
-
-  return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] lg:hidden">
-      <div className="glass-panel p-2 rounded-full flex items-center gap-1 shadow-2xl border-white/10">
-        {items.map((item) => {
-          const active = screen === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setScreen(item.id)}
-              className={cn(
-                "flex flex-col items-center justify-center w-14 h-14 rounded-full transition-all",
-                active ? "bg-white text-black" : "text-white/40 hover:text-white hover:bg-white/5"
-              )}
-            >
-              {item.icon}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ── Root ──────────────────────────────────────────────────── */
-
+/* ── Root Page ──────────────────────────────────────────────── */
 export default function CreatePage() {
-  const [screen, setScreen] = useState<Screen>("home");
-  const [tab, setTab] = useState<Tab>("Image");
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
-  const providerSettings = useWorkflowStore(s => s.providerSettings);
+  const [screen, setScreen] = useState<NavScreen>("create");
+  // Shared state so templates can pre-fill the create screen
+  const [pendingTemplate, setPendingTemplate] = useState<typeof TEMPLATES[0] | null>(null);
 
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 1024);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  const getKey = useCallback((p: string) => {
-    return providerSettings.providers[p as keyof typeof providerSettings.providers]?.apiKey || null;
-  }, [providerSettings]);
-
-  const handleStart = (t: Tab) => { setTab(t); setScreen("generate"); };
-  const handleTemplate = (t: typeof TEMPLATES[0]) => { setTab(t.tab); setScreen("generate"); };
-
-  if (isMobile === null) return <div className="min-h-screen bg-[#0A0A0A]" />;
+  const handleUseTemplate = (t: typeof TEMPLATES[0]) => {
+    setPendingTemplate(t);
+    setScreen("create");
+  };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-white selection:text-black flex font-sans antialiased">
-      {/* Sidebar for Desktop */}
-      <SidebarNav screen={screen} setScreen={setScreen} />
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans antialiased">
 
-      <div className="flex-1 flex flex-col h-screen relative overflow-hidden">
-        {/* Header (Mobile Only) */}
-        <header className="lg:hidden px-6 h-16 flex items-center justify-between flex-shrink-0 bg-[#0A0A0A] z-50">
-          <Link href="/landing" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-              <img src="/pixza-logo.png" alt="" className="w-4 h-4" />
-            </div>
-            <span className="text-xl font-black tracking-tighter">Pixza</span>
+      {/* ── Sidebar ── */}
+      <aside className="hidden lg:flex flex-col items-center py-6 w-20 flex-shrink-0 bg-[#0A0A0A] border-r border-white/5 z-50">
+        <Link href="/landing" className="mb-10 group">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
+            <img src="/pixza-logo.png" alt="" className="w-5 h-5 invert" />
+          </div>
+        </Link>
+
+        {([
+          { id: "create",   icon: Sparkles,  label: "Create"    },
+          { id: "explore",  icon: Compass,   label: "Templates" },
+          { id: "tools",    icon: Wand2,     label: "Tools"     },
+          { id: "settings", icon: Settings,  label: "Settings"  },
+        ] as { id: NavScreen; icon: any; label: string }[]).map(item => {
+          const active = screen === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setScreen(item.id)}
+              title={item.label}
+              className={cn(
+                "w-12 h-12 rounded-2xl mb-2 flex items-center justify-center transition-all group relative",
+                active ? "bg-white text-black" : "text-white/20 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="absolute left-full ml-3 px-2.5 py-1 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+
+        <div className="mt-auto">
+          <Link href="/settings" title="Account" className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all overflow-hidden">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Pixza" alt="" className="w-full h-full grayscale hover:grayscale-0 transition-all" />
           </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/studio" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
-              Studio
-            </Link>
+        </div>
+      </aside>
+
+      {/* ── Content ── */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+
+        {/* Mobile header */}
+        <header className="lg:hidden flex items-center justify-between px-5 h-14 border-b border-white/5 flex-shrink-0">
+          <Link href="/landing" className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
+              <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert" />
+            </div>
+            <span className="font-black tracking-tighter">Pixza</span>
+          </Link>
+          <div className="flex gap-1">
+            {([
+              { id: "create",   icon: Sparkles },
+              { id: "explore",  icon: Compass  },
+              { id: "tools",    icon: Wand2    },
+              { id: "settings", icon: Settings },
+            ] as { id: NavScreen; icon: any }[]).map(item => (
+              <button
+                key={item.id}
+                onClick={() => setScreen(item.id)}
+                className={cn(
+                  "w-9 h-9 rounded-xl flex items-center justify-center transition-all",
+                  screen === item.id ? "bg-white text-black" : "text-white/30 hover:text-white"
+                )}
+              >
+                <item.icon className="w-4 h-4" />
+              </button>
+            ))}
           </div>
         </header>
 
-        {/* Content Area */}
-        <main className="flex-1 flex flex-col relative overflow-hidden bg-[#0A0A0A]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={screen}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.02 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="flex-1 flex flex-col overflow-hidden"
-            >
-              {screen === "home" && <HomeScreen onStart={handleStart} onTemplate={() => setScreen("templates")} />}
-              {screen === "generate" && <GenerateScreen tab={tab} setTab={setTab} onBack={() => setScreen("home")} getKey={getKey} />}
-              {screen === "templates" && <TemplatesScreen onSelect={handleTemplate} />}
-              {screen === "gallery" && <GalleryScreen />}
-              {screen === "tools" && <ToolsScreen />}
-              {screen === "settings" && <SettingsScreen />}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-
-        {/* Bottom Nav (Mobile Only) */}
-        <BottomNav screen={screen} setScreen={setScreen} />
+        {/* Screen content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={screen}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="flex-1 flex flex-col overflow-hidden"
+          >
+            {screen === "create"   && <CreateScreen key={pendingTemplate?.id ?? "create"} />}
+            {screen === "explore"  && <ExploreScreen onUse={handleUseTemplate} />}
+            {screen === "tools"    && <ToolsScreen />}
+            {screen === "settings" && <SettingsScreen />}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* Grain Overlay */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-[300] opacity-[0.03]" 
-        style={{ 
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` 
-        }} 
+      {/* Grain */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[999] opacity-[0.025]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }}
       />
     </div>
   );
