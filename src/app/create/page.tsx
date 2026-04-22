@@ -7,16 +7,17 @@ import {
   Plus, ChevronLeft, ChevronRight, Settings, Image as ImageIcon, 
   Video, Music, Box, Sparkles, LayoutGrid, Compass, Crown, 
   ArrowRight, Download, RefreshCw, X, Globe, BrainCog, Code, Terminal,
-  User, Check, Search, Palette, Maximize2, Share2, Zap
+  User, Check, Search, Palette, Maximize2, Share2, Zap, Wand2
 } from "lucide-react";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
+import { ImageTools } from "@/components/ui/image-tools";
 import { cn } from "@/lib/utils";
 
 /* ── Types & Data ────────────────────────────────────────── */
 
 type Tab = "Image" | "Video" | "Audio" | "3D";
-type Screen = "home" | "generate" | "templates" | "gallery" | "settings";
+type Screen = "home" | "generate" | "templates" | "gallery" | "settings" | "tools";
 
 interface Model { provider: string; modelId: string; label: string; tabs: Tab[]; }
 
@@ -602,11 +603,26 @@ function SettingsScreen() {
 
 /* ── Navigation Components ─────────────────────────────────── */
 
+function ToolsScreen() {
+  return (
+    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-32 lg:px-20 lg:pt-20">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-4xl lg:text-6xl font-black text-white mb-3 tracking-tighter">Tools.</h2>
+        <p className="text-sm font-bold text-white/20 mb-12 uppercase tracking-widest">
+          Local AI — runs in your browser, zero API cost.
+        </p>
+        <ImageTools />
+      </div>
+    </div>
+  );
+}
+
 function SidebarNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
   const items: { id: Screen; icon: any; label: string }[] = [
-    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Dashboard"      },
-    { id: "generate",  icon: <Plus className="w-5 h-5" />, label: "Studio"    },
-    { id: "templates", icon: <Compass className="w-5 h-5" />, label: "Explore" },
+    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Dashboard" },
+    { id: "generate",  icon: <Plus className="w-5 h-5" />,       label: "Studio"    },
+    { id: "templates", icon: <Compass className="w-5 h-5" />,    label: "Explore"   },
+    { id: "tools",     icon: <Wand2 className="w-5 h-5" />,      label: "Tools"     },
     { id: "gallery",   icon: <ImageIcon className="w-5 h-5" />, label: "Vault"   },
     { id: "settings",  icon: <Settings className="w-5 h-5" />, label: "Engine"  },
   ];
@@ -650,11 +666,11 @@ function SidebarNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Scre
 
 function BottomNav({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
   const items: { id: Screen; icon: any; label: string }[] = [
-    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Home"      },
-    { id: "generate",  icon: <Plus className="w-5 h-5" />, label: "Create"    },
-    { id: "templates", icon: <Compass className="w-5 h-5" />, label: "Explore" },
-    { id: "gallery",   icon: <ImageIcon className="w-5 h-5" />, label: "Gallery"   },
-    { id: "settings",  icon: <Settings className="w-5 h-5" />, label: "Auth"  },
+    { id: "home",      icon: <LayoutGrid className="w-5 h-5" />, label: "Home"    },
+    { id: "generate",  icon: <Plus className="w-5 h-5" />,       label: "Create"  },
+    { id: "templates", icon: <Compass className="w-5 h-5" />,    label: "Explore" },
+    { id: "tools",     icon: <Wand2 className="w-5 h-5" />,      label: "Tools"   },
+    { id: "settings",  icon: <Settings className="w-5 h-5" />,   label: "Auth"    },
   ];
 
   return (
@@ -740,6 +756,7 @@ export default function CreatePage() {
               {screen === "generate" && <GenerateScreen tab={tab} setTab={setTab} onBack={() => setScreen("home")} getKey={getKey} />}
               {screen === "templates" && <TemplatesScreen onSelect={handleTemplate} />}
               {screen === "gallery" && <GalleryScreen />}
+              {screen === "tools" && <ToolsScreen />}
               {screen === "settings" && <SettingsScreen />}
             </motion.div>
           </AnimatePresence>
