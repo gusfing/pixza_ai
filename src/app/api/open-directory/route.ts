@@ -7,7 +7,20 @@ import os from "os";
 
 const execFileAsync = promisify(execFile);
 
+function isLocalhostRequest(req: NextRequest): boolean {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const firstIp = forwarded.split(",")[0].trim();
+    if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(firstIp)) return false;
+  }
+  const host = (req.headers.get("host") || "").split(":")[0];
+  return !host || ["localhost", "127.0.0.1", "::1"].includes(host);
+}
+
 export async function POST(req: NextRequest) {
+    if (!isLocalhostRequest(req)) {
+      return NextResponse.json({ success: false, error: "Forbidden: localhost only" }, { status: 403 });
+    }
     try {
         const body = await req.json();
         const { path: inputPath } = body;

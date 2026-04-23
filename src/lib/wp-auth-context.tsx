@@ -7,7 +7,7 @@ interface AuthContextType {
   user: WPUser | null;
   token: string | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string, rememberMe?: boolean) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -15,8 +15,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Sync token to cookie so middleware can read it
-function setTokenCookie(token: string) {
-  document.cookie = `pixza_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+function setTokenCookie(token: string, rememberMe = false) {
+  const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7; // 30 days or 7 days
+  document.cookie = `pixza_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
 function clearTokenCookie() {
@@ -54,12 +55,12 @@ export function WPAuthProvider({ children }: { children: React.ReactNode }) {
     loadUser();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string, rememberMe = false) => {
     setLoading(true);
     try {
       const { token, user } = await wpLogin(username, password);
       localStorage.setItem("pixza_token", token);
-      setTokenCookie(token);
+      setTokenCookie(token, rememberMe);
 
       const fullUser = await wpGetMe(token);
       setToken(token);

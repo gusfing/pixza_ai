@@ -1,35 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { wpGetMe } from "@/lib/wordpress";
 
 // GET /api/generations — list user's generations
 export async function GET(req: NextRequest) {
+  // Support both NextAuth and WP token auth
   const session = await auth();
-  if (!session?.user?.id) {
+  let userId = session?.user?.id ?? null;
+
+  if (!userId) {
+    const wpToken = req.cookies.get("pixza_token")?.value;
+    if (wpToken) {
+      try {
+        const me = await wpGetMe(wpToken);
+        if (me) userId = me.id.toString();
+      } catch {}
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { searchParams } = new URL(req.url);
-  const limit = Math.min(parseInt(searchParams.get("limit") ?? "20"), 100);
-  const cursor = searchParams.get("cursor") ?? undefined;
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+  const per_page = Math.min(parseInt(searchParams.get("per_page") ?? "20"), 100);
+  const skip = (page - 1) * per_page;
 
-  const generations = await db.generation.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
-    take: limit + 1,
-    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-    select: {
-      id: true, prompt: true, mode: true, model: true,
-      provider: true, outputUrl: true, outputType: true,
-      status: true, createdAt: true,
-    },
+  const [items, total] = await Promise.all([
+    db.generation.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: per_page,
+      skip,
+      select: {
+        id: true, prompt: true, mode: true, model: true,
+        provider: true, outputUrl: true, outputType: true,
+        status: true, createdAt: true,
+      },
+    }),
+    db.generation.count({ where: { userId } }),
+  ]);
+
+  return NextResponse.json({
+    items,
+    total,
+    page,
+    pages: Math.ceil(total / per_page),
   });
-
-  const hasMore = generations.length > limit;
-  const items = hasMore ? generations.slice(0, limit) : generations;
-  const nextCursor = hasMore ? items[items.length - 1].id : null;
-
-  return NextResponse.json({ items, nextCursor });
 }
-
-// DELETE /api/generations/:id handled separately

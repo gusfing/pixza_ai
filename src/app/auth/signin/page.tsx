@@ -21,7 +21,7 @@ function SignInForm() {
     e.preventDefault();
     setLoading(true); setError("");
     try {
-      await login(username, password);
+      await login(username, password, rememberMe);
       const next = searchParams.get("next") || "/create";
       router.push(next);
     } catch (err) {

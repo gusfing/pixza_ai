@@ -5,10 +5,18 @@ import { buildWorkflowContext } from '@/lib/chat/contextBuilder';
 import { extractSubgraph } from '@/lib/chat/subgraphExtractor';
 import { WorkflowNode } from '@/types';
 import { WorkflowEdge } from '@/types/workflow';
+import { cookies } from 'next/headers';
 
-export const maxDuration = 60; // 1 minute timeout
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
+  // Require authentication
+  const cookieStore = await cookies();
+  const wpToken = cookieStore.get("pixza_token")?.value;
+  if (!wpToken) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   try {
     const { messages, workflowState, selectedNodeIds } = await request.json() as {
       messages: UIMessage[];
