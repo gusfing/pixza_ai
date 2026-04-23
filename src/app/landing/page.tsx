@@ -404,10 +404,7 @@ export default function LandingPage() {
     let lenis: any;
 
     import("@studio-freight/lenis").then(({ default: Lenis }) => {
-      lenis = new Lenis({
-        // Don't smooth-scroll inside elements that handle their own scroll
-        prevent: (node: Element) => node.id === "scroll-morph-hero",
-      });
+      lenis = new Lenis();
       function raf(time: number) {
         lenis.raf(time);
         animId = requestAnimationFrame(raf);
@@ -423,13 +420,7 @@ export default function LandingPage() {
   return (
     <main className="bg-[#0A0A0A] selection:bg-white selection:text-black">
       <Header />
-      <section
-        id="scroll-morph-hero"
-        className="h-screen w-full relative overflow-hidden"
-      >
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
-        <ScrollMorphHero />
-      </section>
+      <ScrollMorphHero />
       <Features />
       <Gallery />
       <PortfolioGallery />
