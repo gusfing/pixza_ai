@@ -461,13 +461,12 @@ export default function LandingPage() {
   return (
     <main className="bg-[#0A0A0A] selection:bg-white selection:text-black">
       <Header />
+      <section className="h-screen w-full relative overflow-hidden">
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
+        <ScrollMorphHero />
+      </section>
       <Hero />
       <Features />
-      <section className="h-[800px] w-full relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
-        <ScrollMorphHero />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
-      </section>
       <Gallery />
       <PortfolioGallery />
       <CompetitiveEdge />
