@@ -7,6 +7,7 @@ import { GLSLHills } from "@/components/ui/glsl-hills";
 import { ZoomParallax } from "@/components/ui/zoom-parallax";
 import { PortfolioGallery } from "@/components/ui/portfolio-gallery";
 import { Header } from "@/components/ui/header-3";
+import ScrollMorphHero from "@/components/ui/scroll-morph-hero";
 
 /* ── Hero Section ── */
 function Hero() {
@@ -462,6 +463,11 @@ export default function LandingPage() {
       <Header />
       <Hero />
       <Features />
+      <section className="h-[800px] w-full relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
+        <ScrollMorphHero />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
+      </section>
       <Gallery />
       <PortfolioGallery />
       <CompetitiveEdge />
