@@ -401,21 +401,32 @@ function Features() {
 export default function LandingPage() {
   useEffect(() => {
     let animId: number;
+    let lenis: any;
+
     import("@studio-freight/lenis").then(({ default: Lenis }) => {
-      const lenis = new Lenis();
+      lenis = new Lenis({
+        // Don't smooth-scroll inside elements that handle their own scroll
+        prevent: (node: Element) => node.id === "scroll-morph-hero",
+      });
       function raf(time: number) {
         lenis.raf(time);
         animId = requestAnimationFrame(raf);
       }
       animId = requestAnimationFrame(raf);
     });
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      cancelAnimationFrame(animId);
+      lenis?.destroy?.();
+    };
   }, []);
 
   return (
     <main className="bg-[#0A0A0A] selection:bg-white selection:text-black">
       <Header />
-      <section className="h-screen w-full relative overflow-hidden">
+      <section
+        id="scroll-morph-hero"
+        className="h-screen w-full relative overflow-hidden"
+      >
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
         <ScrollMorphHero />
       </section>

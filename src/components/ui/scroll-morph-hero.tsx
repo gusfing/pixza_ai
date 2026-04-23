@@ -101,6 +101,7 @@ export default function ScrollMorphHero() {
     if (!container) return;
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
+      e.stopPropagation();
       const newScroll = Math.min(Math.max(scrollRef.current + e.deltaY, 0), MAX_SCROLL);
       scrollRef.current = newScroll;
       virtualScroll.set(newScroll);
@@ -173,7 +174,7 @@ export default function ScrollMorphHero() {
   const contentY = useTransform(smoothMorph, [0.8, 1], [20, 0]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-full bg-[#0A0A0A] overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-full bg-[#0A0A0A] overflow-hidden" id="scroll-morph-hero">
       <div className="flex h-full w-full flex-col items-center justify-center" style={{ perspective: "1000px" }}>
 
         {/* Intro text */}
