@@ -2,57 +2,11 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Play, Layers, Zap, ShieldCheck, Target, Cpu, Check, Box, Sparkles } from "lucide-react";
-import { GLSLHills } from "@/components/ui/glsl-hills";
+import { ArrowRight, Layers, Zap, ShieldCheck, Target, Cpu, Check, Box, Sparkles } from "lucide-react";
 import { ZoomParallax } from "@/components/ui/zoom-parallax";
 import { PortfolioGallery } from "@/components/ui/portfolio-gallery";
 import { Header } from "@/components/ui/header-3";
 import ScrollMorphHero from "@/components/ui/scroll-morph-hero";
-
-/* ── Hero Section ── */
-function Hero() {
-  return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-      <div className="absolute inset-0 z-0">
-        <GLSLHills speed={0.4} cameraZ={140} />
-        {/* Vignette overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-80" />
-      </div>
-
-      <div className="relative z-10 text-center max-w-5xl px-6 animate-obsidian">
-        <div className="space-y-8 flex flex-col items-center">
-          <h1 className="font-black text-6xl md:text-8xl tracking-tight text-white leading-[0.85]">
-            <span className="italic font-thin text-5xl md:text-7xl block mb-2 opacity-50">Designs That Speak</span>
-            Louder Than Words
-          </h1>
-          
-          <p className="text-white/40 text-base md:text-lg max-w-xl font-medium leading-relaxed">
-            We craft stunning visuals and user-friendly experiences that help your brand stand out and connect with your audience.
-          </p>
-
-          <div className="pt-8 flex flex-col sm:flex-row gap-4 items-center">
-            <Link href="/studio" className="btn-minimal btn-minimal-primary text-lg px-10 py-4 group">
-              Start Creating
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link href="/examples" className="btn-minimal btn-minimal-secondary text-lg px-10 py-4">
-              Explore Showcase
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Atmospheric detail */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3 text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-20"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-white/40"></span>
-        </span>
-        Neural Interface Active
-      </div>
-    </section>
-  );
-}
 
 /* ── Gallery / Showcase Section ── */
 /* ── Gallery / Showcase Section ── */
@@ -465,7 +419,6 @@ export default function LandingPage() {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
         <ScrollMorphHero />
       </section>
-      <Hero />
       <Features />
       <Gallery />
       <PortfolioGallery />
