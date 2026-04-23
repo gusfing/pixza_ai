@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 
-const IMG_WIDTH = 60;
-const IMG_HEIGHT = 85;
+const IMG_WIDTH = 80;
+const IMG_HEIGHT = 110;
 const TOTAL_IMAGES = 20;
 
 const IMAGES = [
@@ -121,14 +121,19 @@ export default function ScrollMorphHero() {
     return () => el.removeEventListener("mousemove", onMove);
   }, [mouseX]);
 
-  // Stable scatter positions
-  const scatter = useMemo(() => IMAGES.map(() => ({
-    x: (Math.random() - 0.5) * 1200,
-    y: (Math.random() - 0.5) * 700,
-    rotation: (Math.random() - 0.5) * 160,
-    scale: 0.8,
-    opacity: 1,
-  })), []);
+  // Stable scatter positions — tighter radius, orbital feel
+  const scatter = useMemo(() => IMAGES.map((_, i) => {
+    // Distribute in a loose orbital pattern rather than pure random
+    const angle = (i / TOTAL_IMAGES) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
+    const radius = 220 + Math.random() * 160;
+    return {
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius * 0.6,
+      rotation: (Math.random() - 0.5) * 30,
+      scale: 0.85 + Math.random() * 0.3,
+      opacity: 1,
+    };
+  }), []);
 
   // Content fade in when arc forms
   const contentOpacity = useTransform(morphValue, [0.8, 1], [0, 1]);
@@ -146,17 +151,25 @@ export default function ScrollMorphHero() {
 
         <div className="flex h-full w-full flex-col items-center justify-center" style={{ perspective: "1000px" }}>
 
-          {/* Intro text */}
+          {/* Intro text — sits above cards with backdrop */}
           <motion.div
             style={{ opacity: introOpacity }}
-            className="absolute z-0 flex flex-col items-center text-center pointer-events-none"
+            className="absolute z-20 flex flex-col items-center text-center pointer-events-none px-6"
           >
-            <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white">
-              The future is built on AI.
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-5">Pixza Studio</p>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white leading-none mb-5">
+              Create without<br />limits.
             </h1>
-            <p className="mt-4 text-[10px] font-black tracking-[0.3em] text-white/30 uppercase">
-              Scroll to explore
+            <p className="text-white/40 text-sm font-medium max-w-xs leading-relaxed">
+              AI-powered image, video, audio & 3D generation in one studio.
             </p>
+            <div className="mt-10 flex items-center gap-2 text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-30" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white/40" />
+              </span>
+              Scroll to explore
+            </div>
           </motion.div>
 
           {/* Arc content */}
@@ -164,11 +177,12 @@ export default function ScrollMorphHero() {
             style={{ opacity: contentOpacity, y: contentY }}
             className="absolute top-[8%] z-10 flex flex-col items-center text-center pointer-events-none px-4"
           >
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-4">50+ AI Models</p>
             <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-3">
-              Explore Our Vision
+              Your creative arsenal.
             </h2>
-            <p className="text-sm text-white/40 max-w-md leading-relaxed">
-              Discover a world where technology meets creativity.
+            <p className="text-sm text-white/40 max-w-sm leading-relaxed">
+              Hover any card to explore. Every image was generated with Pixza.
             </p>
           </motion.div>
 
