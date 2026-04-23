@@ -6,47 +6,7 @@ import { ArrowRight, Play, Layers, Zap, ShieldCheck, Target, Cpu, Check, Box, Sp
 import { GLSLHills } from "@/components/ui/glsl-hills";
 import { ZoomParallax } from "@/components/ui/zoom-parallax";
 import { PortfolioGallery } from "@/components/ui/portfolio-gallery";
-
-/* ── Minimal Navigation ── */
-function Nav() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  return (
-    <nav className={`fixed top-6 left-1/2 -translate-x-1/2 z-[100] transition-all duration-500 w-[95%] max-w-5xl rounded-full px-6 py-3 flex items-center justify-between ${
-      scrolled ? "glass-panel py-2" : "bg-transparent"
-    }`}>
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center overflow-hidden">
-          <img src="/pixza-logo.png" alt="Pixza" className="w-5 h-5 invert" />
-        </div>
-        <span className="text-white font-bold tracking-tight text-lg">Pixza</span>
-      </div>
-
-      <div className="hidden md:flex items-center gap-8">
-        {["Features", "Showcase", "Edge", "Journal", "Pricing", "FAQ"].map((item) => (
-          <a key={item} href={`#${item === "Journal" ? "blog" : item === "Edge" ? "compare" : item.toLowerCase()}`} className="text-white/50 hover:text-white text-sm font-medium transition-colors">
-            {item}
-          </a>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-4">
-        <Link href="/auth/signin" className="text-white/50 hover:text-white text-sm font-medium transition-colors">
-          Sign In
-        </Link>
-        <Link href="/studio" className="btn-minimal btn-minimal-primary text-sm px-5 py-2">
-          Launch Studio
-        </Link>
-      </div>
-    </nav>
-  );
-}
+import { Header } from "@/components/ui/header-3";
 
 /* ── Hero Section ── */
 function Hero() {
@@ -499,7 +459,7 @@ export default function LandingPage() {
 
   return (
     <main className="bg-[#0A0A0A] selection:bg-white selection:text-black">
-      <Nav />
+      <Header />
       <Hero />
       <Features />
       <Gallery />
