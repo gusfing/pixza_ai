@@ -5,7 +5,7 @@
 
 const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "";
 const WP_API = `${WP_URL}/wp-json`;
-const WP_SECRET = WP_SECRET;
+const WP_SECRET = process.env.WP_API_SECRET ?? "";
 
 // ── Types ────────────────────────────────────────────────────
 
