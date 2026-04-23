@@ -9,8 +9,6 @@ export async function generateWithCloudflare(
   apiToken: string,
   input: GenerationInput
 ): Promise<GenerationOutput> {
-  console.log(`[API:${requestId}] Cloudflare generation - Model: ${input.model.id}, Prompt: ${input.prompt.length} chars`);
-
   const modelId = input.model.id;
   const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${modelId}`;
 
@@ -55,7 +53,6 @@ export async function generateWithCloudflare(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[API:${requestId}] Cloudflare API error: ${response.status}`, errorText);
       return {
         success: false,
         error: `Cloudflare API error: ${response.status} - ${errorText}`,
@@ -69,9 +66,6 @@ export async function generateWithCloudflare(
       // Success! Cloudflare returned a raw binary image blob
       const arrayBuffer = await response.arrayBuffer();
       const base64String = Buffer.from(arrayBuffer).toString("base64");
-      
-      console.log(`[API:${requestId}] SUCCESS - Returning Cloudflare binary image blob`);
-      
       return {
         success: true,
         outputs: [
@@ -102,9 +96,6 @@ export async function generateWithCloudflare(
         error: "No image data in Cloudflare JSON response",
       };
     }
-
-    console.log(`[API:${requestId}] SUCCESS - Returning Cloudflare JSON wrapped image`);
-
     return {
       success: true,
       outputs: [
@@ -115,10 +106,10 @@ export async function generateWithCloudflare(
       ],
     };
   } catch (error) {
-    console.error(`[API:${requestId}] Cloudflare generation failed:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Cloudflare generation failed",
     };
   }
 }
+

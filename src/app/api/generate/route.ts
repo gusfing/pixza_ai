@@ -99,7 +99,6 @@ async function buildMediaResponseWithStorage(
       const key = `generations/${userId ?? "anon"}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       storedUrl = await uploadToStorage(output.data, key, contentTypeForOutput(output.type));
     } catch (e) {
-      console.warn("[R2] Upload failed:", e);
     }
   }
 
@@ -115,7 +114,6 @@ async function buildMediaResponseWithStorage(
         },
       });
     } catch (e) {
-      console.warn("[DB] Generation update failed:", e);
     }
   }
 
@@ -133,8 +131,6 @@ function capabilitiesForMediaType(mediaType?: string): ModelCapability[] {
 
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
-  console.log(`\n[API:${requestId}] ========== NEW GENERATE REQUEST ==========`);
-
   // ── Auth & rate limiting ──────────────────────────────────
   const session = await auth();
   let userId = session?.user?.id ?? null;
@@ -151,7 +147,6 @@ export async function POST(request: NextRequest) {
           if (plan === "AGENCY") plan = "PRO"; // Treat agency as PRO for rate limiting
         }
       } catch (e) {
-        console.warn(`[API:${requestId}] WP Token lookup failed`, e);
       }
     }
   }
@@ -172,9 +167,7 @@ export async function POST(request: NextRequest) {
   let body: MultiProviderGenerateRequest;
   try {
     body = await request.json();
-    console.log(`[API:${requestId}] Request parsed. Provider: ${body.selectedModel?.provider || 'gemini'}`);
   } catch (e) {
-    console.error(`[API:${requestId}] Failed to parse request JSON:`, e);
     return NextResponse.json<GenerateResponse>({ success: false, error: "Invalid JSON in request body" }, { status: 400 });
   }
 
@@ -196,7 +189,6 @@ export async function POST(request: NextRequest) {
       });
       generationId = gen.id;
     } catch (e) {
-      console.error(`[API:${requestId}] Error creating pre-generation record:`, e);
     }
   }
 
@@ -242,8 +234,6 @@ export async function POST(request: NextRequest) {
     // Determine which provider to use
     const provider: ProviderType = selectedModel?.provider || "gemini";
     const resolvedModelId = selectedModel?.modelId || model;
-    console.log(`[API:${requestId}] Provider: ${provider}, Model: ${resolvedModelId}`);
-
     // Premium Model Guard - Restrict expensive APIs to PRO / AGENCY plans
     // We allow models marked as 'isFree' to be used by everyone.
     const FREE_MODELS = [
@@ -366,7 +356,6 @@ export async function POST(request: NextRequest) {
       const falApiKey = process.env.FAL_API_KEY || null;
 
       if (!falApiKey) {
-        console.warn(`[API:${requestId}] No FAL API key configured. Proceeding without auth (rate-limited).`);
       }
 
       // Pass images as-is; generateWithFalQueue uploads base64 to CDN internally
@@ -736,7 +725,6 @@ export async function POST(request: NextRequest) {
           await buildMediaResponseWithStorage({ type: "image", data: geminiData.image }, generationId, userId);
         }
       } catch (e) {
-        console.warn("[Gemini] Storage wrap failed:", e);
       }
     }
 
@@ -773,8 +761,7 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
-
-    console.error(`[API:${requestId}] Generation error: ${errorMessage}${errorDetails ? ` (${errorDetails.substring(0, 200)})` : ""}`);
     return NextResponse.json<GenerateResponse>({ success: false, error: errorMessage }, { status: 500 });
   }
 }
+

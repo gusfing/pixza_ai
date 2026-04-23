@@ -74,8 +74,6 @@ export async function generateWithWaveSpeed(
   apiKey: string,
   input: GenerationInput
 ): Promise<GenerationOutput> {
-  console.log(`[API:${requestId}] WaveSpeed generation - Model: ${input.model.id}, Images: ${input.images?.length || 0}, Prompt: ${input.prompt.length} chars`);
-
   const WAVESPEED_API_BASE = "https://api.wavespeed.ai/api/v3";
   const modelId = input.model.id;
 
@@ -85,8 +83,6 @@ export async function generateWithWaveSpeed(
   }
 
   const hasDynamicInputs = input.dynamicInputs && Object.keys(input.dynamicInputs).length > 0;
-  console.log(`[API:${requestId}] Dynamic inputs: ${hasDynamicInputs ? Object.keys(input.dynamicInputs!).join(", ") : "none"}`);
-
   // Determine output type from model capabilities
   const is3DModel = input.model.capabilities.some(c => c.includes("3d"));
   const isVideoModel = input.model.capabilities.includes("text-to-video") ||
@@ -119,14 +115,9 @@ export async function generateWithWaveSpeed(
     // Use "image" for single image (default WaveSpeed format)
     payload.image = input.images[0];
   }
-
-  console.log(`[API:${requestId}] Submitting to WaveSpeed with inputs: ${Object.keys(payload).join(", ")}`);
-
   // Submit task
   // Model ID goes directly in the URL path (slashes are part of the path)
   const submitUrl = `${WAVESPEED_API_BASE}/${modelId}`;
-  console.log(`[API:${requestId}] WaveSpeed submit URL: ${submitUrl}`);
-
   const submitResponse = await fetch(submitUrl, {
     method: "POST",
     headers: {
@@ -145,9 +136,6 @@ export async function generateWithWaveSpeed(
     } catch {
       // Keep original text
     }
-
-    console.error(`[API:${requestId}] WaveSpeed submit failed: ${submitResponse.status} - ${errorDetail}`);
-
     if (submitResponse.status === 429) {
       return {
         success: false,
@@ -162,30 +150,23 @@ export async function generateWithWaveSpeed(
   }
 
   const submitResult: WaveSpeedSubmitResponse = await submitResponse.json();
-  console.log(`[API:${requestId}] WaveSpeed submit response:`, JSON.stringify(submitResult).substring(0, 500));
-
   const taskId = submitResult.data?.id || submitResult.id;
   // Use the polling URL provided by the API if available, with SSRF validation
   let providedPollUrl: string | undefined = submitResult.data?.urls?.get;
   if (providedPollUrl) {
     const pollUrlCheck = validateMediaUrl(providedPollUrl);
     if (!pollUrlCheck.valid || !providedPollUrl.startsWith('https://api.wavespeed.ai')) {
-      console.warn(`[API:${requestId}] WaveSpeed provided invalid poll URL: ${providedPollUrl} — falling back to constructed URL`);
       providedPollUrl = undefined;
     }
   }
 
   if (!taskId) {
-    console.error(`[API:${requestId}] No task ID in WaveSpeed submit response`);
     return {
       success: false,
       error: "WaveSpeed: No task ID returned from API",
     };
   }
-
-  console.log(`[API:${requestId}] WaveSpeed task submitted: ${taskId}`);
   if (providedPollUrl) {
-    console.log(`[API:${requestId}] WaveSpeed provided poll URL: ${providedPollUrl}`);
   }
 
   // Poll for completion using the URL from the API response, or construct it
@@ -199,7 +180,6 @@ export async function generateWithWaveSpeed(
 
   while (true) {
     if (Date.now() - startTime > maxWaitTime) {
-      console.error(`[API:${requestId}] WaveSpeed task timed out after 5 minutes`);
       return {
         success: false,
         error: `${input.model.name}: Generation timed out after 5 minutes`,
@@ -222,8 +202,6 @@ export async function generateWithWaveSpeed(
 
       // Log poll response status for debugging
       const elapsedSec = Math.round((Date.now() - startTime) / 1000);
-      console.log(`[API:${requestId}] WaveSpeed poll (${elapsedSec}s): ${pollResponse.status} from ${pollUrl}`);
-
       // 404 means result not ready yet - continue polling
       if (pollResponse.status === 404) {
         lastStatus = "pending";
@@ -239,7 +217,6 @@ export async function generateWithWaveSpeed(
         } catch {
           // Keep original text
         }
-        console.error(`[API:${requestId}] WaveSpeed poll failed: ${pollResponse.status} - ${errorDetail}`);
         return {
           success: false,
           error: `${input.model.name}: ${errorDetail}`,
@@ -247,21 +224,17 @@ export async function generateWithWaveSpeed(
       }
 
       const pollData: WaveSpeedPredictionResponse = await pollResponse.json();
-      console.log(`[API:${requestId}] WaveSpeed poll data:`, JSON.stringify(pollData).substring(0, 300));
-
       // Extract status from nested data object (WaveSpeed wraps response in { code, message, data: {...} })
       const currentStatus = pollData.data?.status || pollData.status;
       const currentError = pollData.data?.error || pollData.error;
 
       // Log status changes
       if (currentStatus !== lastStatus) {
-        console.log(`[API:${requestId}] WaveSpeed status changed: ${lastStatus} → ${currentStatus}`);
         lastStatus = currentStatus || "";
       }
 
       // Check if task is complete
       if (currentStatus === "completed") {
-        console.log(`[API:${requestId}] WaveSpeed task completed`);
         resultData = pollData;
         break;
       }
@@ -269,7 +242,6 @@ export async function generateWithWaveSpeed(
       // Check if task failed
       if (currentStatus === "failed") {
         const failureReason = currentError || pollData.message || "Generation failed";
-        console.error(`[API:${requestId}] WaveSpeed task failed: ${failureReason}`);
         return {
           success: false,
           error: `${input.model.name}: ${failureReason}`,
@@ -279,7 +251,6 @@ export async function generateWithWaveSpeed(
       // Continue polling for "created" or "processing" status
     } catch (pollError) {
       const message = pollError instanceof Error ? pollError.message : String(pollError);
-      console.error(`[API:${requestId}] WaveSpeed poll error: ${message}`);
       return {
         success: false,
         error: `${input.model.name}: ${message}`,
@@ -317,7 +288,6 @@ export async function generateWithWaveSpeed(
   }
 
   if (outputUrls.length === 0) {
-    console.error(`[API:${requestId}] No outputs in WaveSpeed result. Response:`, JSON.stringify(resultData).substring(0, 500));
     return {
       success: false,
       error: `${input.model.name}: No outputs in generation result`,
@@ -335,7 +305,6 @@ export async function generateWithWaveSpeed(
 
   // For 3D models, return URL directly (GLB files are binary — skip downloading/buffering)
   if (is3DModel) {
-    console.log(`[API:${requestId}] SUCCESS - Returning 3D model URL`);
     return {
       success: true,
       outputs: [
@@ -347,9 +316,6 @@ export async function generateWithWaveSpeed(
       ],
     };
   }
-
-  console.log(`[API:${requestId}] Fetching WaveSpeed output from: ${outputUrl.substring(0, 80)}...`);
-
   const outputResponse = await fetch(outputUrl);
 
   if (!outputResponse.ok) {
@@ -378,12 +344,8 @@ export async function generateWithWaveSpeed(
     (rawContentType && (rawContentType.startsWith("video/") || rawContentType.startsWith("image/") || rawContentType.startsWith("audio/")))
       ? rawContentType
       : (isVideoModel ? "video/mp4" : isAudioModel ? "audio/mpeg" : "image/png");
-
-  console.log(`[API:${requestId}] Output: ${contentType}, ${outputSizeMB.toFixed(2)}MB`);
-
   // For very large videos (>20MB), return URL only (data left empty for consumers)
   if (isVideoModel && outputSizeMB > 20) {
-    console.log(`[API:${requestId}] SUCCESS - Returning URL for large video`);
     return {
       success: true,
       outputs: [
@@ -401,7 +363,6 @@ export async function generateWithWaveSpeed(
 
   if (isAudio) {
     const audioContentType = contentType.startsWith("audio/") ? contentType : "audio/mpeg";
-    console.log(`[API:${requestId}] SUCCESS - Returning audio`);
     return {
       success: true,
       outputs: [
@@ -413,9 +374,6 @@ export async function generateWithWaveSpeed(
       ],
     };
   }
-
-  console.log(`[API:${requestId}] SUCCESS - Returning ${isVideoModel ? "video" : "image"}`);
-
   return {
     success: true,
     outputs: [
@@ -427,4 +385,5 @@ export async function generateWithWaveSpeed(
     ],
   };
 }
+
 

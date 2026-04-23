@@ -63,8 +63,6 @@ export async function POST(request: Request) {
     // Return the UI message stream response for useChat compatibility
     return result.toUIMessageStreamResponse();
   } catch (error) {
-    console.error('[Chat API Error]', error);
-
     if (error instanceof Error && error.message.includes('429')) {
       return new Response('Rate limit reached. Please wait and try again.', { status: 429 });
     }
@@ -83,3 +81,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

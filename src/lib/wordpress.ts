@@ -3,8 +3,9 @@
  * Handles auth, users, subscriptions, credits, admin via WP backend
  */
 
-const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://seashell-peafowl-234313.hostingersite.com";
+const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "";
 const WP_API = `${WP_URL}/wp-json`;
+const WP_SECRET = WP_SECRET;
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -181,7 +182,7 @@ export async function wpDeductCredits(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-WP-Secret": process.env.WP_API_SECRET ?? "",
+      "X-WP-Secret": WP_SECRET,
     },
     body: JSON.stringify({ user_id: userId, amount, reason }),
   });
@@ -203,7 +204,7 @@ export async function wpAdminSetUserCredits(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-WP-Secret": process.env.WP_API_SECRET ?? "",
+      "X-WP-Secret": WP_SECRET,
     },
     body: JSON.stringify(data),
   });
@@ -243,7 +244,7 @@ export async function wpAdminGetUsers(params?: {
   if (params?.search) qs.set("search", params.search);
 
   const res = await fetch(`${WP_API}/pixza/v1/admin/users?${qs}`, {
-    headers: { "X-WP-Secret": process.env.WP_API_SECRET ?? "" },
+    headers: { "X-WP-Secret": WP_SECRET },
   });
   if (!res.ok) return { users: [], total: 0, pages: 1 };
   return res.json();
@@ -260,7 +261,7 @@ export async function wpAdminUpdateUser(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-WP-Secret": process.env.WP_API_SECRET ?? "",
+      "X-WP-Secret": WP_SECRET,
     },
     body: JSON.stringify(data),
   });
@@ -279,7 +280,7 @@ export async function wpAdminGetStats(): Promise<{
   credits_issued: number;
 }> {
   const res = await fetch(`${WP_API}/pixza/v1/admin/stats`, {
-    headers: { "X-WP-Secret": process.env.WP_API_SECRET ?? "" },
+    headers: { "X-WP-Secret": WP_SECRET },
   });
   if (!res.ok) return { total_users: 0, total_generations: 0, pro_users: 0, agency_users: 0, free_users: 0, credits_issued: 0 };
   return res.json();
@@ -350,7 +351,7 @@ export async function wpSendEmail(data: {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-WP-Secret": process.env.WP_API_SECRET!,
+      "X-WP-Secret": WP_SECRET,
     },
     body: JSON.stringify(data),
   });

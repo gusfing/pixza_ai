@@ -20,11 +20,6 @@ export async function GET() {
     });
 
     if (!response.ok) {
-      console.error(
-        "Error fetching community workflows:",
-        response.status,
-        response.statusText
-      );
       return NextResponse.json(
         {
           success: false,
@@ -38,7 +33,6 @@ export async function GET() {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error listing community workflows:", error);
     return NextResponse.json(
       {
         success: false,
@@ -48,3 +42,4 @@ export async function GET() {
     );
   }
 }
+

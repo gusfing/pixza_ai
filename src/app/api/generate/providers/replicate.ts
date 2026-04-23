@@ -20,8 +20,6 @@ export async function generateWithReplicate(
   apiKey: string,
   input: GenerationInput
 ): Promise<GenerationOutput> {
-  console.log(`[API:${requestId}] Replicate generation - Model: ${input.model.id}, Images: ${input.images?.length || 0}, Prompt: ${input.prompt.length} chars`);
-
   const REPLICATE_API_BASE = "https://api.replicate.com/v1";
 
   // Get the latest version of the model
@@ -63,8 +61,6 @@ export async function generateWithReplicate(
   }
 
   const hasDynamicInputs = input.dynamicInputs && Object.keys(input.dynamicInputs).length > 0;
-  console.log(`[API:${requestId}] Model version: ${version}, Dynamic inputs: ${hasDynamicInputs ? Object.keys(input.dynamicInputs!).join(", ") : "none"}`);
-
   // Get schema for type coercion and input mapping
   const schema = modelData.latest_version?.openapi_schema as Record<string, unknown> | undefined;
   const parameterTypes = getParameterTypesFromSchema(schema);
@@ -163,8 +159,6 @@ export async function generateWithReplicate(
   }
 
   const prediction = await createResponse.json();
-  console.log(`[API:${requestId}] Prediction created: ${prediction.id}`);
-
   // Poll for completion — video models get a longer timeout
   const isVideoModel = input.model.capabilities.some(c => c.includes("video"));
   const maxWaitTime = isVideoModel ? 10 * 60 * 1000 : 5 * 60 * 1000;
@@ -206,7 +200,6 @@ export async function generateWithReplicate(
 
     currentPrediction = await pollResponse.json();
     if (currentPrediction.status !== lastStatus) {
-      console.log(`[API:${requestId}] Prediction status: ${currentPrediction.status}`);
       lastStatus = currentPrediction.status;
     }
   }
@@ -254,11 +247,8 @@ export async function generateWithReplicate(
   // Validate URL before fetching (SSRF protection)
   const mediaUrlCheck = validateMediaUrl(mediaUrl);
   if (!mediaUrlCheck.valid) {
-    console.error(`[API:${requestId}] Invalid media URL from Replicate: ${mediaUrl}`);
     return { success: false, error: `Invalid media URL: ${mediaUrlCheck.error}` };
   }
-
-  console.log(`[API:${requestId}] Fetching output from: ${mediaUrl.substring(0, 80)}...`);
   const mediaResponse = await fetch(mediaUrl);
 
   if (!mediaResponse.ok) {
@@ -271,7 +261,6 @@ export async function generateWithReplicate(
   // Check if this is a 3D model — return URL directly (GLB files are binary)
   const is3DModel = input.model.capabilities.some(c => c.includes("3d"));
   if (is3DModel) {
-    console.log(`[API:${requestId}] SUCCESS - Returning 3D model URL`);
     return {
       success: true,
       outputs: [
@@ -294,12 +283,8 @@ export async function generateWithReplicate(
   const mediaArrayBuffer = await mediaResponse.arrayBuffer();
   const mediaSizeBytes = mediaArrayBuffer.byteLength;
   const mediaSizeMB = mediaSizeBytes / (1024 * 1024);
-
-  console.log(`[API:${requestId}] Output: ${contentType}, ${mediaSizeMB.toFixed(2)}MB`);
-
   // For very large videos (>20MB), return URL only (data left empty for consumers)
   if (isVideo && mediaSizeMB > 20) {
-    console.log(`[API:${requestId}] SUCCESS - Returning URL for large video`);
     return {
       success: true,
       outputs: [
@@ -316,7 +301,6 @@ export async function generateWithReplicate(
 
   if (isAudio) {
     const audioContentType = contentType.startsWith("audio/") ? contentType : "audio/mpeg";
-    console.log(`[API:${requestId}] SUCCESS - Returning audio`);
     return {
       success: true,
       outputs: [
@@ -328,9 +312,6 @@ export async function generateWithReplicate(
       ],
     };
   }
-
-  console.log(`[API:${requestId}] SUCCESS - Returning ${isVideo ? "video" : "image"}`);
-
   return {
     success: true,
     outputs: [
@@ -342,3 +323,4 @@ export async function generateWithReplicate(
     ],
   };
 }
+

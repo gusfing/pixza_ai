@@ -162,24 +162,15 @@ function validateProposalShape(data: unknown): string | null {
 
 export async function POST(request: NextRequest) {
   const requestId = `prop-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  console.log(`[Propose:${requestId}] New request received`);
-
   try {
     const body: ProposeRequest = await request.json();
     const { description } = body;
-
-    console.log(`[Propose:${requestId}] Parameters:`, {
-      hasDescription: !!description,
-      descriptionLength: description?.length || 0,
-    });
-
     // Validate description (same as existing endpoint)
     if (
       !description ||
       typeof description !== "string" ||
       description.trim().length < 3
     ) {
-      console.warn(`[Propose:${requestId}] Invalid description`);
       return NextResponse.json<ProposeResponse>(
         {
           success: false,
@@ -193,7 +184,6 @@ export async function POST(request: NextRequest) {
     // Check API key
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.error(`[Propose:${requestId}] No GEMINI_API_KEY configured`);
       return NextResponse.json<ProposeResponse>(
         {
           success: false,
@@ -205,10 +195,7 @@ export async function POST(request: NextRequest) {
 
     // Build the proposal prompt
     const prompt = buildProposalPrompt(description.trim());
-    console.log(`[Propose:${requestId}] Prompt built, length: ${prompt.length}`);
-
     // Call Gemini API
-    console.log(`[Propose:${requestId}] Calling Gemini API...`);
     const ai = new GoogleGenAI({ apiKey });
     const startTime = Date.now();
 
@@ -222,12 +209,9 @@ export async function POST(request: NextRequest) {
     });
 
     const duration = Date.now() - startTime;
-    console.log(`[Propose:${requestId}] Gemini API response in ${duration}ms`);
-
     // Extract text from response
     const responseText = response.text;
     if (!responseText) {
-      console.error(`[Propose:${requestId}] No text in Gemini response`);
       return NextResponse.json<ProposeResponse>(
         {
           success: false,
@@ -236,22 +220,11 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    console.log(
-      `[Propose:${requestId}] Response text length: ${responseText.length}`
-    );
-
     // Parse JSON from response
     let parsedProposal: unknown;
     try {
       parsedProposal = parseJSONFromResponse(responseText);
-      console.log(`[Propose:${requestId}] JSON parsed successfully`);
     } catch (error) {
-      console.error(`[Propose:${requestId}] JSON parse error:`, error);
-      console.error(
-        `[Propose:${requestId}] Response text:`,
-        responseText.substring(0, 500)
-      );
       return NextResponse.json<ProposeResponse>(
         {
           success: false,
@@ -264,9 +237,6 @@ export async function POST(request: NextRequest) {
     // Validate the proposal shape
     const validationError = validateProposalShape(parsedProposal);
     if (validationError) {
-      console.error(
-        `[Propose:${requestId}] Validation error: ${validationError}`
-      );
       return NextResponse.json<ProposeResponse>(
         {
           success: false,
@@ -277,18 +247,11 @@ export async function POST(request: NextRequest) {
     }
 
     const proposal = parsedProposal as WorkflowProposal;
-
-    console.log(
-      `[Propose:${requestId}] Success - nodes: ${proposal.nodes.length}, connections: ${proposal.connections.length}`
-    );
-
     return NextResponse.json<ProposeResponse>({
       success: true,
       proposal,
     });
   } catch (error) {
-    console.error(`[Propose:${requestId}] Unexpected error:`, error);
-
     // Handle rate limiting
     if (error instanceof Error && error.message.includes("429")) {
       return NextResponse.json<ProposeResponse>(
@@ -310,3 +273,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

@@ -873,16 +873,12 @@ async function fetchWaveSpeedModels(apiKey: string): Promise<ProviderModel[]> {
   const models = data.models || data.data || data.results || [];
 
   if (!Array.isArray(models)) {
-    console.warn("[WaveSpeed] Unexpected response format:", data);
     return [];
   }
 
   // Log first model structure for debugging (including api_schema if present)
   if (models.length > 0) {
     const firstModel = models[0];
-    console.log("[WaveSpeed] First model sample:", JSON.stringify(firstModel, null, 2).substring(0, 1000));
-    console.log(`[WaveSpeed] Total models: ${models.length}`);
-    console.log(`[WaveSpeed] First model has api_schema: ${!!firstModel.api_schema}`);
   }
 
   // Extract and cache schemas from models that have them
@@ -896,7 +892,6 @@ async function fetchWaveSpeedModels(apiKey: string): Promise<ProviderModel[]> {
 
   // Bulk cache all schemas
   if (schemaMap.size > 0) {
-    console.log(`[WaveSpeed] Caching ${schemaMap.size} model schemas`);
     setCachedWaveSpeedSchemas(schemaMap);
   }
 
@@ -1209,7 +1204,6 @@ export async function GET(
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
-        console.error(`[Models] ${provider}: ${errorMessage}`);
         errors.push(`${provider}: ${errorMessage}`);
         providerResults[provider] = {
           success: false,
@@ -1271,3 +1265,4 @@ export async function GET(
 
   return NextResponse.json<ModelsSuccessResponse>(response);
 }
+

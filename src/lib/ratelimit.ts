@@ -1,7 +1,8 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-// Only instantiate if env vars are present (skip in dev without Redis)
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
 function createRatelimiter(requests: number, window: string) {
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
     return null;
@@ -25,11 +26,34 @@ export const proLimiter = createRatelimiter(200, "1 h");
 // Auth endpoints: 10 attempts / 15 min
 export const authLimiter = createRatelimiter(10, "15 m");
 
+// In-memory fallback counters (dev only — resets on restart)
+const memoryCounters = new Map<string, { count: number; resetAt: number }>();
+
+function memoryRateLimit(identifier: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  const entry = memoryCounters.get(identifier);
+  if (!entry || now > entry.resetAt) {
+    memoryCounters.set(identifier, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (entry.count >= limit) return false;
+  entry.count++;
+  return true;
+}
+
 export async function checkRateLimit(
   limiter: ReturnType<typeof createRatelimiter>,
   identifier: string
 ): Promise<{ success: boolean; remaining: number; reset: number }> {
-  if (!limiter) return { success: true, remaining: 999, reset: 0 };
+  if (!limiter) {
+    // In production without Redis: apply a conservative in-memory limit
+    if (IS_PRODUCTION) {
+      const ok = memoryRateLimit(identifier, 10, 60 * 60 * 1000); // 10/hr fallback
+      return { success: ok, remaining: ok ? 9 : 0, reset: 0 };
+    }
+    // In dev: allow all
+    return { success: true, remaining: 999, reset: 0 };
+  }
 
   const result = await limiter.limit(identifier);
   return {
@@ -43,18 +67,17 @@ export async function getRateLimitRemaining(
   limiter: ReturnType<typeof createRatelimiter>,
   identifier: string
 ): Promise<{ limit: number; remaining: number; reset: number }> {
-  if (!limiter) return { limit: 999, remaining: 999, reset: 0 };
-  
-  // @ts-ignore - Some older versions of Upstash limit types have 'getRemaining' but it might be poorly typed
+  if (!limiter) return { limit: IS_PRODUCTION ? 10 : 999, remaining: IS_PRODUCTION ? 10 : 999, reset: 0 };
+
   try {
+    // @ts-ignore
     const result = await limiter.getRemaining(identifier);
     return {
       limit: result.limit || 999,
       remaining: result.remaining || 999,
       reset: result.reset || 0,
     };
-  } catch (e) {
-    // Fallback if getRemaining isn't available
+  } catch {
     return { limit: 999, remaining: 999, reset: 0 };
   }
 }

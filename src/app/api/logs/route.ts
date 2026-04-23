@@ -40,8 +40,6 @@ export async function POST(req: NextRequest) {
       sessionId: session.sessionId,
     });
   } catch (error) {
-    console.error('Failed to save log session:', error);
-
     return NextResponse.json(
       {
         success: false,
@@ -51,3 +49,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

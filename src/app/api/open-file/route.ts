@@ -109,10 +109,10 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error("Failed to reveal file:", error);
         return NextResponse.json(
             { success: false, error: "Failed to open file location" },
             { status: 500 }
         );
     }
 }
+
