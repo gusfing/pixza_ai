@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-  // SaaS features moved to WordPress. This route is now a placeholder.
-  return NextResponse.json({ error: "SaaS migration in progress" }, { status: 501 });
+// Stripe integration deprecated — payments handled via WooCommerce/WordPress
+export async function POST() {
+  return NextResponse.json({ error: "Not available. Use the WordPress checkout flow." }, { status: 404 });
 }

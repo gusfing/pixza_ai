@@ -84,7 +84,7 @@ export function Header() {
   const handleProjectSave = async (id: string, name: string, path: string) => {
     setWorkflowMetadata(id, name, path);
     setShowProjectModal(false);
-    setTimeout(() => saveToFile().catch(console.error), 50);
+    setTimeout(() => saveToFile().catch(() => {}), 50);
   };
 
   const handleOpenDir = async () => {

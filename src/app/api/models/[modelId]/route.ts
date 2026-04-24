@@ -1146,7 +1146,6 @@ async function fetchWaveSpeedSchema(
   // First check if we have a cached schema from the models list
   const cachedSchema = getCachedWaveSpeedSchema(modelId);
   if (cachedSchema) {
-    console.log(`[WaveSpeed Schema] Using cached schema for ${modelId}`);
     const result = extractWaveSpeedSchema(cachedSchema, modelId);
     if (result.parameters.length > 0 || result.inputs.length > 0) {
       return result;
@@ -1156,7 +1155,6 @@ async function fetchWaveSpeedSchema(
   // If no cache and we have an API key, try fetching the model directly
   if (apiKey) {
     try {
-      console.log(`[WaveSpeed Schema] Fetching schema for ${modelId} from API`);
       const response = await fetch(`${WAVESPEED_API_BASE}/models`, {
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -1180,18 +1178,15 @@ async function fetchWaveSpeedSchema(
 
           const result = extractWaveSpeedSchema(model.api_schema as WaveSpeedApiSchema, modelId);
           if (result.parameters.length > 0 || result.inputs.length > 0) {
-            console.log(`[WaveSpeed Schema] Found dynamic schema with ${result.parameters.length} params, ${result.inputs.length} inputs`);
             return result;
           }
         }
       }
     } catch (error) {
-      console.warn(`[WaveSpeed Schema] Failed to fetch from API: ${error}`);
     }
   }
 
   // Fall back to static schema
-  console.log(`[WaveSpeed Schema] Using static fallback for ${modelId}`);
   return getStaticWaveSpeedSchema(modelId);
 }
 
@@ -1206,20 +1201,17 @@ function extractWaveSpeedSchema(
   // WaveSpeed schema structure: api_schema.api_schemas[].request_schema
   const apiSchemas = apiSchema.api_schemas;
   if (!apiSchemas || !Array.isArray(apiSchemas) || apiSchemas.length === 0) {
-    console.log(`[WaveSpeed Schema] No api_schemas array found for ${modelId}`);
     return { parameters: [], inputs: [] };
   }
 
   // Use the first schema (primary request schema)
   const requestSchema = apiSchemas[0]?.request_schema;
   if (!requestSchema || typeof requestSchema !== "object") {
-    console.log(`[WaveSpeed Schema] No request_schema found for ${modelId}`);
     return { parameters: [], inputs: [] };
   }
 
   // Log the schema structure for debugging
   const schemaKeys = Object.keys(requestSchema);
-  console.log(`[WaveSpeed Schema] Schema keys for ${modelId}: ${schemaKeys.join(", ")}`);
 
   // Extract parameters using the shared extraction function
   return extractParametersFromSchema(requestSchema as Record<string, unknown>);
@@ -1328,7 +1320,6 @@ export async function GET(
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error(`[ModelSchema] Error fetching ${decodedModelId}: ${errorMessage}`);
     return NextResponse.json<SchemaErrorResponse>(
       {
         success: false,

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-  // SaaS features moved to WordPress. This route is now a placeholder.
+// Stripe webhook deprecated — subscription events handled via WooCommerce
+export async function POST() {
   return NextResponse.json({ received: true });
 }

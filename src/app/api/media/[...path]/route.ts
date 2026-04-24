@@ -28,7 +28,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("[Media API] File not found:", fullPath);
     return new NextResponse("File not found", { status: 404 });
   }
 }

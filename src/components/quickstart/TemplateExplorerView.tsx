@@ -268,7 +268,7 @@ export function TemplateExplorerView({ onBack, onWorkflowSelected }: TemplateExp
     fetch("/api/community-workflows")
       .then(r => r.json())
       .then(d => { if (d.success) setCommunityWorkflows(d.workflows); })
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setIsLoadingList(false));
   }, []);
 

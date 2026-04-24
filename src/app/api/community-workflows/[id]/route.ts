@@ -53,7 +53,6 @@ export async function GET(request: Request, { params }: RouteParams) {
       downloadUrl: urlData.downloadUrl,
     });
   } catch (error) {
-    console.error("Error getting community workflow URL:", error);
     return NextResponse.json(
       { success: false, error: "Failed to load workflow" },
       { status: 500 }
