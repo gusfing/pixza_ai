@@ -2,8 +2,7 @@
 
 import type React from "react";
 import { useRef, useMemo, useCallback, useState, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 
 type ImageItem = string | { src: string; alt?: string };
@@ -170,7 +169,11 @@ function GalleryScene({
     [images]
   );
 
-  const textures = useTexture(normalizedImages.map((img) => img.src));
+  const textures = useLoader(
+    THREE.TextureLoader,
+    normalizedImages.map((img) => img.src),
+    (loader) => { (loader as THREE.TextureLoader).crossOrigin = "anonymous"; }
+  ) as THREE.Texture[];
 
   const materials = useMemo(
     () => Array.from({ length: visibleCount }, () => createClothMaterial()),
@@ -392,6 +395,10 @@ export default function InfiniteGallery({
     } catch {
       setWebglSupported(false);
     }
+    // Set crossOrigin on Three.js texture loader globally
+    THREE.DefaultLoadingManager.onStart = () => {};
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = "anonymous";
   }, []);
 
   if (!webglSupported) {

@@ -8,22 +8,22 @@ import { ArrowLeft } from "lucide-react";
 import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 
 const GALLERY_IMAGES = [
-  { src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80", alt: "Abstract generative art" },
-  { src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80", alt: "Modern architecture" },
-  { src: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=600&q=80", alt: "AI portrait" },
-  { src: "https://images.unsplash.com/photo-1639322537228-f710d846310a?w=600&q=80", alt: "Neural network" },
-  { src: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80", alt: "Mountain landscape" },
-  { src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80", alt: "Nature" },
-  { src: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?w=600&q=80", alt: "Digital bloom" },
-  { src: "https://images.unsplash.com/photo-1557683316-973673baf926?w=600&q=80", alt: "Abstract geometric" },
-  { src: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=600&q=80", alt: "Prismatic wave" },
-  { src: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=600&q=80", alt: "Ethereal light" },
-  { src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80", alt: "Forest light" },
-  { src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80", alt: "Landscape" },
-  { src: "https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?w=600&q=80", alt: "Abstract" },
-  { src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80", alt: "Nature 2" },
-  { src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80", alt: "Space" },
-  { src: "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=600&q=80", alt: "Wildlife" },
+  { src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80&crossorigin=anonymous", alt: "Abstract generative art" },
+  { src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80&crossorigin=anonymous", alt: "Modern architecture" },
+  { src: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=600&q=80&crossorigin=anonymous", alt: "AI portrait" },
+  { src: "https://images.unsplash.com/photo-1639322537228-f710d846310a?w=600&q=80&crossorigin=anonymous", alt: "Neural network" },
+  { src: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80&crossorigin=anonymous", alt: "Mountain landscape" },
+  { src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80&crossorigin=anonymous", alt: "Nature" },
+  { src: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?w=600&q=80&crossorigin=anonymous", alt: "Digital bloom" },
+  { src: "https://images.unsplash.com/photo-1557683316-973673baf926?w=600&q=80&crossorigin=anonymous", alt: "Abstract geometric" },
+  { src: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=600&q=80&crossorigin=anonymous", alt: "Prismatic wave" },
+  { src: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=600&q=80&crossorigin=anonymous", alt: "Ethereal light" },
+  { src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80&crossorigin=anonymous", alt: "Forest light" },
+  { src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80&crossorigin=anonymous", alt: "Landscape" },
+  { src: "https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?w=600&q=80&crossorigin=anonymous", alt: "Abstract" },
+  { src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80&crossorigin=anonymous", alt: "Nature 2" },
+  { src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80&crossorigin=anonymous", alt: "Space" },
+  { src: "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=600&q=80&crossorigin=anonymous", alt: "Wildlife" },
 ];
 
 export default function GalleryPage() {
