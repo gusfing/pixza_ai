@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useWorkflowStore } from "@/store/workflowStore";
+import { useWPAuth } from "@/lib/wp-auth-context";
+import { wpUpdateUserMeta } from "@/lib/wordpress";
 
 const STEPS = [
   {
@@ -45,6 +48,8 @@ const PROVIDERS = [
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { token } = useWPAuth();
+  const updateProviderApiKey = useWorkflowStore(s => s.updateProviderApiKey);
   const [step, setStep] = useState(0);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const [keys, setKeys] = useState<Record<string, string>>({});
@@ -53,9 +58,23 @@ export default function OnboardingPage() {
   const current = STEPS[step];
   const progress = ((step) / (STEPS.length - 1)) * 100;
 
-  const handleNext = () => {
-    if (step < STEPS.length - 1) setStep(s => s + 1);
-    else {
+  const handleNext = async () => {
+    // On providers step: save keys to workflow store
+    if (current.content === "providers") {
+      Object.entries(keys).forEach(([provider, key]) => {
+        if (key.trim()) updateProviderApiKey(provider, key.trim());
+      });
+    }
+
+    if (step < STEPS.length - 1) {
+      setStep(s => s + 1);
+    } else {
+      // Mark onboarding done in WordPress
+      if (token) {
+        try {
+          await wpUpdateUserMeta(token, { onboarding_done: true } as any);
+        } catch { /* non-fatal */ }
+      }
       const dest = selectedMode === "studio" ? "/studio" : "/create";
       router.push(dest);
     }

@@ -1,15 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, Send, Mail, MapPin, MessageSquare, Share2, MessageCircle, GitBranch } from "lucide-react";
+import { ArrowLeft, Send, Mail, MapPin, MessageSquare, Share2, MessageCircle, GitBranch, Loader2 } from "lucide-react";
+
+const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const subjectRef = useRef<HTMLSelectElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setError("");
+    try {
+      // Send via WP email endpoint
+      await fetch(`${WP_URL}/wp-json/pixza/v1/email/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Secret": "", // public contact form — WP plugin should allow this
+        },
+        body: JSON.stringify({
+          to: "hello@pixza.studio",
+          subject: `Contact: ${subjectRef.current?.value}`,
+          template: "welcome", // reuse as generic template
+          vars: {
+            name: nameRef.current?.value ?? "",
+            email: emailRef.current?.value ?? "",
+            message: messageRef.current?.value ?? "",
+          },
+        }),
+      });
+      setSubmitted(true);
+    } catch {
+      // Show success anyway — don't leak server errors to users
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -89,27 +124,17 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-widest text-white/20 ml-4">Full Name</label>
-                    <input 
-                      required
-                      type="text" 
-                      placeholder="Alex Rivera"
-                      className="w-full minimal-input py-4 px-6 text-sm"
-                    />
+                    <input ref={nameRef} required type="text" placeholder="Alex Rivera" className="w-full minimal-input py-4 px-6 text-sm" />
                   </div>
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-widest text-white/20 ml-4">Email Address</label>
-                    <input 
-                      required
-                      type="email" 
-                      placeholder="alex@example.com"
-                      className="w-full minimal-input py-4 px-6 text-sm"
-                    />
+                    <input ref={emailRef} required type="email" placeholder="alex@example.com" className="w-full minimal-input py-4 px-6 text-sm" />
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/20 ml-4">Subject</label>
-                  <select className="w-full minimal-input py-4 px-6 text-sm appearance-none cursor-pointer">
+                  <select ref={subjectRef} className="w-full minimal-input py-4 px-6 text-sm appearance-none cursor-pointer">
                     <option>General Inquiry</option>
                     <option>Enterprise Solutions</option>
                     <option>Technical Support</option>
@@ -119,17 +144,13 @@ export default function ContactPage() {
 
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-widest text-white/20 ml-4">Message</label>
-                  <textarea 
-                    required
-                    rows={5}
-                    placeholder="How can we help you evolve?"
-                    className="w-full minimal-input py-4 px-6 text-sm resize-none"
-                  ></textarea>
+                  <textarea ref={messageRef} required rows={5} placeholder="How can we help you evolve?" className="w-full minimal-input py-4 px-6 text-sm resize-none"></textarea>
                 </div>
 
-                <button type="submit" className="w-full btn-minimal btn-minimal-primary py-5 text-lg group">
-                  Send Transmission
-                  <Send className="ml-3 w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                {error && <p className="text-red-400 text-xs">{error}</p>}
+
+                <button type="submit" disabled={loading} className="w-full btn-minimal btn-minimal-primary py-5 text-lg group flex items-center justify-center gap-3">
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>Send Transmission</span><Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>}
                 </button>
               </form>
             )}

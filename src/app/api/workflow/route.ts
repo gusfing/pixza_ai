@@ -4,10 +4,23 @@ import * as path from "path";
 import { logger } from "@/utils/logger";
 import { validateWorkflowPath } from "@/utils/pathValidation";
 
-export const maxDuration = 300; // 5 minute timeout for large workflow files
+export const maxDuration = 300;
+
+function isLocalhostRequest(req: NextRequest): boolean {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const firstIp = forwarded.split(",")[0].trim();
+    if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(firstIp)) return false;
+  }
+  const host = (req.headers.get("host") || "").split(":")[0];
+  return !host || ["localhost", "127.0.0.1", "::1"].includes(host);
+}
 
 // POST: Save workflow to file
 export async function POST(request: NextRequest) {
+  if (!isLocalhostRequest(request)) {
+    return NextResponse.json({ success: false, error: "Forbidden: localhost only" }, { status: 403 });
+  }
   let directoryPath: string | undefined;
   let filename: string | undefined;
   try {
@@ -143,6 +156,9 @@ export async function POST(request: NextRequest) {
 
 // GET: Validate directory path, or load workflow from directory
 export async function GET(request: NextRequest) {
+  if (!isLocalhostRequest(request)) {
+    return NextResponse.json({ success: false, error: "Forbidden: localhost only" }, { status: 403 });
+  }
   const directoryPath = request.nextUrl.searchParams.get("path");
   const shouldLoad = request.nextUrl.searchParams.get("load") === "true";
 

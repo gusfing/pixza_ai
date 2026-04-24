@@ -3,6 +3,16 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { validateWorkflowPath } from "@/utils/pathValidation";
 
+function isLocalhostRequest(req: NextRequest): boolean {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const firstIp = forwarded.split(",")[0].trim();
+    if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(firstIp)) return false;
+  }
+  const host = (req.headers.get("host") || "").split(":")[0];
+  return !host || ["localhost", "127.0.0.1", "::1"].includes(host);
+}
+
 const MAX_DEPTH = 3;
 const SKIP_DIRS = new Set([".git", "node_modules", "__pycache__", ".next"]);
 
@@ -101,6 +111,9 @@ async function probeWorkflow(
 }
 
 export async function GET(request: NextRequest) {
+  if (!isLocalhostRequest(request)) {
+    return NextResponse.json({ success: false, error: "Forbidden: localhost only" }, { status: 403 });
+  }
   const parentPath = request.nextUrl.searchParams.get("path");
 
   if (!parentPath) {
