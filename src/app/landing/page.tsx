@@ -435,7 +435,9 @@ export default function LandingPage() {
   return (
     <main className="bg-[#0A0A0A] text-white selection:bg-white selection:text-black">
       <Header />
-      <ScrollMorphHero />
+      <div className="h-screen w-full">
+        <ScrollMorphHero />
+      </div>
       <Stats />
       <Features />
       <Showcase />
