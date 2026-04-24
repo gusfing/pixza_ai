@@ -1,55 +1,38 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWPAuth } from "@/lib/wp-auth-context";
-import { Download, ArrowLeft, ImageIcon, Video, Music, Box, RefreshCw } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 
-interface Generation {
-  id: string;
-  prompt: string;
-  outputUrl: string | null;
-  outputType: string;
-  model: string;
-  provider: string;
-  status: string;
-  createdAt: string;
-}
-
-const TYPE_ICON: Record<string, any> = {
-  image: ImageIcon,
-  video: Video,
-  audio: Music,
-  "3d": Box,
-};
+const GALLERY_IMAGES = [
+  { src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80", alt: "Abstract generative art" },
+  { src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80", alt: "Modern architecture" },
+  { src: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=600&q=80", alt: "AI portrait" },
+  { src: "https://images.unsplash.com/photo-1639322537228-f710d846310a?w=600&q=80", alt: "Neural network" },
+  { src: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80", alt: "Mountain landscape" },
+  { src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80", alt: "Nature" },
+  { src: "https://images.unsplash.com/photo-1635776062127-d3b036db9f20?w=600&q=80", alt: "Digital bloom" },
+  { src: "https://images.unsplash.com/photo-1557683316-973673baf926?w=600&q=80", alt: "Abstract geometric" },
+  { src: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=600&q=80", alt: "Prismatic wave" },
+  { src: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=600&q=80", alt: "Ethereal light" },
+  { src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80", alt: "Forest light" },
+  { src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80", alt: "Landscape" },
+  { src: "https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?w=600&q=80", alt: "Abstract" },
+  { src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80", alt: "Nature 2" },
+  { src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80", alt: "Space" },
+  { src: "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=600&q=80", alt: "Wildlife" },
+];
 
 export default function GalleryPage() {
   const { user, loading: authLoading } = useWPAuth();
   const router = useRouter();
-  const [generations, setGenerations] = useState<Generation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/auth/signin?next=/gallery");
   }, [authLoading, user, router]);
-
-  useEffect(() => {
-    if (!user) return;
-    setLoading(true);
-    fetch(`/api/generations?page=${page}&per_page=20`)
-      .then(r => r.json())
-      .then(data => {
-        if (page === 1) setGenerations(data.items ?? []);
-        else setGenerations(prev => [...prev, ...(data.items ?? [])]);
-        setHasMore((data.items?.length ?? 0) === 20);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [user, page]);
 
   if (authLoading) return (
     <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
@@ -58,105 +41,48 @@ export default function GalleryPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans antialiased">
-      {/* Nav */}
-      <nav className="h-14 border-b border-white/5 flex items-center justify-between px-6 sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-50">
-        <div className="flex items-center gap-4">
-          <Link href="/create" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-bold">Studio</span>
-          </Link>
-          <span className="text-white/10">·</span>
-          <span className="text-sm font-black text-white">My Gallery</span>
-        </div>
-        <Link href="/create" className="text-xs font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
-          + New Generation
-        </Link>
-      </nav>
+    <main className="min-h-screen h-full w-full bg-[#0A0A0A]">
+      {/* 3D Gallery — full screen */}
+      <InfiniteGallery
+        images={GALLERY_IMAGES}
+        speed={1.2}
+        visibleCount={12}
+        className="h-screen w-full"
+        fadeSettings={{
+          fadeIn: { start: 0.05, end: 0.25 },
+          fadeOut: { start: 0.4, end: 0.43 },
+        }}
+        blurSettings={{
+          blurIn: { start: 0.0, end: 0.1 },
+          blurOut: { start: 0.4, end: 0.43 },
+          maxBlur: 8.0,
+        }}
+      />
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        {loading && generations.length === 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="aspect-square rounded-2xl bg-white/5 animate-pulse" />
-            ))}
-          </div>
-        ) : generations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6">
-              <ImageIcon className="w-10 h-10 text-white/10" />
-            </div>
-            <h2 className="text-2xl font-black text-white mb-3 tracking-tighter">No generations yet</h2>
-            <p className="text-white/30 text-sm mb-8">Your generated images, videos, and audio will appear here.</p>
-            <Link href="/create" className="px-8 py-3 rounded-2xl bg-white text-black font-black text-sm hover:bg-white/90 transition-all">
-              Start Creating
-            </Link>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {generations.map((gen) => {
-                const Icon = TYPE_ICON[gen.outputType] ?? ImageIcon;
-                return (
-                  <div key={gen.id} className="group relative aspect-square rounded-2xl overflow-hidden bg-white/5 border border-white/5">
-                    {gen.outputUrl ? (
-                      gen.outputType === "video" ? (
-                        <video src={gen.outputUrl} className="w-full h-full object-cover" muted />
-                      ) : gen.outputType === "audio" ? (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Music className="w-10 h-10 text-amber-400/40" />
-                        </div>
-                      ) : (
-                        <img src={gen.outputUrl} alt={gen.prompt} className="w-full h-full object-cover" />
-                      )
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Icon className="w-10 h-10 text-white/10" />
-                      </div>
-                    )}
-
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                      <p className="text-xs text-white font-medium line-clamp-2 mb-2">{gen.prompt}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{gen.model}</span>
-                        {gen.outputUrl && (
-                          <a
-                            href={gen.outputUrl}
-                            download
-                            className="w-7 h-7 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-white hover:text-black transition-all"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Status badge */}
-                    {gen.status === "pending" && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
-                        <RefreshCw className="w-3 h-3 text-white/60 animate-spin" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {hasMore && (
-              <div className="flex justify-center mt-10">
-                <button
-                  onClick={() => setPage(p => p + 1)}
-                  disabled={loading}
-                  className="px-8 py-3 rounded-2xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all disabled:opacity-30"
-                >
-                  {loading ? "Loading…" : "Load More"}
-                </button>
-              </div>
-            )}
-          </>
-        )}
+      {/* Overlay text */}
+      <div className="fixed inset-0 pointer-events-none flex items-center justify-center text-center px-4 mix-blend-exclusion">
+        <h1 className="font-black text-5xl md:text-8xl tracking-tighter text-white leading-none">
+          <span className="italic font-thin opacity-60">Your</span><br />Gallery
+        </h1>
       </div>
-    </div>
+
+      {/* Back link */}
+      <Link
+        href="/create"
+        className="fixed top-6 left-6 z-50 flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-bold bg-black/40 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10"
+      >
+        <ArrowLeft className="w-4 h-4" /> Studio
+      </Link>
+
+      {/* Instructions */}
+      <div className="fixed bottom-8 left-0 right-0 text-center pointer-events-none z-50">
+        <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
+          Scroll or use arrow keys to navigate · Hover to interact
+        </p>
+        <p className="text-white/15 text-[9px] font-medium mt-1">
+          Auto-play resumes after 3 seconds
+        </p>
+      </div>
+    </main>
   );
 }
