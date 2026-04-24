@@ -250,8 +250,23 @@ export async function POST(request: NextRequest) {
     const PREMIUM_MODELS = [
       "nano-banana-pro",
       "nano-banana-2",
+      "veo-3.0-generate-preview",
       "veo-3.1/text-to-video",
       "veo-3.1/image-to-video",
+      "fal-ai/gpt-image-1.5",
+      "fal-ai/gpt-image-1/text-to-image",
+      "fal-ai/gpt-image-1-mini",
+      "fal-ai/gpt-image-1/edit-image",
+      "fal-ai/flux-2-pro",
+      "fal-ai/kling-video/v3/pro/text-to-video",
+      "fal-ai/kling-video/v3/pro/image-to-video",
+      "fal-ai/kling-video/v2.6/pro/text-to-video",
+      "fal-ai/kling-video/v2.6/pro/image-to-video",
+      "fal-ai/seedance-v1-pro",
+      "fal-ai/ltx-2/image-to-video/fast",
+      "fal-ai/minimax-music/v2",
+      "sonauto/v2/text-to-music",
+      "fal-ai/hunyuan3d-v2",
     ];
 
     const isFreeModel = FREE_MODELS.includes(resolvedModelId);
