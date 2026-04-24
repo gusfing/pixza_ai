@@ -20,23 +20,47 @@ interface Model { provider: string; modelId: string; label: string; tabs: Tab[];
 
 /* ── Model Registry ─────────────────────────────────────────── */
 const MODELS: Model[] = [
-  { provider: "gemini",    modelId: "nano-banana-2",                              label: "Imagen 4",        tabs: ["Image"], badge: "Fast" },
-  { provider: "gemini",    modelId: "nano-banana-pro",                            label: "Imagen 3",        tabs: ["Image"], badge: "Quality" },
-  { provider: "fal",       modelId: "fal-ai/flux-pro",                            label: "FLUX Pro",        tabs: ["Image"], badge: "Pro" },
-  { provider: "fal",       modelId: "fal-ai/flux/schnell",                        label: "FLUX Schnell",    tabs: ["Image"], badge: "Fast" },
-  { provider: "fal",       modelId: "fal-ai/flux-realism",                        label: "FLUX Realism",    tabs: ["Image"] },
-  { provider: "wavespeed", modelId: "wavespeed-ai/flux-dev-ultra-fast",           label: "FLUX Ultra",      tabs: ["Image"], badge: "Fastest" },
-  { provider: "fal",       modelId: "fal-ai/flux/dev/image-to-image",             label: "FLUX I2I",        tabs: ["Image"] },
-  { provider: "gemini",    modelId: "veo-3.0-generate-preview",                   label: "Veo 3",           tabs: ["Video"], badge: "Best" },
-  { provider: "gemini",    modelId: "veo-2.0-generate-001",                       label: "Veo 2",           tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/kling-video/v1.6/pro/text-to-video",  label: "Kling 1.6 Pro",   tabs: ["Video"], badge: "Popular" },
-  { provider: "fal",       modelId: "fal-ai/wan-t2v",                             label: "Wan T2V",         tabs: ["Video"], badge: "Fast" },
-  { provider: "fal",       modelId: "fal-ai/minimax-video",                       label: "MiniMax",         tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/kling-video/v1.6/pro/image-to-video", label: "Kling I2V",       tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/stable-audio",                        label: "Stable Audio",    tabs: ["Audio"] },
-  { provider: "fal",       modelId: "fal-ai/trellis",                             label: "Trellis",         tabs: ["3D"], badge: "Best" },
-  { provider: "fal",       modelId: "fal-ai/stable-zero123",                      label: "Zero123",         tabs: ["3D"] },
-  { provider: "replicate", modelId: "stability-ai/triposr",                       label: "TripoSR",         tabs: ["3D"], badge: "Fast" },
+  // ── Image ──────────────────────────────────────────────────
+  { provider: "gemini",    modelId: "nano-banana-2",                                    label: "Imagen 4",           tabs: ["Image"], badge: "New" },
+  { provider: "gemini",    modelId: "nano-banana-pro",                                  label: "Imagen 3",           tabs: ["Image"], badge: "Quality" },
+  { provider: "fal",       modelId: "fal-ai/flux-2-pro",                                label: "FLUX.2 Pro",         tabs: ["Image"], badge: "Best" },
+  { provider: "fal",       modelId: "fal-ai/flux-pro",                                  label: "FLUX.1 Pro",         tabs: ["Image"] },
+  { provider: "fal",       modelId: "fal-ai/flux/schnell",                              label: "FLUX Schnell",       tabs: ["Image"], badge: "Fast" },
+  { provider: "fal",       modelId: "fal-ai/flux-realism",                              label: "FLUX Realism",       tabs: ["Image"] },
+  { provider: "fal",       modelId: "fal-ai/seedream-v4-5",                             label: "Seedream V4.5",      tabs: ["Image"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/ideogram/v3",                               label: "Ideogram V3",        tabs: ["Image"] },
+  { provider: "fal",       modelId: "fal-ai/recraft-v3",                                label: "Recraft V3",         tabs: ["Image"] },
+  { provider: "wavespeed", modelId: "wavespeed-ai/flux-dev-ultra-fast",                 label: "FLUX Ultra Fast",    tabs: ["Image"], badge: "Fastest" },
+  { provider: "fal",       modelId: "fal-ai/flux/dev/image-to-image",                   label: "FLUX I2I",           tabs: ["Image"] },
+  { provider: "fal",       modelId: "fal-ai/aura-flow",                                 label: "AuraFlow",           tabs: ["Image"] },
+
+  // ── Video ──────────────────────────────────────────────────
+  { provider: "gemini",    modelId: "veo-3.0-generate-preview",                         label: "Veo 3",              tabs: ["Video"], badge: "Best" },
+  { provider: "gemini",    modelId: "veo-2.0-generate-001",                             label: "Veo 2",              tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/kling-video/v3/pro/text-to-video",          label: "Kling 3.0 Pro",      tabs: ["Video"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/kling-video/v2.6/pro/text-to-video",        label: "Kling 2.6 Pro",      tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/kling-video/v1.6/pro/text-to-video",        label: "Kling 1.6 Pro",      tabs: ["Video"], badge: "Popular" },
+  { provider: "fal",       modelId: "fal-ai/kling-video/v3/pro/image-to-video",         label: "Kling 3.0 I2V",      tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/kling-video/v2.6/pro/image-to-video",       label: "Kling 2.6 I2V",      tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/wan-t2v",                                   label: "Wan T2V",            tabs: ["Video"], badge: "Fast" },
+  { provider: "fal",       modelId: "fal-ai/wan-i2v",                                   label: "Wan I2V",            tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/minimax-video",                             label: "MiniMax Video",      tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/seedance-v1-pro",                           label: "Seedance V1 Pro",    tabs: ["Video"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/luma-dream-machine",                        label: "Luma Dream Machine", tabs: ["Video"] },
+
+  // ── Audio ──────────────────────────────────────────────────
+  { provider: "fal",       modelId: "fal-ai/minimax-music/v2",                          label: "MiniMax Music 2.0",  tabs: ["Audio"], badge: "Best" },
+  { provider: "fal",       modelId: "fal-ai/minimax-music",                             label: "MiniMax Music",      tabs: ["Audio"] },
+  { provider: "fal",       modelId: "sonauto/v2/text-to-music",                         label: "Sonauto V2",         tabs: ["Audio"], badge: "Songs" },
+  { provider: "fal",       modelId: "fal-ai/stable-audio",                              label: "Stable Audio",       tabs: ["Audio"] },
+  { provider: "fal",       modelId: "fal-ai/ace-step",                                  label: "ACE-Step",           tabs: ["Audio"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/mmaudio-v2",                                label: "MMAudio V2",         tabs: ["Audio"] },
+
+  // ── 3D ────────────────────────────────────────────────────
+  { provider: "fal",       modelId: "fal-ai/trellis",                                   label: "Trellis",            tabs: ["3D"], badge: "Best" },
+  { provider: "fal",       modelId: "fal-ai/hunyuan3d-v2",                              label: "Hunyuan3D V2",       tabs: ["3D"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/stable-zero123",                            label: "Zero123",            tabs: ["3D"] },
+  { provider: "replicate", modelId: "stability-ai/triposr",                             label: "TripoSR",            tabs: ["3D"], badge: "Fast" },
 ];
 
 const QUICK_PROMPTS: Record<Tab, string[]> = {
@@ -53,10 +77,12 @@ const QUICK_PROMPTS: Record<Tab, string[]> = {
     "Abstract particles flowing in space",
   ],
   Audio: [
-    "Cinematic orchestral score, epic and emotional",
-    "Lo-fi hip hop beat, relaxing study music",
-    "Ambient electronic soundscape",
-    "Upbeat corporate background music",
+    "Upbeat electronic pop song with catchy melody and energetic beat",
+    "Cinematic orchestral score, epic and emotional, 120 BPM",
+    "Lo-fi hip hop beat with vinyl crackle, relaxing study music",
+    "Dark ambient soundscape with deep bass and atmospheric pads",
+    "Acoustic guitar ballad, warm and melancholic",
+    "Trap beat with 808 bass, hi-hats, and punchy snares",
   ],
   "3D": [
     "A detailed 3D model of a sports car",
@@ -543,7 +569,20 @@ function SettingsScreen() {
               <p className="font-black text-lg tracking-tighter">Upgrade to Pro</p>
               <p className="text-sm text-black/50 mt-1">Unlock all models, 2000 credits/month</p>
             </div>
-            <button className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-black/80 transition-all">
+            <button
+              onClick={async () => {
+                const token = localStorage.getItem("pixza_token");
+                if (!token) { window.location.href = "/auth/signin"; return; }
+                try {
+                  const { wpCreateCheckout } = await import("@/lib/wordpress");
+                  const { checkout_url } = await wpCreateCheckout(token, "pro");
+                  window.location.href = checkout_url;
+                } catch {
+                  window.location.href = "/settings";
+                }
+              }}
+              className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-black/80 transition-all"
+            >
               <Crown className="w-4 h-4" /> Upgrade
             </button>
           </div>
@@ -569,13 +608,46 @@ function ToolsScreen() {
 /* ── Root Page ──────────────────────────────────────────────── */
 export default function CreatePage() {
   const [screen, setScreen] = useState<NavScreen>("create");
-  // Shared state so templates can pre-fill the create screen
   const [pendingTemplate, setPendingTemplate] = useState<typeof TEMPLATES[0] | null>(null);
+
+  // Import WPAuth for credits + user display
+  const [user, setUser] = useState<any>(null);
+  const [credits, setCredits] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Lazy import to avoid SSR issues
+    import("@/lib/wp-auth-context").then(({ useWPAuth: _ }) => {});
+    // Read user from localStorage token
+    const token = localStorage.getItem("pixza_token");
+    if (token) {
+      import("@/lib/wordpress").then(({ wpGetMe }) => {
+        wpGetMe(token).then(u => {
+          setUser(u);
+          setCredits(u.meta?.credits ?? null);
+        }).catch(() => {});
+      });
+    }
+  }, []);
 
   const handleUseTemplate = (t: typeof TEMPLATES[0]) => {
     setPendingTemplate(t);
     setScreen("create");
   };
+
+  const handleUpgrade = async () => {
+    const token = localStorage.getItem("pixza_token");
+    if (!token) { window.location.href = "/auth/signin"; return; }
+    try {
+      const { wpCreateCheckout } = await import("@/lib/wordpress");
+      const { checkout_url } = await wpCreateCheckout(token, "pro");
+      window.location.href = checkout_url;
+    } catch {
+      window.location.href = "/settings";
+    }
+  };
+
+  const plan = user?.meta?.plan ?? "free";
+  const isPro = plan !== "free";
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans antialiased">
@@ -613,9 +685,38 @@ export default function CreatePage() {
           );
         })}
 
-        <div className="mt-auto">
-          <Link href="/settings" title="Account" className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all overflow-hidden">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Pixza" alt="" className="w-full h-full grayscale hover:grayscale-0 transition-all" />
+        <div className="mt-auto flex flex-col items-center gap-3">
+          {/* Credits pill */}
+          {credits !== null && (
+            <button
+              onClick={handleUpgrade}
+              title={isPro ? `${credits} credits left` : "Upgrade for more credits"}
+              className={cn(
+                "w-12 h-12 rounded-2xl flex flex-col items-center justify-center transition-all group relative border",
+                isPro ? "bg-violet-500/10 border-violet-500/20 text-violet-400" : "bg-white/5 border-white/5 text-white/30 hover:bg-amber-500/10 hover:border-amber-500/20 hover:text-amber-400"
+              )}
+            >
+              <Zap className="w-4 h-4" />
+              <span className="text-[8px] font-black mt-0.5">{credits > 999 ? `${Math.floor(credits/1000)}k` : credits}</span>
+              <span className="absolute left-full ml-3 px-2.5 py-1 bg-white text-black text-[10px] font-black rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
+                {isPro ? `${credits} credits` : "Upgrade →"}
+              </span>
+            </button>
+          )}
+
+          {/* User avatar */}
+          <Link
+            href={user ? "/settings" : "/auth/signin"}
+            title={user ? user.name || user.username : "Sign In"}
+            className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all overflow-hidden"
+          >
+            {user ? (
+              <div className="w-full h-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-xs font-black">
+                {(user.name || user.username || "U")[0].toUpperCase()}
+              </div>
+            ) : (
+              <Crown className="w-4 h-4" />
+            )}
           </Link>
         </div>
       </aside>

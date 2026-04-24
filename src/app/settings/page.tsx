@@ -213,14 +213,38 @@ function SubscriptionTab() {
           <SettingCard className="flex flex-col h-full">
             <h4 className="font-black text-white text-lg mb-2">Upgrade Engine</h4>
             <p className="text-xs text-white/30 mb-8 leading-relaxed">Unlock priority queuing, unlimited 4K exports, and hyper-speed generation.</p>
-            <button className="mt-auto btn-minimal btn-minimal-primary w-full py-4 text-[11px] font-black uppercase tracking-widest">
-              Compare Plans
+            <button
+              onClick={async () => {
+                if (!token) { window.location.href = "/auth/signin"; return; }
+                try {
+                  const { wpCreateCheckout } = await import("@/lib/wordpress");
+                  const { checkout_url } = await wpCreateCheckout(token, "pro");
+                  window.location.href = checkout_url;
+                } catch {
+                  alert("Failed to start checkout. Please try again.");
+                }
+              }}
+              className="mt-auto btn-minimal btn-minimal-primary w-full py-4 text-[11px] font-black uppercase tracking-widest"
+            >
+              Upgrade to Pro — $29/mo
             </button>
           </SettingCard>
           <SettingCard className="flex flex-col h-full bg-transparent border-white/5">
             <h4 className="font-black text-white/40 text-lg mb-2">Billing History</h4>
             <p className="text-xs text-white/20 mb-8 leading-relaxed">Download invoices and manage payment methods.</p>
-            <button className="mt-auto px-6 py-4 rounded-3xl border border-white/10 text-white/40 text-[11px] font-black uppercase tracking-widest hover:text-white hover:border-white/20 transition-all">
+            <button
+              onClick={async () => {
+                if (!token) return;
+                try {
+                  const { wpCreateCheckout } = await import("@/lib/wordpress");
+                  const { checkout_url } = await wpCreateCheckout(token, "pro");
+                  window.location.href = checkout_url;
+                } catch {
+                  window.open("https://woocommerce.com", "_blank");
+                }
+              }}
+              className="mt-auto px-6 py-4 rounded-3xl border border-white/10 text-white/40 text-[11px] font-black uppercase tracking-widest hover:text-white hover:border-white/20 transition-all"
+            >
               Manage Portal
             </button>
           </SettingCard>
