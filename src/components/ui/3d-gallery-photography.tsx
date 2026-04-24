@@ -363,10 +363,20 @@ function FallbackGallery({ images }: { images: ImageItem[] }) {
     [images]
   );
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 h-full overflow-y-auto">
-      {normalized.map((img, i) => (
-        <img key={i} src={img.src} alt={img.alt} className="w-full h-48 object-cover rounded-2xl" />
-      ))}
+    <div className="w-full h-full overflow-y-auto bg-[#0A0A0A]">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          {normalized.map((img, i) => (
+            <div key={i} className="break-inside-avoid rounded-2xl overflow-hidden group cursor-pointer">
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="w-full h-auto object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -389,10 +399,24 @@ export default function InfiniteGallery({
   const [webglSupported, setWebglSupported] = useState(true);
 
   useEffect(() => {
+    // More permissive WebGL check — try multiple context types
     try {
       const canvas = document.createElement("canvas");
-      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-      if (!gl) setWebglSupported(false);
+      const gl =
+        canvas.getContext("webgl2") ||
+        canvas.getContext("webgl") ||
+        (canvas.getContext as any)("experimental-webgl");
+      if (!gl) {
+        // Give it one more try after a short delay (some browsers need time)
+        setTimeout(() => {
+          const c2 = document.createElement("canvas");
+          const gl2 =
+            c2.getContext("webgl2") ||
+            c2.getContext("webgl") ||
+            (c2.getContext as any)("experimental-webgl");
+          if (!gl2) setWebglSupported(false);
+        }, 500);
+      }
     } catch {
       setWebglSupported(false);
     }

@@ -4,7 +4,7 @@ import { useEffect, Component, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useWPAuth } from "@/lib/wp-auth-context";
 import Link from "next/link";
-import { ArrowLeft, ImageIcon } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 
 // Dynamically import to avoid SSR issues with WebGL
@@ -36,17 +36,18 @@ class GalleryErrorBoundary extends Component<{ children: ReactNode }, { hasError
 
 function GalleryFallback() {
   return (
-    <div className="h-screen w-full bg-[#0A0A0A] flex flex-col items-center justify-center gap-6 text-center px-6">
-      <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center">
-        <ImageIcon className="w-10 h-10 text-white/20" />
+    <div className="w-full h-full overflow-y-auto bg-[#0A0A0A]">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-black text-white tracking-tighter mb-8">Gallery</h2>
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          {RAW_IMAGES.map((src, i) => (
+            <div key={i} className="break-inside-avoid rounded-2xl overflow-hidden group cursor-pointer">
+              <img src={src} alt={`Gallery ${i + 1}`}
+                className="w-full h-auto object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+            </div>
+          ))}
+        </div>
       </div>
-      <div>
-        <h2 className="text-2xl font-black text-white tracking-tighter mb-2">WebGL unavailable</h2>
-        <p className="text-white/30 text-sm">Your browser doesn't support WebGL or it's disabled.</p>
-      </div>
-      <Link href="/create" className="px-6 py-3 rounded-2xl bg-white text-black font-black text-sm hover:bg-white/90 transition-all">
-        Go to Studio
-      </Link>
     </div>
   );
 }
