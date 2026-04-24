@@ -267,6 +267,7 @@ export async function POST(request: NextRequest) {
       "fal-ai/kling-video/v2.6/pro/text-to-video",
       "fal-ai/kling-video/v2.6/pro/image-to-video",
       "fal-ai/seedance-v1-pro",
+      "fal-ai/seedance-2-0",
       "fal-ai/ltx-2/image-to-video/fast",
       "fal-ai/minimax-music/v2",
       "sonauto/v2/text-to-music",

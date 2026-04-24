@@ -55,6 +55,7 @@ const MODELS: Model[] = [
   { provider: "fal",       modelId: "fal-ai/wan-i2v",                                     label: "Wan I2V",            tabs: ["Video"] },
   { provider: "fal",       modelId: "fal-ai/minimax-video",                               label: "MiniMax Video",      tabs: ["Video"] },
   { provider: "fal",       modelId: "fal-ai/seedance-v1-pro",                             label: "Seedance V1 Pro",    tabs: ["Video"] },
+  { provider: "fal",       modelId: "fal-ai/seedance-2-0",                                label: "Seedance 2.0",       tabs: ["Video"], badge: "New" },
   { provider: "fal",       modelId: "fal-ai/luma-dream-machine",                          label: "Luma Dream Machine", tabs: ["Video"] },
 
   // ── Audio ──────────────────────────────────────────────────
