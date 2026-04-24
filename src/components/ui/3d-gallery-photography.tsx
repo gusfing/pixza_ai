@@ -4,6 +4,7 @@ import type React from "react";
 import { useRef, useMemo, useCallback, useState, useEffect } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
+import { Suspense } from "react";
 
 type ImageItem = string | { src: string; alt?: string };
 
@@ -412,7 +413,9 @@ export default function InfiniteGallery({
   return (
     <div className={className} style={style}>
       <Canvas camera={{ position: [0, 0, 0], fov: 55 }} gl={{ antialias: true, alpha: true }}>
-        <GalleryScene images={images} fadeSettings={fadeSettings} blurSettings={blurSettings} {...rest} />
+        <Suspense fallback={null}>
+          <GalleryScene images={images} fadeSettings={fadeSettings} blurSettings={blurSettings} {...rest} />
+        </Suspense>
       </Canvas>
     </div>
   );
