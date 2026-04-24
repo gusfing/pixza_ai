@@ -20,7 +20,6 @@ function isVercelProduction(): boolean {
  */
 export async function saveSession(session: LogSession): Promise<void> {
   if (isVercelProduction()) {
-    console.log(`[Logger] Skipping file save on Vercel (session: ${session.sessionId})`);
     return;
   }
 
@@ -32,7 +31,6 @@ export async function saveSession(session: LogSession): Promise<void> {
   try {
     await fs.mkdir(logsDir, { recursive: true });
   } catch (error) {
-    console.error('Failed to create logs directory:', error);
     return;
   }
 
@@ -40,7 +38,6 @@ export async function saveSession(session: LogSession): Promise<void> {
   try {
     await fs.writeFile(filepath, JSON.stringify(session, null, 2), 'utf-8');
   } catch (error) {
-    console.error('Failed to write log file:', error);
   }
 }
 
@@ -59,7 +56,6 @@ export async function rotateLogFiles(): Promise<void> {
   try {
     await fs.mkdir(logsDir, { recursive: true });
   } catch (error) {
-    console.error('Failed to create logs directory:', error);
     return;
   }
 
@@ -68,7 +64,6 @@ export async function rotateLogFiles(): Promise<void> {
   try {
     files = await fs.readdir(logsDir);
   } catch (error) {
-    console.error('Failed to read logs directory:', error);
     return;
   }
 
@@ -83,9 +78,7 @@ export async function rotateLogFiles(): Promise<void> {
   for (const file of filesToDelete) {
     try {
       await fs.unlink(path.join(logsDir, file));
-      console.log(`Deleted old log file: ${file}`);
     } catch (error) {
-      console.error(`Failed to delete log file ${file}:`, error);
     }
   }
 }

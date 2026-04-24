@@ -111,7 +111,6 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
         );
       }
     } catch (error) {
-      console.error("Failed to fetch video models:", error);
       setExternalModels([]);
       setModelsFetchError("Failed to load models. Check your connection.");
     } finally {
@@ -218,7 +217,6 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
   // Load video by ID from generations folder
   const loadVideoById = useCallback(async (videoId: string) => {
     if (!generationsPath) {
-      console.error("Generations path not configured");
       return null;
     }
 
@@ -235,12 +233,10 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
       const result = await response.json();
       if (!result.success) {
         // Missing videos are expected when refs point to deleted/moved files
-        console.log(`Video not found: ${videoId}`);
         return null;
       }
       return result.video || result.image;
     } catch (error) {
-      console.warn("Error loading video:", error);
       return null;
     }
   }, [generationsPath]);

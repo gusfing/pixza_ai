@@ -66,7 +66,6 @@ export async function executeNanoBanana(
   // (Guards against corrupted node data or race conditions in parallel execution)
   if (promptText !== null && typeof promptText !== 'string') {
     const raw: unknown = promptText;
-    console.warn('[nanoBanana] promptText was not a string, coercing:', typeof raw, Array.isArray(raw) ? `<redacted array length=${raw.length}>` : '<redacted>');
     promptText = Array.isArray(raw) ? (raw as string[])[0] ?? null : null;
   }
 
@@ -111,7 +110,6 @@ export async function executeNanoBanana(
   // This catches any remaining edge cases and provides a clear error message
   if (typeof requestPayload.prompt !== 'string') {
     const errorMsg = `Internal error: prompt is ${typeof requestPayload.prompt}, expected string`;
-    console.error('[nanoBanana]', errorMsg);
     updateNodeData(node.id, { status: 'error', error: errorMsg });
     throw new Error(errorMsg);
   }
@@ -222,7 +220,6 @@ export async function executeNanoBanana(
             }
           })
           .catch((err) => {
-            console.error("Failed to save generation:", err);
           });
 
         trackSaveGeneration(imageId, savePromise);

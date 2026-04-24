@@ -1019,7 +1019,6 @@ export function WorkflowCanvas() {
         });
 
       } catch (error) {
-        console.error("[SplitGrid] Error:", error);
         alert("Failed to split image grid: " + (error instanceof Error ? error.message : "Unknown error"));
       } finally {
         setIsSplitting(false);
@@ -1069,7 +1068,6 @@ export function WorkflowCanvas() {
         showToast(data.error || "Failed to generate workflow", "error");
       }
     } catch (error) {
-      console.error("Error generating workflow:", error);
       showToast("Failed to generate workflow. Please try again.", "error");
     } finally {
       setIsBuildingWorkflow(false);
@@ -1107,7 +1105,6 @@ export function WorkflowCanvas() {
       showToast(`Applied ${result.applied} edit(s)`, "success");
     }
     if (result.skipped.length > 0) {
-      console.warn('Skipped operations:', result.skipped);
     }
     return result;
   }, [captureSnapshot, applyEditOperations, showToast]);
@@ -1864,7 +1861,6 @@ export function WorkflowCanvas() {
           img.src = image;
           return;
         } catch (err) {
-          console.error("Failed to parse history image data:", err);
         }
       }
 

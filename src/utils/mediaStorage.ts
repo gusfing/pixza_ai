@@ -1129,12 +1129,10 @@ async function loadMediaById(
     }
 
     if (!genResult.success) {
-      console.log(`${mediaType} not found: ${mediaId}`);
       return "";
     }
     const mediaData = mediaType === "video" ? genResult.video : genResult.audio;
     if (!mediaData) {
-      console.log(`${mediaType} not found or invalid payload: ${mediaId}`);
       return "";
     }
     loadedMedia.set(mediaId, mediaData);
@@ -1145,7 +1143,6 @@ async function loadMediaById(
   const result = await response.json();
 
   if (!result.success) {
-    console.log(`${mediaType} not found: ${mediaId}`);
     return "";
   }
 

@@ -66,7 +66,6 @@ function Model({ url, onError }: { url: string; onError?: () => void }) {
         undefined,
         (error) => {
           if (cancelled) return;
-          console.warn("GLB load failed (file may need re-upload):", error);
           onError?.();
         }
       );
@@ -80,14 +79,14 @@ function Model({ url, onError }: { url: string; onError?: () => void }) {
       if (sceneRef.current) {
         sceneRef.current.traverse((obj) => {
           if (obj instanceof THREE.Mesh) {
-            try { obj.geometry?.dispose(); } catch (e) { console.warn("GLB geometry dispose failed:", e); }
+            try { obj.geometry?.dispose(); } catch (e) { }
             try {
               if (Array.isArray(obj.material)) {
                 obj.material.forEach((m) => { m.dispose(); });
               } else {
                 obj.material?.dispose();
               }
-            } catch (e) { console.warn("GLB material dispose failed:", e); }
+            } catch (e) { }
           }
         });
         sceneRef.current = null;
@@ -155,7 +154,6 @@ function CaptureHelper({
 
         return dataUrl;
       } catch (err) {
-        console.warn("GLB capture failed:", err);
         // Restore environment objects on failure
         if (envGroupRef.current) {
           envGroupRef.current.visible = true;

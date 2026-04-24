@@ -45,7 +45,6 @@ export function WPAuthProvider({ children }: { children: React.ReactNode }) {
             clearTokenCookie();
           }
         } catch (error) {
-          console.error("Failed to load user:", error);
           localStorage.removeItem("pixza_token");
           clearTokenCookie();
         }

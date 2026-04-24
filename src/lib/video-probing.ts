@@ -55,7 +55,6 @@ export const probeVideoMetadata = async (blob: Blob): Promise<VideoMetadata> => 
         bitrate = packetStats.averageBitrate;
       }
     } catch (e) {
-      console.warn('Failed to compute packet stats for bitrate', e);
     }
 
     let duration = 0;
@@ -65,7 +64,6 @@ export const probeVideoMetadata = async (blob: Blob): Promise<VideoMetadata> => 
         duration = d;
       }
     } catch (e) {
-      console.warn('Failed to compute duration', e);
     }
 
     return {

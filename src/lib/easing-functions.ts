@@ -122,7 +122,7 @@ export function createBezierEasing(
 
 export function getEasingFunction(name: string): EasingFunction {
   const func = easing[name as keyof typeof easing];
-  if (!func) { console.warn(`Easing function "${name}" not found, using linear`); return easing.linear; }
+  if (!func) { return easing.linear; }
   return func;
 }
 

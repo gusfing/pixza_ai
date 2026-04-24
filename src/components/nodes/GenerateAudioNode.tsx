@@ -117,7 +117,6 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
   // Load audio by ID from generations folder
   const loadAudioById = useCallback(async (audioId: string) => {
     if (!generationsPath) {
-      console.error("Generations path not configured");
       return null;
     }
 
@@ -133,12 +132,10 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
 
       const result = await response.json();
       if (!result.success) {
-        console.log(`Audio not found: ${audioId}`);
         return null;
       }
       return result.audio || result.image;
     } catch (error) {
-      console.warn("Error loading audio:", error);
       return null;
     }
   }, [generationsPath]);

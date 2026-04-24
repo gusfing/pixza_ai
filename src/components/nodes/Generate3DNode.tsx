@@ -380,7 +380,6 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
                       useToast.getState().show("Failed to open file", "error", true, detail);
                     }
                   } catch (err) {
-                    console.error("Failed to open file location:", err);
                     useToast.getState().show("Failed to open file location", "error");
                   }
                 }}

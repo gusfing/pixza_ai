@@ -62,7 +62,6 @@ export async function executeSplitGrid(ctx: NodeExecutionContext): Promise<void>
             resolve();
           };
           img.onerror = () => {
-            console.warn(`[splitGrid] Failed to load split image ${index} for node ${childSet.imageInput}`);
             updateNodeData(childSet.imageInput, {
               image: null,
               filename: null,

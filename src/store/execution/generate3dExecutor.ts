@@ -141,7 +141,6 @@ export async function executeGenerate3D(
             }
           })
           .catch((err) => {
-            console.error("Failed to save 3D model:", err);
           });
 
         trackSaveGeneration(`3d-${Date.now()}`, savePromise);

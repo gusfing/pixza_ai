@@ -472,11 +472,9 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
 
   const processFile = (file: File) => {
     if (!isImageFile(file)) {
-      console.log("Only image files are allowed");
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      console.log("File too large (max 10MB)");
       return;
     }
     setFiles([file]);
@@ -547,10 +545,9 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     }
   };
 
-  const handleStartRecording = () => console.log("Started recording");
+  const handleStartRecording = () =>
 
   const handleStopRecording = (duration: number) => {
-    console.log(`Stopped recording after ${duration} seconds`);
     setIsRecording(false);
     onSend(`[Voice message - ${duration} seconds]`, []);
   };

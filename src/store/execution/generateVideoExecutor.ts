@@ -186,7 +186,6 @@ export async function executeGenerateVideo(
             }
           })
           .catch((err) => {
-            console.error("Failed to save video generation:", err);
           });
 
         trackSaveGeneration(videoId, savePromise);

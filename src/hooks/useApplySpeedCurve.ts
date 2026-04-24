@@ -123,11 +123,9 @@ async function applySpeedCurveCore(
       videoTrack
         .computePacketStats()
         .catch((statsError: unknown) => {
-          console.warn('Failed to compute packet stats', statsError);
           return null;
         }),
       getVideoDimensions(videoBlob).catch((e: unknown) => {
-        console.warn('Failed to get video dimensions', e);
         return { width: 1920, height: 1080 }; // Fallback
       })
     ]);
@@ -333,7 +331,6 @@ async function applySpeedCurveCore(
 
     for await (const sample of samplesIterator) {
       if (!sample) {
-        console.warn(`[SpeedCurve] Null sample at index ${emittedCount}, skipping`);
         emittedCount++;
         continue;
       }
@@ -388,21 +385,18 @@ async function applySpeedCurveCore(
       try {
         await videoSource.close();
       } catch (e) {
-        console.warn('Failed to close videoSource:', e);
       }
     }
     if (output && outputStarted) {
       try {
         await output.cancel();
       } catch (e) {
-        console.warn('Failed to cancel output:', e);
       }
     }
     if (input) {
       try {
         input.dispose();
       } catch (e) {
-        console.warn('Failed to dispose input:', e);
       }
     }
   }
@@ -431,7 +425,6 @@ export async function applySpeedCurveAsync(
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Speed curve error:', error);
 
     const errorProgress: SpeedCurveProgress = {
       status: 'error',
@@ -490,7 +483,6 @@ export const useApplySpeedCurve = (): UseApplySpeedCurveReturn => {
         return result;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error('Speed curve error:', error);
 
         const errorProgress: SpeedCurveProgress = {
           status: 'error',

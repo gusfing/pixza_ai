@@ -159,7 +159,6 @@ const replicateProvider: ProviderInterface = {
     // Real API calls should go through the API route
     const apiKey = getApiKeyFromStorage();
     if (!apiKey) {
-      console.warn("[Replicate] No API key configured, cannot list models");
       return [];
     }
 
@@ -177,12 +176,10 @@ const replicateProvider: ProviderInterface = {
       const data: ReplicateModelsResponse = await response.json();
       // Defensive null check - API may return different structure
       if (!data.results) {
-        console.warn("[Replicate] List returned no results array");
         return [];
       }
       return data.results.map(mapToProviderModel);
     } catch (error) {
-      console.error("[Replicate] Failed to list models:", error);
       return [];
     }
   },
@@ -190,7 +187,6 @@ const replicateProvider: ProviderInterface = {
   async searchModels(query: string): Promise<ProviderModel[]> {
     const apiKey = getApiKeyFromStorage();
     if (!apiKey) {
-      console.warn("[Replicate] No API key configured, cannot search models");
       return [];
     }
 
@@ -211,12 +207,10 @@ const replicateProvider: ProviderInterface = {
       const data: ReplicateSearchResponse = await response.json();
       // Defensive null check - search API may return different structure
       if (!data.results) {
-        console.warn("[Replicate] Search returned no results array");
         return [];
       }
       return data.results.map((result) => mapToProviderModel(result.model));
     } catch (error) {
-      console.error("[Replicate] Failed to search models:", error);
       return [];
     }
   },
@@ -224,14 +218,12 @@ const replicateProvider: ProviderInterface = {
   async getModel(modelId: string): Promise<ProviderModel | null> {
     const apiKey = getApiKeyFromStorage();
     if (!apiKey) {
-      console.warn("[Replicate] No API key configured, cannot get model");
       return null;
     }
 
     // modelId format: "owner/name"
     const parts = modelId.split("/");
     if (parts.length !== 2) {
-      console.error("[Replicate] Invalid model ID format:", modelId);
       return null;
     }
 
@@ -257,7 +249,6 @@ const replicateProvider: ProviderInterface = {
       const model: ReplicateModel = await response.json();
       return mapToProviderModel(model);
     } catch (error) {
-      console.error("[Replicate] Failed to get model:", error);
       return null;
     }
   },
@@ -438,7 +429,6 @@ const replicateProvider: ProviderInterface = {
         ],
       };
     } catch (error) {
-      console.error("[Replicate] Generation failed:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Generation failed",

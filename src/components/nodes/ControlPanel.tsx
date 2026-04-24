@@ -249,7 +249,6 @@ function GenerateImageControls({ node }: { node: Node }) {
         setModelsFetchError(errorMsg);
       }
     } catch (error) {
-      console.error("Failed to fetch models:", error);
       setExternalModels([]);
       setModelsFetchError("Failed to load models. Check your connection.");
     } finally {

@@ -45,12 +45,8 @@ const determineEncodeParameters = async (
       if (rotation === null) {
         rotation = trackRotation;
       } else if (trackRotation !== rotation) {
-        console.warn(
-          `Rotation mismatch detected for video ${i + 1} (got ${trackRotation}, expected ${rotation}). Using the first rotation value.`
-        );
       }
     } catch (error) {
-      console.warn(`Failed to probe metadata for video ${i + 1}`, error);
     }
   }
 
@@ -202,14 +198,6 @@ export async function stitchVideosAsync(
       );
     }
 
-    console.log('Stitch encoder configuration', {
-      width: safeWidth,
-      height: safeHeight,
-      codecProfile,
-      bitrate: resolvedBitrate,
-      maxSourceBitrate,
-      rotation: aggregateRotation,
-    });
 
     // Create output
     updateProgress('processing', 'Creating output container...', 10);
@@ -243,7 +231,6 @@ export async function stitchVideosAsync(
       });
 
       if (!audioCodec) {
-        console.warn('[VideoStitch] No supported audio codec found, continuing without audio');
         updateProgress('processing', 'Warning: no supported audio codec — audio skipped', 10);
       } else {
         updateProgress('processing', `Adding audio track (${audioCodec})...`, 10);
@@ -302,7 +289,6 @@ export async function stitchVideosAsync(
       try {
         const videoTracks = await input.getVideoTracks();
         if (videoTracks.length === 0) {
-          console.warn(`No video tracks in video ${videoNumber}`);
           continue;
         }
 
@@ -369,7 +355,6 @@ export async function stitchVideosAsync(
           videoError instanceof Error
             ? videoError.message
             : `Failed to process video ${videoNumber}`;
-        console.error(`Error processing video ${videoNumber}:`, videoError);
         throw new Error(errorMsg);
       } finally {
         input.dispose();
@@ -407,28 +392,24 @@ export async function stitchVideosAsync(
         try {
           await audioSource.close();
         } catch (e) {
-          console.warn('Failed to close audioSource:', e);
         }
       }
       if (videoSource) {
         try {
           await videoSource.close();
         } catch (e) {
-          console.warn('Failed to close videoSource:', e);
         }
       }
       if (output && outputStarted) {
         try {
           await output.cancel();
         } catch (e) {
-          console.warn('Failed to cancel output:', e);
         }
       }
     }
   } catch (error) {
     const normalizedError =
       error instanceof Error ? error : new Error(String(error));
-    console.error('Video stitching error:', normalizedError);
 
     const errorProgress: StitchProgress = {
       status: 'error',

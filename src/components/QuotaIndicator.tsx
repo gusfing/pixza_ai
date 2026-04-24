@@ -26,7 +26,6 @@ export function QuotaIndicator() {
         }
       }
     } catch (error) {
-      console.error("Failed to fetch quota:", error);
     } finally {
       setLoading(false);
     }

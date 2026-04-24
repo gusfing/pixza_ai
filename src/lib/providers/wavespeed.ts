@@ -171,7 +171,6 @@ const wavespeedProvider: ProviderInterface = {
     // Only return models if API key is configured (to signal availability)
     const apiKey = getApiKeyFromStorage();
     if (!apiKey) {
-      console.warn("[WaveSpeed] No API key configured, returning empty model list");
       return [];
     }
     return WAVESPEED_MODELS;
@@ -399,7 +398,6 @@ const wavespeedProvider: ProviderInterface = {
         ],
       };
     } catch (error) {
-      console.error("[WaveSpeed] Generation failed:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Generation failed",

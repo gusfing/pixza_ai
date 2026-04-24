@@ -4,7 +4,18 @@ import { useState, useEffect } from "react";
 import { generateWorkflowId, useWorkflowStore } from "@/store/workflowStore";
 import { ProviderType, ProviderSettings, NodeDefaultsConfig, LLMProvider, LLMModelType } from "@/types";
 import { CanvasNavigationSettings, PanMode, ZoomMode, SelectionMode } from "@/types/canvas";
-import { EnvStatusResponse } from "@/app/api/env-status/route";
+// EnvStatusResponse type (previously exported from route, now defined here)
+interface EnvStatusResponse {
+  gemini: boolean;
+  replicate: boolean;
+  fal: boolean;
+  kie: boolean;
+  wavespeed: boolean;
+  cloudflare: boolean;
+  r2: boolean;
+  redis: boolean;
+  wp: boolean;
+}
 import { loadNodeDefaults, saveNodeDefaults, getLastProjectBaseDir, setLastProjectBaseDir } from "@/store/utils/localStorage";
 import { ProviderModel } from "@/lib/providers/types";
 import { ModelSearchDialog } from "@/components/modals/ModelSearchDialog";

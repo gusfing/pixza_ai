@@ -43,7 +43,6 @@ export function useVideoAutoplay(
         clearHoverTimeout();
         video.play().catch((e) => {
           if (e.name !== "AbortError") {
-            console.warn("Video play failed:", e);
           }
         });
       } else if (isHovered) {
@@ -52,7 +51,6 @@ export function useVideoAutoplay(
         hoverTimeoutRef.current = setTimeout(() => {
           video.play().catch((e) => {
             if (e.name !== "AbortError") {
-              console.warn("Video play failed:", e);
             }
           });
         }, 300);

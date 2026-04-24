@@ -174,7 +174,6 @@ const falProvider: ProviderInterface = {
       // Filter to relevant categories and map to ProviderModel
       return data.models.filter(isRelevantModel).map(mapToProviderModel);
     } catch (error) {
-      console.error("[fal.ai] Failed to list models:", error);
       return [];
     }
   },
@@ -199,7 +198,6 @@ const falProvider: ProviderInterface = {
       // Filter to relevant categories and map to ProviderModel
       return data.models.filter(isRelevantModel).map(mapToProviderModel);
     } catch (error) {
-      console.error("[fal.ai] Failed to search models:", error);
       return [];
     }
   },
@@ -231,13 +229,11 @@ const falProvider: ProviderInterface = {
 
       // Check if it's a relevant model type
       if (!isRelevantModel(model)) {
-        console.warn(`[fal.ai] Model ${modelId} is not an image/video model`);
         return null;
       }
 
       return mapToProviderModel(model);
     } catch (error) {
-      console.error("[fal.ai] Failed to get model:", error);
       return null;
     }
   },
@@ -327,7 +323,6 @@ const falProvider: ProviderInterface = {
         ],
       };
     } catch (error) {
-      console.error("[fal.ai] Generation failed:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Generation failed",

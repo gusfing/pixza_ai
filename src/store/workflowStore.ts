@@ -129,7 +129,6 @@ function saveLogSession(): void {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session }),
     }).catch((err) => {
-      console.error('Failed to save log session:', err);
     });
   }
 }
@@ -437,7 +436,6 @@ async function waitForPendingImageSyncs(timeout: number = 60000): Promise<void> 
   let timeoutId: ReturnType<typeof setTimeout>;
   const timeoutPromise = new Promise<void>((resolve) => {
     timeoutId = setTimeout(() => {
-      console.warn(`Pending image syncs timed out after ${timeout}ms, continuing with save`);
       resolve();
     }, timeout);
   });
@@ -610,7 +608,6 @@ const workflowStoreImpl: StateCreator<WorkflowStore> = (set, get) => ({
 
       set({ modelPricingMap: pricingMap });
     } catch (error) {
-      console.error("Failed to fetch model pricing:", error);
     }
   },
 
@@ -2025,7 +2022,6 @@ const workflowStoreImpl: StateCreator<WorkflowStore> = (set, get) => ({
       try {
         hydratedWorkflow = await hydrateWorkflowMedia(workflow, directoryPath);
       } catch (error) {
-        console.error("Failed to hydrate workflow media:", error);
         // Continue with original workflow if hydration fails
       }
     }
@@ -2324,7 +2320,6 @@ const workflowStoreImpl: StateCreator<WorkflowStore> = (set, get) => ({
       }
       return false;
     } catch (e) {
-      console.error("DB save failed:", e);
       return false;
     }
   },

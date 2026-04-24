@@ -62,7 +62,6 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       } catch (err) {
-        console.error("Failed to copy text:", err);
       }
     }
   }, [nodeData.outputText]);

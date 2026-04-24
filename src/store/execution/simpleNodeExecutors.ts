@@ -41,7 +41,6 @@ export async function executeAnnotation(ctx: NodeExecutionContext): Promise<void
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[Workflow] Annotation node ${node.id} failed:`, message);
     updateNodeData(node.id, { error: message });
   }
 }
@@ -58,7 +57,6 @@ export async function executePrompt(ctx: NodeExecutionContext): Promise<void> {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[Workflow] Prompt node ${node.id} failed:`, message);
     updateNodeData(node.id, { error: message });
   }
 }
@@ -91,7 +89,6 @@ export async function executeArray(ctx: NodeExecutionContext): Promise<void> {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[Workflow] Array node ${node.id} failed:`, message);
     updateNodeData(node.id, { error: message });
   }
 }
@@ -174,7 +171,6 @@ export async function executePromptConstructor(ctx: NodeExecutionContext): Promi
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[Workflow] PromptConstructor node ${node.id} failed:`, message);
     updateNodeData(node.id, { error: message });
   }
 }
@@ -211,7 +207,6 @@ export async function executeOutput(ctx: NodeExecutionContext): Promise<void> {
           createDirectory: true,
         }),
       }).catch((err) => {
-        console.error("Failed to save output:", err);
       });
     }
     return;
@@ -241,7 +236,6 @@ export async function executeOutput(ctx: NodeExecutionContext): Promise<void> {
           createDirectory: true,
         }),
       }).catch((err) => {
-        console.error("Failed to save output:", err);
       });
     }
   } else if (images.length > 0) {
@@ -283,7 +277,6 @@ export async function executeOutput(ctx: NodeExecutionContext): Promise<void> {
           createDirectory: true,
         }),
       }).catch((err) => {
-        console.error("Failed to save output:", err);
       });
     }
   }
@@ -385,7 +378,6 @@ export async function executeGlbViewer(ctx: NodeExecutionContext): Promise<void>
         return;
       }
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[Workflow] GLB Viewer node ${node.id} failed:`, message);
       updateNodeData(node.id, { error: message });
     }
   }

@@ -207,7 +207,6 @@ export function VideoStitchNode({ id, data, selected }: NodeProps<VideoStitchNod
 
           clip.duration = video.duration;
         } catch (error) {
-          console.warn(`Failed to extract thumbnail for clip ${clip.edgeId}:`, error);
         }
         cleanupVideo(video);
       }

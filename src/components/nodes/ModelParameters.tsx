@@ -143,7 +143,6 @@ function ModelParametersInner({
           onInputsLoaded(inputs);
         }
       } catch (err) {
-        console.error("Failed to fetch model schema:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch schema");
         setSchema([]);
       } finally {

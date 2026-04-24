@@ -28,3 +28,30 @@ export default function Demo() {
 		</div>
 	);
 }
+
+// Canvas dashed background grid — used by WorkflowCanvas
+export function DashedBackground({ x = 0, y = 0, zoom = 1 }: { x?: number; y?: number; zoom?: number }) {
+  const size = 24 * zoom;
+  const offsetX = x % size;
+  const offsetY = y % size;
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 0 }}
+    >
+      <defs>
+        <pattern
+          id="dashed-grid"
+          x={offsetX}
+          y={offsetY}
+          width={size}
+          height={size}
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx={0} cy={0} r={0.8} fill="rgba(255,255,255,0.12)" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#dashed-grid)" />
+    </svg>
+  );
+}

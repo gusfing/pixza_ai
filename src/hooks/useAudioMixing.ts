@@ -85,13 +85,13 @@ async function decodeWithMediaBunny(
     const closeable = (obj: unknown): obj is { close(): Promise<void> } =>
       obj != null && typeof (obj as any).close === 'function';
     if (closeable(sink)) {
-      try { await sink.close(); } catch (e) { console.warn('Failed to close sink:', e); }
+      try { await sink.close(); } catch (e) { }
     }
     if (closeable(input)) {
-      try { await input.close(); } catch (e) { console.warn('Failed to close input:', e); }
+      try { await input.close(); } catch (e) { }
     }
     if (closeable(blobSource)) {
-      try { await blobSource.close(); } catch (e) { console.warn('Failed to close blobSource:', e); }
+      try { await blobSource.close(); } catch (e) { }
     }
   }
 }
@@ -131,7 +131,6 @@ export async function prepareAudioAsync(
     try {
       decodedBuffers = await decodeWithMediaBunny(audioBlob, onProgress);
     } catch (mediaBunnyError) {
-      console.warn('MediaBunny audio decode failed, falling back to Web Audio API:', mediaBunnyError);
       decodedBuffers = await decodeWithWebAudio(audioBlob, onProgress);
     }
 
@@ -228,7 +227,6 @@ export async function prepareAudioAsync(
       duration: totalSamples / sampleRate,
     };
   } catch (error) {
-    console.error('[VideoStitch] Audio preparation failed:', error instanceof Error ? error.message : error, error);
     throw new Error(`Failed to process audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

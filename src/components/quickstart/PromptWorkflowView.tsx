@@ -46,7 +46,6 @@ export function PromptWorkflowView({
         onWorkflowGenerated(result.workflow);
       }
     } catch (err) {
-      console.error("Prompt workflow error:", err);
       setError(
         err instanceof Error ? err.message : "Failed to generate workflow"
       );

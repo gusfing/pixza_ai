@@ -32,10 +32,8 @@ export function QuickstartTemplatesView({
         if (result.success) {
           setCommunityWorkflows(result.workflows);
         } else {
-          console.error("Failed to fetch community workflows:", result.error);
         }
       } catch (err) {
-        console.error("Error fetching community workflows:", err);
       } finally {
         setIsLoadingList(false);
       }
@@ -69,7 +67,6 @@ export function QuickstartTemplatesView({
           onWorkflowSelected(result.workflow);
         }
       } catch (err) {
-        console.error("Error loading preset:", err);
         setError(err instanceof Error ? err.message : "Failed to load template");
       } finally {
         setLoadingWorkflowId(null);
@@ -101,7 +98,6 @@ export function QuickstartTemplatesView({
         const workflow = await workflowResponse.json();
         onWorkflowSelected(workflow);
       } catch (err) {
-        console.error("Error loading community workflow:", err);
         setError(err instanceof Error ? err.message : "Failed to load workflow");
       } finally {
         setLoadingWorkflowId(null);

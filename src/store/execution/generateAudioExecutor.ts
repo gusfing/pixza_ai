@@ -176,7 +176,6 @@ export async function executeGenerateAudio(
             }
           })
           .catch((err) => {
-            console.error("Failed to save audio generation:", err);
           });
 
         trackSaveGeneration(audioId, savePromise);

@@ -103,7 +103,6 @@ export function useAudioVisualization(audioFile: File | Blob | null) {
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to process audio';
         setError(message);
-        console.error('Audio processing error:', err);
       } finally {
         if (!isCancelled) {
           setIsLoading(false);

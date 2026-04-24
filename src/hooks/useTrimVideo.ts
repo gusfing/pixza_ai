@@ -72,15 +72,6 @@ export async function trimVideoAsync(
     );
     const resolvedBitrate = Math.max(1, Math.floor(candidateBitrate));
 
-    console.log('Trim encoder configuration', {
-      width: safeWidth,
-      height: safeHeight,
-      codecProfile,
-      bitrate: resolvedBitrate,
-      rotation,
-      startTime,
-      endTime,
-    });
 
     updateProgress('processing', 'Creating output container...', 8);
 
@@ -192,12 +183,10 @@ export async function trimVideoAsync(
 
               updateProgress('processing', `Audio track ready (${audioCodec})`, 14);
             } else {
-              console.warn('No supported audio codec found, output will be video-only');
             }
           }
         }
       } catch (audioErr) {
-        console.warn('Audio extraction failed, continuing without audio:', audioErr);
       }
 
       await output.start();
@@ -291,28 +280,24 @@ export async function trimVideoAsync(
         try {
           await audioSource.close();
         } catch (e) {
-          console.warn('Failed to close audioSource:', e);
         }
       }
       if (videoSource) {
         try {
           await videoSource.close();
         } catch (e) {
-          console.warn('Failed to close videoSource:', e);
         }
       }
       if (output && outputStarted) {
         try {
           await output.cancel();
         } catch (e) {
-          console.warn('Failed to cancel output:', e);
         }
       }
       input.dispose();
     }
   } catch (error) {
     const normalizedError = error instanceof Error ? error : new Error(String(error));
-    console.error('Video trim error:', normalizedError);
 
     onProgress?.({
       status: 'error',

@@ -138,7 +138,6 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
         );
       }
     } catch (error) {
-      console.error("Failed to fetch models:", error);
       setExternalModels([]);
       setModelsFetchError("Failed to load models. Check your connection.");
     } finally {
@@ -305,7 +304,6 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
 
   const loadImageById = useCallback(async (imageId: string) => {
     if (!generationsPath) {
-      console.error("Generations path not configured");
       return null;
     }
 
@@ -322,12 +320,10 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
       const result = await response.json();
       if (!result.success) {
         // Missing images are expected when refs point to deleted/moved files
-        console.log(`Image not found: ${imageId}`);
         return null;
       }
       return result.image;
     } catch (error) {
-      console.warn("Error loading image:", error);
       return null;
     }
   }, [generationsPath]);

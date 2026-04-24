@@ -89,9 +89,6 @@ function mapTimeWithEasing(normalizedTime: number, func: EasingFunction): number
   const inverse = getInverseEasing(func);
   if (!inverse) {
     if (!warnedNonMonotonic.has(func)) {
-      console.warn(
-        `Easing function "${func.name ?? 'anonymous'}" is not monotonic. Falling back to direct mapping - timing may feel inverted.`
-      );
       warnedNonMonotonic.add(func);
     }
     return func(normalizedTime);

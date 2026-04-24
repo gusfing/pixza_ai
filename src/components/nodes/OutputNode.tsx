@@ -97,7 +97,6 @@ export function OutputNode({ id, data, selected }: NodeProps<OutputNodeType>) {
         document.body.removeChild(link);
         URL.revokeObjectURL(blobUrl);
       } catch (error) {
-        console.error("Failed to download:", error);
       }
       return;
     }
