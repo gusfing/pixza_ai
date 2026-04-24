@@ -21,24 +21,28 @@ interface Model { provider: string; modelId: string; label: string; tabs: Tab[];
 /* ── Model Registry ─────────────────────────────────────────── */
 const MODELS: Model[] = [
   // ── Image ──────────────────────────────────────────────────
-  { provider: "fal",       modelId: "fal-ai/gpt-image-1.5",                              label: "GPT Image 1.5",      tabs: ["Image"], badge: "OpenAI" },
-  { provider: "fal",       modelId: "fal-ai/gpt-image-1/text-to-image",                  label: "GPT Image 1",        tabs: ["Image"], badge: "OpenAI" },
+  { provider: "fal",       modelId: "fal-ai/gpt-image-2",                                label: "GPT Image 2",        tabs: ["Image"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/gpt-image-2/edit",                           label: "GPT Image 2 Edit",   tabs: ["Image"], badge: "OpenAI" },
+  { provider: "fal",       modelId: "fal-ai/gpt-image-1.5",                              label: "GPT Image 1.5",      tabs: ["Image"] },
+  { provider: "fal",       modelId: "fal-ai/gpt-image-1/text-to-image",                  label: "GPT Image 1",        tabs: ["Image"] },
   { provider: "fal",       modelId: "fal-ai/gpt-image-1-mini",                           label: "GPT Image Mini",     tabs: ["Image"] },
-  { provider: "gemini",    modelId: "nano-banana-2",                                      label: "Imagen 4",           tabs: ["Image"], badge: "New" },
+  { provider: "gemini",    modelId: "nano-banana-2",                                      label: "Imagen 4",           tabs: ["Image"] },
   { provider: "gemini",    modelId: "nano-banana-pro",                                    label: "Imagen 3",           tabs: ["Image"], badge: "Quality" },
   { provider: "fal",       modelId: "fal-ai/flux-2-pro",                                  label: "FLUX.2 Pro",         tabs: ["Image"], badge: "Best" },
   { provider: "fal",       modelId: "fal-ai/flux-pro",                                    label: "FLUX.1 Pro",         tabs: ["Image"] },
   { provider: "fal",       modelId: "fal-ai/flux/schnell",                                label: "FLUX Schnell",       tabs: ["Image"], badge: "Fast" },
   { provider: "fal",       modelId: "fal-ai/flux-realism",                                label: "FLUX Realism",       tabs: ["Image"] },
-  { provider: "fal",       modelId: "fal-ai/seedream-v4-5",                               label: "Seedream V4.5",      tabs: ["Image"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/seedream-v4-5",                               label: "Seedream V4.5",      tabs: ["Image"] },
   { provider: "fal",       modelId: "fal-ai/ideogram/v3",                                 label: "Ideogram V3",        tabs: ["Image"] },
   { provider: "fal",       modelId: "fal-ai/recraft-v3",                                  label: "Recraft V3",         tabs: ["Image"] },
   { provider: "wavespeed", modelId: "wavespeed-ai/flux-dev-ultra-fast",                   label: "FLUX Ultra Fast",    tabs: ["Image"], badge: "Fastest" },
   { provider: "fal",       modelId: "fal-ai/flux/dev/image-to-image",                     label: "FLUX I2I",           tabs: ["Image"] },
-  { provider: "fal",       modelId: "fal-ai/gpt-image-1/edit-image",                      label: "GPT Image Edit",     tabs: ["Image"] },
+  { provider: "fal",       modelId: "fal-ai/gpt-image-1/edit-image",                      label: "GPT Image 1 Edit",   tabs: ["Image"] },
   { provider: "fal",       modelId: "fal-ai/aura-flow",                                   label: "AuraFlow",           tabs: ["Image"] },
 
   // ── Video ──────────────────────────────────────────────────
+  { provider: "fal",       modelId: "fal-ai/sora-2/text-to-video/pro",                    label: "Sora 2 Pro",         tabs: ["Video"], badge: "OpenAI" },
+  { provider: "fal",       modelId: "fal-ai/sora-2/image-to-video/pro",                   label: "Sora 2 I2V",         tabs: ["Video"] },
   { provider: "gemini",    modelId: "veo-3.0-generate-preview",                           label: "Veo 3",              tabs: ["Video"], badge: "Best" },
   { provider: "gemini",    modelId: "veo-2.0-generate-001",                               label: "Veo 2",              tabs: ["Video"] },
   { provider: "fal",       modelId: "fal-ai/kling-video/v3/pro/text-to-video",            label: "Kling 3.0 Pro",      tabs: ["Video"], badge: "New" },
@@ -50,7 +54,7 @@ const MODELS: Model[] = [
   { provider: "fal",       modelId: "fal-ai/wan-t2v",                                     label: "Wan T2V",            tabs: ["Video"], badge: "Fast" },
   { provider: "fal",       modelId: "fal-ai/wan-i2v",                                     label: "Wan I2V",            tabs: ["Video"] },
   { provider: "fal",       modelId: "fal-ai/minimax-video",                               label: "MiniMax Video",      tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/seedance-v1-pro",                             label: "Seedance V1 Pro",    tabs: ["Video"], badge: "New" },
+  { provider: "fal",       modelId: "fal-ai/seedance-v1-pro",                             label: "Seedance V1 Pro",    tabs: ["Video"] },
   { provider: "fal",       modelId: "fal-ai/luma-dream-machine",                          label: "Luma Dream Machine", tabs: ["Video"] },
 
   // ── Audio ──────────────────────────────────────────────────
