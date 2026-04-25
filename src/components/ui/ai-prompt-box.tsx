@@ -545,7 +545,9 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     }
   };
 
-  const handleStartRecording = () =>
+  const handleStartRecording = () => {
+    setIsRecording(true);
+  };
 
   const handleStopRecording = (duration: number) => {
     setIsRecording(false);

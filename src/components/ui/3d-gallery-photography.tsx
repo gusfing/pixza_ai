@@ -341,7 +341,9 @@ function GalleryScene({
         const texture = textures[plane.imageIndex];
         const material = materials[i];
         if (!texture || !material) return null;
-        const aspect = texture.image ? texture.image.width / texture.image.height : 1;
+        const aspect = texture.image && (texture.image as any).width
+          ? (texture.image as any).width / (texture.image as any).height
+          : 1;
         const scale: [number, number, number] = aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
         return (
           <ImagePlane
