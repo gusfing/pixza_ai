@@ -19,48 +19,83 @@ import { cn } from "@/lib/utils";
 /* ── Types ─────────────────────────────────────────────────── */
 type Tab = "Image" | "Video" | "Audio" | "3D";
 type NavScreen = "create" | "explore" | "tools" | "settings";
-interface Model { provider: string; modelId: string; label: string; tabs: Tab[]; badge?: string; }
+interface Model {
+  provider: string;
+  modelId: string;
+  label: string;
+  tabs: Tab[];
+  badge?: string;
+  tier: "free" | "pro" | "agency"; // access tier
+  creditCost: number; // credits per generation
+}
+
+/* ── Plan Config ─────────────────────────────────────────────── */
+const PLAN_LIMITS = {
+  free:   { credits: 50,    label: "Free",   color: "text-white/40" },
+  pro:    { credits: 2000,  label: "Pro",    color: "text-violet-400" },
+  agency: { credits: 10000, label: "Agency", color: "text-amber-400" },
+};
 
 /* ── Model Registry ─────────────────────────────────────────── */
 const MODELS: Model[] = [
-  { provider: "fal",       modelId: "fal-ai/gpt-image-2",                                label: "GPT Image 2",        tabs: ["Image"], badge: "New" },
-  { provider: "fal",       modelId: "fal-ai/gpt-image-1.5",                              label: "GPT Image 1.5",      tabs: ["Image"], badge: "OpenAI" },
-  { provider: "fal",       modelId: "fal-ai/gpt-image-1/text-to-image",                  label: "GPT Image 1",        tabs: ["Image"] },
-  { provider: "gemini",    modelId: "nano-banana-2",                                      label: "Imagen 4",           tabs: ["Image"] },
-  { provider: "gemini",    modelId: "nano-banana-pro",                                    label: "Imagen 3",           tabs: ["Image"], badge: "Quality" },
-  { provider: "fal",       modelId: "fal-ai/flux-2-pro",                                  label: "FLUX.2 Pro",         tabs: ["Image"], badge: "Best" },
-  { provider: "fal",       modelId: "fal-ai/flux-pro",                                    label: "FLUX.1 Pro",         tabs: ["Image"] },
-  { provider: "fal",       modelId: "fal-ai/flux/schnell",                                label: "FLUX Schnell",       tabs: ["Image"], badge: "Fast" },
-  { provider: "fal",       modelId: "fal-ai/flux-realism",                                label: "FLUX Realism",       tabs: ["Image"] },
-  { provider: "fal",       modelId: "fal-ai/seedream-v4-5",                               label: "Seedream V4.5",      tabs: ["Image"] },
-  { provider: "fal",       modelId: "fal-ai/ideogram/v3",                                 label: "Ideogram V3",        tabs: ["Image"] },
-  { provider: "fal",       modelId: "fal-ai/recraft-v3",                                  label: "Recraft V3",         tabs: ["Image"] },
-  { provider: "wavespeed", modelId: "wavespeed-ai/flux-dev-ultra-fast",                   label: "FLUX Ultra Fast",    tabs: ["Image"], badge: "Fastest" },
-  { provider: "fal",       modelId: "fal-ai/flux/dev/image-to-image",                     label: "FLUX I2I",           tabs: ["Image"] },
-  { provider: "fal",       modelId: "fal-ai/sora-2/text-to-video/pro",                    label: "Sora 2 Pro",         tabs: ["Video"], badge: "OpenAI" },
-  { provider: "gemini",    modelId: "veo-3.0-generate-preview",                           label: "Veo 3",              tabs: ["Video"], badge: "Best" },
-  { provider: "gemini",    modelId: "veo-2.0-generate-001",                               label: "Veo 2",              tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/kling-video/v3/pro/text-to-video",            label: "Kling 3.0 Pro",      tabs: ["Video"], badge: "New" },
-  { provider: "fal",       modelId: "fal-ai/kling-video/v2.6/pro/text-to-video",          label: "Kling 2.6 Pro",      tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/kling-video/v1.6/pro/text-to-video",          label: "Kling 1.6 Pro",      tabs: ["Video"], badge: "Popular" },
-  { provider: "fal",       modelId: "fal-ai/kling-video/v3/pro/image-to-video",           label: "Kling 3.0 I2V",      tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/kling-video/v2.6/pro/image-to-video",         label: "Kling 2.6 I2V",      tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/ltx-2/image-to-video/fast",                   label: "LTX Video 2.0",      tabs: ["Video"], badge: "4K" },
-  { provider: "fal",       modelId: "fal-ai/wan-t2v",                                     label: "Wan T2V",            tabs: ["Video"], badge: "Fast" },
-  { provider: "fal",       modelId: "fal-ai/wan-i2v",                                     label: "Wan I2V",            tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/minimax-video",                               label: "MiniMax Video",      tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/seedance-2-0",                                label: "Seedance 2.0",       tabs: ["Video"], badge: "New" },
-  { provider: "fal",       modelId: "fal-ai/luma-dream-machine",                          label: "Luma Dream Machine", tabs: ["Video"] },
-  { provider: "fal",       modelId: "fal-ai/minimax-music/v2",                            label: "MiniMax Music 2.0",  tabs: ["Audio"], badge: "Best" },
-  { provider: "fal",       modelId: "fal-ai/minimax-music",                               label: "MiniMax Music",      tabs: ["Audio"] },
-  { provider: "fal",       modelId: "sonauto/v2/text-to-music",                           label: "Sonauto V2",         tabs: ["Audio"], badge: "Songs" },
-  { provider: "fal",       modelId: "fal-ai/stable-audio",                                label: "Stable Audio",       tabs: ["Audio"] },
-  { provider: "fal",       modelId: "fal-ai/ace-step",                                    label: "ACE-Step",           tabs: ["Audio"], badge: "New" },
-  { provider: "fal",       modelId: "fal-ai/mmaudio-v2",                                  label: "MMAudio V2",         tabs: ["Audio"] },
-  { provider: "fal",       modelId: "fal-ai/trellis",                                     label: "Trellis",            tabs: ["3D"], badge: "Best" },
-  { provider: "fal",       modelId: "fal-ai/hunyuan3d-v2",                                label: "Hunyuan3D V2",       tabs: ["3D"], badge: "New" },
-  { provider: "fal",       modelId: "fal-ai/stable-zero123",                              label: "Zero123",            tabs: ["3D"] },
-  { provider: "replicate", modelId: "stability-ai/triposr",                               label: "TripoSR",            tabs: ["3D"], badge: "Fast" },
+  // ── FREE TIER — Cloudflare AI (zero cost) ──────────────────
+  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-1-schnell",              label: "FLUX Schnell (Free)",  tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/stabilityai/stable-diffusion-xl-base-1.0",     label: "SDXL (Free)",          tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/bytedance/stable-diffusion-xl-lightning",      label: "SDXL Lightning (Free)",tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/lykon/dreamshaper-8-lcm",                      label: "DreamShaper (Free)",   tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+
+  // ── PRO TIER — Image ───────────────────────────────────────
+  { provider: "fal",        modelId: "fal-ai/gpt-image-2",                               label: "GPT Image 2",          tabs: ["Image"], badge: "New",     tier: "pro",    creditCost: 5 },
+  { provider: "fal",        modelId: "fal-ai/gpt-image-1.5",                             label: "GPT Image 1.5",        tabs: ["Image"], badge: "OpenAI",  tier: "pro",    creditCost: 4 },
+  { provider: "fal",        modelId: "fal-ai/gpt-image-1/text-to-image",                 label: "GPT Image 1",          tabs: ["Image"],                   tier: "pro",    creditCost: 3 },
+  { provider: "gemini",     modelId: "nano-banana-2",                                     label: "Imagen 4",             tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  { provider: "gemini",     modelId: "nano-banana-pro",                                   label: "Imagen 3",             tabs: ["Image"], badge: "Quality", tier: "pro",    creditCost: 3 },
+  { provider: "fal",        modelId: "fal-ai/flux-2-pro",                                 label: "FLUX.2 Pro",           tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 3 },
+  { provider: "fal",        modelId: "fal-ai/flux-pro",                                   label: "FLUX.1 Pro",           tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  { provider: "fal",        modelId: "fal-ai/flux/schnell",                               label: "FLUX Schnell",         tabs: ["Image"], badge: "Fast",    tier: "pro",    creditCost: 1 },
+  { provider: "fal",        modelId: "fal-ai/flux-realism",                               label: "FLUX Realism",         tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  { provider: "fal",        modelId: "fal-ai/seedream-v4-5",                              label: "Seedream V4.5",        tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  { provider: "fal",        modelId: "fal-ai/ideogram/v3",                                label: "Ideogram V3",          tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  { provider: "fal",        modelId: "fal-ai/recraft-v3",                                 label: "Recraft V3",           tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  { provider: "wavespeed",  modelId: "wavespeed-ai/flux-dev-ultra-fast",                  label: "FLUX Ultra Fast",      tabs: ["Image"], badge: "Fastest", tier: "pro",    creditCost: 1 },
+  { provider: "fal",        modelId: "fal-ai/flux/dev/image-to-image",                    label: "FLUX I2I",             tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+
+  // ── PRO TIER — Video ───────────────────────────────────────
+  { provider: "fal",        modelId: "fal-ai/wan-t2v",                                    label: "Wan T2V",              tabs: ["Video"], badge: "Fast",    tier: "pro",    creditCost: 5 },
+  { provider: "fal",        modelId: "fal-ai/wan-i2v",                                    label: "Wan I2V",              tabs: ["Video"],                   tier: "pro",    creditCost: 5 },
+  { provider: "fal",        modelId: "fal-ai/minimax-video",                              label: "MiniMax Video",        tabs: ["Video"],                   tier: "pro",    creditCost: 8 },
+  { provider: "fal",        modelId: "fal-ai/kling-video/v1.6/pro/text-to-video",         label: "Kling 1.6 Pro",        tabs: ["Video"], badge: "Popular", tier: "pro",    creditCost: 8 },
+  { provider: "fal",        modelId: "fal-ai/kling-video/v1.6/pro/image-to-video",        label: "Kling 1.6 I2V",        tabs: ["Video"],                   tier: "pro",    creditCost: 8 },
+  { provider: "fal",        modelId: "fal-ai/luma-dream-machine",                         label: "Luma Dream Machine",   tabs: ["Video"],                   tier: "pro",    creditCost: 8 },
+
+  // ── AGENCY TIER — Video (expensive) ───────────────────────
+  { provider: "fal",        modelId: "fal-ai/sora-2/text-to-video/pro",                   label: "Sora 2 Pro",           tabs: ["Video"], badge: "OpenAI",  tier: "agency", creditCost: 30 },
+  { provider: "gemini",     modelId: "veo-3.0-generate-preview",                          label: "Veo 3",                tabs: ["Video"], badge: "Best",    tier: "agency", creditCost: 25 },
+  { provider: "gemini",     modelId: "veo-2.0-generate-001",                              label: "Veo 2",                tabs: ["Video"],                   tier: "agency", creditCost: 15 },
+  { provider: "fal",        modelId: "fal-ai/kling-video/v3/pro/text-to-video",           label: "Kling 3.0 Pro",        tabs: ["Video"], badge: "New",     tier: "agency", creditCost: 15 },
+  { provider: "fal",        modelId: "fal-ai/kling-video/v2.6/pro/text-to-video",         label: "Kling 2.6 Pro",        tabs: ["Video"],                   tier: "agency", creditCost: 12 },
+  { provider: "fal",        modelId: "fal-ai/kling-video/v3/pro/image-to-video",          label: "Kling 3.0 I2V",        tabs: ["Video"],                   tier: "agency", creditCost: 15 },
+  { provider: "fal",        modelId: "fal-ai/kling-video/v2.6/pro/image-to-video",        label: "Kling 2.6 I2V",        tabs: ["Video"],                   tier: "agency", creditCost: 12 },
+  { provider: "fal",        modelId: "fal-ai/ltx-2/image-to-video/fast",                  label: "LTX Video 2.0",        tabs: ["Video"], badge: "4K",      tier: "agency", creditCost: 12 },
+  { provider: "fal",        modelId: "fal-ai/seedance-2-0",                               label: "Seedance 2.0",         tabs: ["Video"], badge: "New",     tier: "agency", creditCost: 15 },
+
+  // ── PRO TIER — Audio ───────────────────────────────────────
+  { provider: "fal",        modelId: "fal-ai/stable-audio",                               label: "Stable Audio",         tabs: ["Audio"],                   tier: "pro",    creditCost: 3 },
+  { provider: "fal",        modelId: "fal-ai/ace-step",                                   label: "ACE-Step",             tabs: ["Audio"], badge: "New",     tier: "pro",    creditCost: 3 },
+  { provider: "fal",        modelId: "fal-ai/mmaudio-v2",                                 label: "MMAudio V2",           tabs: ["Audio"],                   tier: "pro",    creditCost: 3 },
+  { provider: "fal",        modelId: "fal-ai/minimax-music",                              label: "MiniMax Music",        tabs: ["Audio"],                   tier: "pro",    creditCost: 4 },
+
+  // ── AGENCY TIER — Audio ────────────────────────────────────
+  { provider: "fal",        modelId: "fal-ai/minimax-music/v2",                           label: "MiniMax Music 2.0",    tabs: ["Audio"], badge: "Best",    tier: "agency", creditCost: 6 },
+  { provider: "fal",        modelId: "sonauto/v2/text-to-music",                          label: "Sonauto V2",           tabs: ["Audio"], badge: "Songs",   tier: "agency", creditCost: 6 },
+
+  // ── PRO TIER — 3D ─────────────────────────────────────────
+  { provider: "replicate",  modelId: "stability-ai/triposr",                              label: "TripoSR",              tabs: ["3D"],    badge: "Fast",    tier: "pro",    creditCost: 5 },
+  { provider: "fal",        modelId: "fal-ai/stable-zero123",                             label: "Zero123",              tabs: ["3D"],                      tier: "pro",    creditCost: 5 },
+
+  // ── AGENCY TIER — 3D ──────────────────────────────────────
+  { provider: "fal",        modelId: "fal-ai/trellis",                                    label: "Trellis",              tabs: ["3D"],    badge: "Best",    tier: "agency", creditCost: 10 },
+  { provider: "fal",        modelId: "fal-ai/hunyuan3d-v2",                               label: "Hunyuan3D V2",         tabs: ["3D"],    badge: "New",     tier: "agency", creditCost: 10 },
 ];
 
 const EXAMPLE_CARDS = [
@@ -79,10 +114,26 @@ const TAB_CONFIG: Record<Tab, { icon: any; color: string; placeholder: string }>
 };
 
 /* ── Model Picker ───────────────────────────────────────────── */
-function ModelPicker({ models, value, onChange }: { models: Model[]; value: string; onChange: (v: string) => void }) {
+function ModelPicker({ models, value, onChange, userPlan = "free" }: {
+  models: Model[]; value: string; onChange: (v: string) => void; userPlan?: string;
+}) {
   const [open, setOpen] = useState(false);
-  const ref = useState<HTMLDivElement | null>(null);
   const sel = models.find(m => m.modelId === value) || models[0];
+
+  const canUse = (m: Model) => {
+    if (m.tier === "free") return true;
+    if (m.tier === "pro") return userPlan === "pro" || userPlan === "agency";
+    if (m.tier === "agency") return userPlan === "agency";
+    return false;
+  };
+
+  const tierColor = (tier: string) => {
+    if (tier === "free") return "text-green-400 bg-green-500/10";
+    if (tier === "pro") return "text-violet-400 bg-violet-500/10";
+    return "text-amber-400 bg-amber-500/10";
+  };
+
+  const dotColor = sel?.tier === "free" ? "bg-green-400" : sel?.tier === "pro" ? "bg-violet-400" : "bg-amber-400";
 
   return (
     <div className="relative">
@@ -90,7 +141,7 @@ function ModelPicker({ models, value, onChange }: { models: Model[]; value: stri
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-xs font-bold text-white"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+        <span className={cn("w-1.5 h-1.5 rounded-full", dotColor)} />
         {sel?.label}
         {sel?.badge && <span className="text-[8px] font-black uppercase tracking-widest text-white/30 bg-white/5 px-1.5 py-0.5 rounded">{sel.badge}</span>}
         <ChevronDown className={cn("w-3 h-3 text-white/30 transition-transform", open && "rotate-180")} />
@@ -102,22 +153,35 @@ function ModelPicker({ models, value, onChange }: { models: Model[]; value: stri
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.97 }}
             transition={{ duration: 0.12 }}
-            className="absolute top-full left-0 mt-1 z-50 bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden min-w-[180px] max-h-64 overflow-y-auto"
+            className="absolute top-full left-0 mt-1 z-50 bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden min-w-[240px] max-h-72 overflow-y-auto"
             onMouseLeave={() => setOpen(false)}
           >
-            {models.map(m => (
-              <button
-                key={m.modelId}
-                onClick={() => { onChange(m.modelId); setOpen(false); }}
-                className={cn("w-full flex items-center justify-between px-4 py-2.5 text-xs transition-all hover:bg-white/5", value === m.modelId ? "text-white font-bold" : "text-white/50")}
-              >
-                <span>{m.label}</span>
-                <div className="flex items-center gap-1.5">
-                  {m.badge && <span className="text-[8px] font-black uppercase text-white/20">{m.badge}</span>}
-                  {value === m.modelId && <Check className="w-3 h-3 text-white" />}
-                </div>
-              </button>
-            ))}
+            {models.map(m => {
+              const locked = !canUse(m);
+              return (
+                <button
+                  key={m.modelId}
+                  onClick={() => { if (!locked) { onChange(m.modelId); setOpen(false); } }}
+                  className={cn(
+                    "w-full flex items-center justify-between px-4 py-2.5 text-xs transition-all",
+                    locked ? "opacity-40 cursor-not-allowed" : "hover:bg-white/5",
+                    value === m.modelId ? "text-white font-bold" : "text-white/50"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {locked && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
+                    <span>{m.label}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className={cn("text-[8px] font-black uppercase px-1.5 py-0.5 rounded", tierColor(m.tier))}>
+                      {m.tier === "free" ? "Free" : m.tier === "pro" ? "Pro" : "Agency"}
+                    </span>
+                    <span className="text-[8px] text-white/20">{m.creditCost}cr</span>
+                    {value === m.modelId && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                </button>
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
@@ -134,6 +198,20 @@ function CreateScreen() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastPrompt, setLastPrompt] = useState<string>("");
+  const [userPlan, setUserPlan] = useState("free");
+  const [credits, setCredits] = useState<number | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("pixza_token");
+    if (token) {
+      import("@/lib/wordpress").then(({ wpGetMe }) => {
+        wpGetMe(token).then(u => {
+          setUserPlan(u.meta?.plan ?? "free");
+          setCredits(u.meta?.credits ?? null);
+        }).catch(() => {});
+      });
+    }
+  }, []);
 
   const tabModels = MODELS.filter(m => m.tabs.includes(tab));
   const selModel = tabModels.find(m => m.modelId === modelId) || tabModels[0];
@@ -223,7 +301,14 @@ function CreateScreen() {
           <div className="mb-4">
             <AIInputWithSearch
               placeholder={TAB_CONFIG[tab].placeholder}
-              onSubmit={(val) => generate(val)}
+              onSubmit={(val) => {
+                // Check credits before generating
+                if (credits !== null && selModel && credits < selModel.creditCost) {
+                  setError(`Not enough credits. You need ${selModel.creditCost} credits but have ${credits}. Upgrade to get more.`);
+                  return;
+                }
+                generate(val);
+              }}
               onFileSelect={(file) => {
                 const r = new FileReader();
                 r.onload = (e) => setRefImage(e.target?.result as string);
@@ -236,16 +321,25 @@ function CreateScreen() {
           <div className="flex items-center justify-between px-1 mb-8">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Model</span>
-              <ModelPicker models={tabModels} value={selModel.modelId} onChange={setModelId} />
+              <ModelPicker models={tabModels} value={selModel.modelId} onChange={setModelId} userPlan={userPlan} />
             </div>
-            {refImage && (
-              <div className="flex items-center gap-2">
-                <img src={refImage} className="w-7 h-7 rounded-lg object-cover border border-white/10" alt="ref" />
-                <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white">
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              {/* Credit cost indicator */}
+              {selModel && (
+                <span className="text-[10px] text-white/30 font-bold">
+                  {selModel.creditCost} credit{selModel.creditCost !== 1 ? "s" : ""}
+                  {credits !== null && <span className="text-white/20"> · {credits} left</span>}
+                </span>
+              )}
+              {refImage && (
+                <div className="flex items-center gap-2">
+                  <img src={refImage} className="w-7 h-7 rounded-lg object-cover border border-white/10" alt="ref" />
+                  <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </BlurFade>
 
@@ -277,7 +371,18 @@ function CreateScreen() {
                     <audio src={result} controls className="w-full" />
                   </div>
                 ) : (
-                  <img src={result} alt="Generated" className="w-full max-h-[60vh] object-contain" />
+                  <div className="relative">
+                    <img src={result} alt="Generated" className="w-full max-h-[60vh] object-contain" />
+                    {/* Watermark for free tier */}
+                    {selModel?.tier === "free" && (
+                      <div className="absolute inset-0 pointer-events-none flex items-end justify-end p-3">
+                        <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
+                          <img src="/pixza-logo.png" alt="" className="w-3 h-3 invert opacity-60" />
+                          <span className="text-[9px] font-black uppercase tracking-widest text-white/50">Pixza Free</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                   <a href={result} download={`pixza-${tab.toLowerCase()}`}
@@ -303,9 +408,26 @@ function CreateScreen() {
             <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="mx-auto max-w-lg p-4 rounded-2xl bg-red-500/10 border border-red-500/20">
               <p className="text-xs text-red-400 font-medium leading-relaxed">{error}</p>
-              <button className="mt-2 text-[11px] font-bold text-red-400 hover:text-red-300 flex items-center gap-1">
-                <RefreshCw className="w-3 h-3" /> Retry
-              </button>
+              {error.includes("credits") ? (
+                <button
+                  onClick={async () => {
+                    const token = localStorage.getItem("pixza_token");
+                    if (!token) { window.location.href = "/auth/signin"; return; }
+                    try {
+                      const { wpCreateCheckout } = await import("@/lib/wordpress");
+                      const { checkout_url } = await wpCreateCheckout(token, "pro");
+                      window.location.href = checkout_url;
+                    } catch { window.location.href = "/settings"; }
+                  }}
+                  className="mt-3 flex items-center gap-2 text-[11px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest"
+                >
+                  <Crown className="w-3 h-3" /> Upgrade to Pro
+                </button>
+              ) : (
+                <button onClick={() => generate(lastPrompt)} className="mt-2 text-[11px] font-bold text-red-400 hover:text-red-300 flex items-center gap-1">
+                  <RefreshCw className="w-3 h-3" /> Retry
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
