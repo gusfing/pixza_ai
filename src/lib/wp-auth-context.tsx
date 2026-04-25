@@ -64,6 +64,13 @@ export function WPAuthProvider({ children }: { children: React.ReactNode }) {
       const fullUser = await wpGetMe(token);
       setToken(token);
       setUser(fullUser);
+    } catch (err) {
+      // If WordPress is unreachable, provide a clear error
+      const msg = err instanceof Error ? err.message : "Login failed";
+      if (msg.includes("502") || msg.includes("fetch") || msg.includes("Failed to reach")) {
+        throw new Error("Cannot connect to authentication server. Please try again later.");
+      }
+      throw err;
     } finally {
       setLoading(false);
     }
