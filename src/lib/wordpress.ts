@@ -81,10 +81,14 @@ export const PLAN_CREDIT_LIMITS: Record<string, number> = {
 // ── Auth ─────────────────────────────────────────────────────
 
 export async function wpLogin(username: string, password: string): Promise<{ token: string; user: WPUser }> {
-  const res = await fetch(`${WP_API}/jwt-auth/v1/token`, {
+  const res = await fetch(isBrowser ? "/api/wp-proxy" : `${WP_API}/jwt-auth/v1/token`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify(
+      isBrowser
+        ? { path: "/jwt-auth/v1/token", method: "POST", body: { username, password } }
+        : { username, password }
+    ),
   });
   if (!res.ok) {
     const err = await res.json();
@@ -100,10 +104,14 @@ export async function wpRegister(data: {
   password: string;
   name?: string;
 }): Promise<WPUser> {
-  const res = await fetch(`${WP_API}/pixza/v1/register`, {
+  const res = await fetch(isBrowser ? "/api/wp-proxy" : `${WP_API}/pixza/v1/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify(
+      isBrowser
+        ? { path: "/pixza/v1/register", method: "POST", body: data }
+        : data
+    ),
   });
   if (!res.ok) {
     const err = await res.json();
@@ -118,9 +126,15 @@ export async function wpGetMe(token: string): Promise<WPUser> {
 }
 
 export async function wpValidateToken(token: string): Promise<boolean> {
-  const res = await fetch(`${WP_API}/jwt-auth/v1/token/validate`, {
+  const res = await fetch(isBrowser ? "/api/wp-proxy" : `${WP_API}/jwt-auth/v1/token/validate`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(
+      isBrowser
+        ? { path: "/jwt-auth/v1/token/validate", method: "POST", token }
+        : undefined
+    ),
+    ...(isBrowser ? {} : { headers: { Authorization: `Bearer ${token}` } }),
   });
   return res.ok;
 }
@@ -420,18 +434,36 @@ export async function wpGetPosts(params?: { per_page?: number; page?: number; se
 
 // ── Helpers ───────────────────────────────────────────────────
 
+// Use server-side proxy when called from browser to avoid CORS
+const isBrowser = typeof window !== "undefined";
+
 async function wpFetch(
   path: string,
   token?: string,
   options: RequestInit = {}
 ): Promise<Response> {
+  // In browser: route through our Next.js proxy to avoid CORS
+  if (isBrowser) {
+    const res = await fetch("/api/wp-proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        path,
+        method: options.method ?? "GET",
+        body: options.body ? JSON.parse(options.body as string) : undefined,
+        token,
+      }),
+    });
+    return res;
+  }
+
+  // Server-side: call WP directly
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  // Append token as query param fallback (for hosts that strip Authorization header)
   let url = `${WP_API}${path}`;
   if (token) {
     const sep = url.includes("?") ? "&" : "?";
