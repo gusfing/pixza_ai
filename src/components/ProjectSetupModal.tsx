@@ -7,6 +7,8 @@ import { CanvasNavigationSettings, PanMode, ZoomMode, SelectionMode } from "@/ty
 // EnvStatusResponse type (previously exported from route, now defined here)
 interface EnvStatusResponse {
   gemini: boolean;
+  openai: boolean;
+  anthropic: boolean;
   replicate: boolean;
   fal: boolean;
   kie: boolean;
