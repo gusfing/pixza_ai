@@ -133,6 +133,7 @@ function CreateScreen() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lastPrompt, setLastPrompt] = useState<string>("");
 
   const tabModels = MODELS.filter(m => m.tabs.includes(tab));
   const selModel = tabModels.find(m => m.modelId === modelId) || tabModels[0];
@@ -146,6 +147,7 @@ function CreateScreen() {
   const generate = useCallback(async (prompt: string) => {
     if (!prompt.trim() || loading) return;
     setLoading(true); setError(null); setResult(null);
+    setLastPrompt(prompt.trim());
     try {
       const body: Record<string, unknown> = {
         prompt: prompt.trim(),
@@ -286,7 +288,7 @@ function CreateScreen() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => { setResult(null); }} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all">New</button>
-                <button onClick={() => {}} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2">
+                <button onClick={() => generate(lastPrompt)} disabled={!lastPrompt} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2 disabled:opacity-30">
                   <RefreshCw className="w-4 h-4" /> Regenerate
                 </button>
                 <a href={result} download={`pixza-${tab.toLowerCase()}`}

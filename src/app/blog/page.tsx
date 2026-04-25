@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { wpGetPosts } from "@/lib/wordpress";
+import { NewsletterForm } from "@/components/ui/newsletter-form";
 
 const C = {
   bg: "#040406", surface: "#0e0e10", surface2: "#161618",
@@ -226,10 +227,7 @@ export default function BlogPage() {
         <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: C.text, margin: "0 0 12px", letterSpacing: "-0.02em" }}>Stay in the loop</h2>
           <p style={{ fontSize: 15, color: C.text2, margin: "0 0 28px" }}>Get new articles, model releases, and workflow tips delivered to your inbox.</p>
-          <div style={{ display: "flex", gap: 10 }}>
-            <input placeholder="your@email.com" style={{ flex: 1, padding: "11px 14px", borderRadius: 10, background: C.surface2, border: `1px solid ${C.border}`, color: C.text, fontSize: 14, outline: "none", fontFamily: "inherit" }} />
-            <button style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: C.accent, color: "#080808", fontSize: 14, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>Subscribe</button>
-          </div>
+          <NewsletterForm />
         </div>
       </div>
     </div>

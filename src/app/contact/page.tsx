@@ -94,9 +94,15 @@ export default function ContactPage() {
                 <div>
                   <h4 className="text-white font-bold text-lg mb-1">Community</h4>
                   <div className="flex gap-4 mt-2">
-                    <Share2 className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
-                    <MessageCircle className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
-                    <GitBranch className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
+                    <a href="https://twitter.com/pixzastudio" target="_blank" rel="noopener noreferrer">
+                      <Share2 className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
+                    </a>
+                    <a href="https://discord.gg/pixza" target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
+                    </a>
+                    <a href="https://github.com/pixzastudio" target="_blank" rel="noopener noreferrer">
+                      <GitBranch className="w-5 h-5 text-white/20 hover:text-white cursor-pointer transition-colors" />
+                    </a>
                   </div>
                 </div>
               </div>

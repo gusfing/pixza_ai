@@ -409,9 +409,9 @@ function Footer() {
         <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/20 text-xs">© 2026 Pixza Studio. All rights reserved.</p>
           <div className="flex gap-6 text-white/20 text-xs">
-            {["Twitter / X", "Discord", "GitHub"].map(s => (
-              <a key={s} href="#" className="hover:text-white transition-colors">{s}</a>
-            ))}
+            <a href="https://twitter.com/pixzastudio" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Twitter / X</a>
+            <a href="https://discord.gg/pixza" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Discord</a>
+            <a href="https://github.com/pixzastudio" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
           </div>
         </div>
       </div>

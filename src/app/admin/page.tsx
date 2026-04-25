@@ -204,12 +204,28 @@ export default function AdminPage() {
                       <td className="px-5 py-4 text-white/40">{(u.meta?.generations_count ?? 0).toLocaleString()}</td>
                       <td className="px-5 py-4 text-white/30 text-xs">{new Date(u.registered).toLocaleDateString()}</td>
                       <td className="px-5 py-4">
-                        <button
-                          onClick={() => setEditingUser({ ...u, meta: { ...u.meta, plan, credits, credits_limit: limit } })}
-                          className="text-xs font-bold text-white/40 hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20"
-                        >
-                          Edit
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setEditingUser({ ...u, meta: { ...u.meta, plan, credits, credits_limit: limit } })}
+                            className="text-xs font-bold text-white/40 hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!confirm(`Delete ${u.email}? This cannot be undone.`)) return;
+                              await fetch(`/api/admin/users/${u.id}`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ role: "deleted" }),
+                              });
+                              fetchUsers();
+                            }}
+                            className="text-xs font-bold text-red-500/40 hover:text-red-400 transition-colors px-3 py-1.5 rounded-lg border border-red-500/10 hover:border-red-500/20"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

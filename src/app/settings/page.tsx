@@ -254,6 +254,110 @@ function SubscriptionTab() {
   );
 }
 
+function NotificationsTab() {
+  const [prefs, setPrefs] = useState({
+    generationDone: true,
+    weeklyDigest: false,
+    productUpdates: true,
+    billing: true,
+  });
+  const toggle = (key: keyof typeof prefs) => setPrefs(p => ({ ...p, [key]: !p[key] }));
+
+  const items = [
+    { key: "generationDone" as const, label: "Generation Complete", desc: "Get notified when your AI generation finishes." },
+    { key: "weeklyDigest" as const, label: "Weekly Digest", desc: "A summary of new models, templates, and tips." },
+    { key: "productUpdates" as const, label: "Product Updates", desc: "New features, model releases, and improvements." },
+    { key: "billing" as const, label: "Billing Alerts", desc: "Credit usage warnings and invoice notifications." },
+  ];
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <SettingSection title="Email Notifications">
+        <SettingCard>
+          <div className="space-y-6">
+            {items.map(item => (
+              <div key={item.key} className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-white">{item.label}</p>
+                  <p className="text-xs text-white/30 mt-0.5">{item.desc}</p>
+                </div>
+                <button
+                  onClick={() => toggle(item.key)}
+                  className={cn(
+                    "w-12 h-6 rounded-full transition-all relative",
+                    prefs[item.key] ? "bg-white" : "bg-white/10"
+                  )}
+                >
+                  <span className={cn(
+                    "absolute top-1 w-4 h-4 rounded-full transition-all",
+                    prefs[item.key] ? "left-7 bg-black" : "left-1 bg-white/40"
+                  )} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </SettingCard>
+      </SettingSection>
+    </div>
+  );
+}
+
+function AppearanceTab() {
+  const [accentColor, setAccentColor] = useState("white");
+  const [density, setDensity] = useState("comfortable");
+
+  const colors = [
+    { id: "white", label: "Obsidian", hex: "#ffffff" },
+    { id: "cyan", label: "Cyan", hex: "#06b6d4" },
+    { id: "violet", label: "Violet", hex: "#8b5cf6" },
+    { id: "amber", label: "Amber", hex: "#f59e0b" },
+    { id: "emerald", label: "Emerald", hex: "#10b981" },
+  ];
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <SettingSection title="Accent Color">
+        <SettingCard>
+          <div className="flex gap-4 flex-wrap">
+            {colors.map(c => (
+              <button
+                key={c.id}
+                onClick={() => setAccentColor(c.id)}
+                className={cn(
+                  "flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all",
+                  accentColor === c.id ? "border-white/30 bg-white/5" : "border-white/5 hover:border-white/10"
+                )}
+              >
+                <div className="w-8 h-8 rounded-full border-2 border-white/10" style={{ background: c.hex }} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/40">{c.label}</span>
+              </button>
+            ))}
+          </div>
+        </SettingCard>
+      </SettingSection>
+
+      <SettingSection title="Interface Density">
+        <SettingCard>
+          <div className="grid grid-cols-3 gap-3">
+            {["compact", "comfortable", "spacious"].map(d => (
+              <button
+                key={d}
+                onClick={() => setDensity(d)}
+                className={cn(
+                  "py-3 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all capitalize",
+                  density === d ? "bg-white text-black border-white" : "border-white/10 text-white/40 hover:text-white hover:border-white/20"
+                )}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+        </SettingCard>
+      </SettingSection>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { user, loading: authLoading, logout } = useWPAuth();
   const router = useRouter();
@@ -339,17 +443,8 @@ export default function SettingsPage() {
             >
               {tab === "profile" && <ProfileTab />}
               {tab === "subscription" && <SubscriptionTab />}
-              {(tab === "notifications" || tab === "appearance") && (
-                <div className="py-20 text-center">
-                  <div className="w-20 h-20 glass-panel rounded-[40px] flex items-center justify-center mx-auto mb-8 animate-pulse">
-                    <SettingsIcon className="w-10 h-10 text-white/20" />
-                  </div>
-                  <h2 className="text-3xl font-black tracking-tighter text-white mb-4">Neural Tuning.</h2>
-                  <p className="text-white/30 text-sm font-medium uppercase tracking-[0.2em] max-w-xs mx-auto leading-relaxed">
-                    This subsystem is being calibrated for optimal response.
-                  </p>
-                </div>
-              )}
+              {tab === "notifications" && <NotificationsTab />}
+              {tab === "appearance" && <AppearanceTab />}
             </motion.div>
           </AnimatePresence>
         </main>
