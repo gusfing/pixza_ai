@@ -1,0 +1,14 @@
+# Exclude large sample images from Vercel deployment
+examples/
+public/sample-images/
+public/node-banana.png
+.git
+logs/
+scratch/
+wordpress-plugin/
+MASTER_SETUP_GUIDE.md
+AI_PROVIDERS_AND_COSTS.md
+PRODUCTION_TODO.md
+CHANGELOG.md
+CLAUDE.md
+prd-image-workflow.md

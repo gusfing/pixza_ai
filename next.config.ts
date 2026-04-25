@@ -34,7 +34,19 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: "100mb", // Increased for large media files
+      bodySizeLimit: "100mb",
+    },
+    outputFileTracingExcludes: {
+      "*": [
+        "public/sample-images/**",
+        "examples/**",
+        ".git/**",
+        "public/node-banana.png",
+        "public/landing/**",
+        "wordpress-plugin/**",
+        "logs/**",
+        "scratch/**",
+      ],
     },
   },
   // Note: For route handlers (.../route.ts files), body size is controlled by
