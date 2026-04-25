@@ -153,7 +153,7 @@ function ModelPicker({ models, value, onChange, userPlan = "free" }: {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.97 }}
             transition={{ duration: 0.12 }}
-            className="absolute top-full left-0 mt-1 z-50 bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden min-w-[240px] max-h-72 overflow-y-auto"
+            className="absolute top-full left-0 mt-1 z-[200] bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden min-w-[240px] max-h-72 overflow-y-auto"
             onMouseLeave={() => setOpen(false)}
           >
             {models.map(m => {
@@ -318,7 +318,7 @@ function CreateScreen() {
           </div>
 
           {/* Model + ref image row */}
-          <div className="flex items-center justify-between px-1 mb-8">
+          <div className="flex items-center justify-between px-1 mb-8 relative z-[100]">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Model</span>
               <ModelPicker models={tabModels} value={selModel.modelId} onChange={setModelId} userPlan={userPlan} />
@@ -435,7 +435,7 @@ function CreateScreen() {
         {/* Example cards — shown when idle */}
         {!loading && !result && !error && (
           <BlurFade delay={0.4} inView>
-            <div className="mt-4">
+            <div className="mt-4 relative z-0">
               <h2 className="text-sm font-bold text-white/40 mb-4 uppercase tracking-widest">Created with Pixza</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {EXAMPLE_CARDS.map((card, i) => (
