@@ -62,7 +62,7 @@ export default function OnboardingPage() {
     // On providers step: save keys to workflow store
     if (current.content === "providers") {
       Object.entries(keys).forEach(([provider, key]) => {
-        if (key.trim()) updateProviderApiKey(provider, key.trim());
+        if (key.trim()) updateProviderApiKey(provider as any, key.trim());
       });
     }
 
