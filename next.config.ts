@@ -36,18 +36,18 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "100mb",
     },
-    outputFileTracingExcludes: {
-      "*": [
-        "public/sample-images/**",
-        "examples/**",
-        ".git/**",
-        "public/node-banana.png",
-        "public/landing/**",
-        "wordpress-plugin/**",
-        "logs/**",
-        "scratch/**",
-      ],
-    },
+  },
+  outputFileTracingExcludes: {
+    "*": [
+      "public/sample-images/**",
+      "examples/**",
+      ".git/**",
+      "public/node-banana.png",
+      "public/landing/**",
+      "wordpress-plugin/**",
+      "logs/**",
+      "scratch/**",
+    ],
   },
   // Note: For route handlers (.../route.ts files), body size is controlled by
   // the underlying server. For large payloads, consider using streaming or
