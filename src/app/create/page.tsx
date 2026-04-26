@@ -313,18 +313,26 @@ function CreateScreen() {
           </div>
         </BlurFade>
 
-        {/* AI Input */}
+        {/* AI Input — options embedded inside the box */}
         <BlurFade delay={0.2} inView>
-          <div className="mb-3">
+          <div className="mb-5 relative z-[200]">
             <AIInputWithSearch
               placeholder={TAB_CONFIG[tab].placeholder}
               models={tabModels}
               selectedModelId={selModel.modelId}
               onModelChange={setModelId}
               userPlan={userPlan}
+              showOptions={tab === "Image"}
+              aspectRatio={aspectRatio}
+              onAspectRatioChange={setAspectRatio}
+              numImages={numImages}
+              onNumImagesChange={setNumImages}
+              refImage={refImage}
+              onRefImageRemove={() => setRefImage(null)}
+              credits={credits}
               onSubmit={(val) => {
                 if (credits !== null && selModel && credits < selModel.creditCost * numImages) {
-                  setError(`Not enough credits. You need ${selModel.creditCost * numImages} but have ${credits}.`);
+                  setError(`Not enough credits. Need ${selModel.creditCost * numImages}, have ${credits}.`);
                   return;
                 }
                 generate(val);
@@ -337,43 +345,6 @@ function CreateScreen() {
             />
           </div>
         </BlurFade>
-
-        {/* Options row — tight, unified pill bar */}
-        {tab === "Image" && (
-          <div className="flex items-center justify-between mb-5 px-1 relative z-[100]">
-            <div className="flex items-center gap-1 bg-white/5 rounded-xl p-1">
-              {["1:1", "4:3", "3:4", "16:9", "9:16"].map(r => (
-                <button key={r} onClick={() => setAspectRatio(r)}
-                  className={cn("px-2.5 py-1.5 rounded-lg text-[10px] font-black transition-all",
-                    aspectRatio === r ? "bg-white text-black" : "text-white/30 hover:text-white")}>
-                  {r}
-                </button>
-              ))}
-              <div className="w-px h-4 bg-white/10 mx-1" />
-              {[1, 2, 4].map(n => (
-                <button key={n} onClick={() => setNumImages(n)}
-                  className={cn("w-7 h-7 rounded-lg text-[10px] font-black transition-all",
-                    numImages === n ? "bg-white text-black" : "text-white/30 hover:text-white")}>
-                  {n}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
-              {refImage && (
-                <div className="flex items-center gap-1.5">
-                  <img src={refImage} className="w-6 h-6 rounded-lg object-cover border border-white/10" alt="ref" />
-                  <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white">
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-              <span className="text-[10px] text-white/20 font-bold tabular-nums">
-                {selModel?.creditCost * numImages}cr
-                {credits !== null && <span className="text-white/10"> / {credits}</span>}
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Result area */}
         <AnimatePresence mode="wait">
