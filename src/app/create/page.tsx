@@ -207,6 +207,17 @@ function CreateScreen() {
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [numImages, setNumImages] = useState(1);
 
+  const refreshCredits = useCallback(async () => {
+    try {
+      const res = await fetch("/api/credits");
+      if (res.ok) {
+        const data = await res.json();
+        setCredits(data.credits ?? null);
+        setUserPlan(data.plan ?? "free");
+      }
+    } catch { /* non-fatal */ }
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem("pixza_token");
     if (token) {
@@ -264,12 +275,14 @@ function CreateScreen() {
       }
       if (outputs.length === 0) throw new Error("No output received");
       setResults(outputs);
+      // Refresh credit balance from server after successful generation
+      refreshCredits();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
-  }, [selModel, refImage, tab, loading, aspectRatio, numImages]);
+  }, [selModel, refImage, tab, loading, aspectRatio, numImages, refreshCredits]);
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
@@ -560,59 +573,307 @@ function SettingsScreen() {
   const providerSettings = useWorkflowStore(s => s.providerSettings);
   const updateProviderApiKey = useWorkflowStore(s => s.updateProviderApiKey);
   const [show, setShow] = useState<Record<string, boolean>>({});
+  const [tab, setTab] = useState<"plan" | "keys" | "usage">("plan");
+
+  // Live data from WP
+  const [user, setUser] = useState<any>(null);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [creditLimit, setCreditLimit] = useState<number | null>(null);
+  const [plan, setPlan] = useState("free");
+  const [subscription, setSubscription] = useState<any>(null);
+  const [usage, setUsage] = useState<any[]>([]);
+  const [usageLoading, setUsageLoading] = useState(false);
+  const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
   const PROVIDERS = [
     { id: "gemini",    name: "Google Gemini", placeholder: "AIza..." },
     { id: "fal",       name: "fal.ai",        placeholder: "fal_..." },
     { id: "replicate", name: "Replicate",     placeholder: "r8_..."  },
     { id: "wavespeed", name: "WaveSpeed",     placeholder: "ws_..."  },
   ] as const;
+
+  // Load user + credits on mount
+  useEffect(() => {
+    const token = localStorage.getItem("pixza_token");
+    if (!token) return;
+    fetch("/api/credits").then(r => r.json()).then(d => {
+      setCredits(d.credits ?? null);
+      setCreditLimit(d.limit ?? null);
+      setPlan(d.plan ?? "free");
+    }).catch(() => {});
+    import("@/lib/wordpress").then(({ wpGetMe, wpGetSubscription }) => {
+      wpGetMe(token).then(setUser).catch(() => {});
+      wpGetSubscription(token).then(setSubscription).catch(() => {});
+    });
+  }, []);
+
+  // Load usage when tab switches
+  useEffect(() => {
+    if (tab !== "usage") return;
+    const token = localStorage.getItem("pixza_token");
+    if (!token) return;
+    setUsageLoading(true);
+    import("@/lib/wordpress").then(() => {
+      fetch("/api/wp-proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: "/pixza/v1/usage?per_page=30", method: "GET", token }),
+      }).then(r => r.json()).then(d => {
+        setUsage(d.items ?? []);
+        setUsageLoading(false);
+      }).catch(() => setUsageLoading(false));
+    });
+  }, [tab]);
+
+  const handleUpgrade = async (targetPlan: "pro" | "agency") => {
+    const token = localStorage.getItem("pixza_token");
+    if (!token) { window.location.href = "/auth/signin"; return; }
+    setUpgrading(targetPlan);
+    try {
+      const { wpCreateCheckout } = await import("@/lib/wordpress");
+      const { checkout_url } = await wpCreateCheckout(token, targetPlan);
+      window.location.href = checkout_url;
+    } catch (e) {
+      setMsg({ type: "err", text: e instanceof Error ? e.message : "Checkout failed" });
+      setUpgrading(null);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm("Cancel your subscription? You keep access until the end of the billing period.")) return;
+    const token = localStorage.getItem("pixza_token");
+    if (!token) return;
+    setCancelLoading(true);
+    try {
+      const { wpCancelSubscription } = await import("@/lib/wordpress");
+      await wpCancelSubscription(token);
+      setSubscription((s: any) => ({ ...s, status: "cancelled" }));
+      setMsg({ type: "ok", text: "Subscription cancelled. Access continues until period end." });
+    } catch (e) {
+      setMsg({ type: "err", text: "Failed to cancel. Contact support." });
+    }
+    setCancelLoading(false);
+  };
+
+  const creditPct = credits !== null && creditLimit ? Math.round((credits / creditLimit) * 100) : null;
+  const planColor = plan === "agency" ? "text-amber-400" : plan === "pro" ? "text-violet-400" : "text-white/40";
+  const planBg    = plan === "agency" ? "bg-amber-500/10 border-amber-500/20" : plan === "pro" ? "bg-violet-500/10 border-violet-500/20" : "bg-white/5 border-white/10";
+
   return (
     <div className="flex-1 overflow-y-auto px-6 pt-8 pb-24 max-w-2xl mx-auto w-full">
       <BlurFade delay={0.1} inView>
-        <h2 className="text-3xl font-black text-white tracking-tighter mb-1">API Keys</h2>
-        <p className="text-white/30 text-sm mb-8">Add your own keys. Stored locally in your browser.</p>
-        <div className="space-y-3">
-          {PROVIDERS.map(p => {
-            const key = providerSettings.providers[p.id as keyof typeof providerSettings.providers]?.apiKey || "";
-            return (
-              <div key={p.id} className="p-5 rounded-2xl bg-white/5 border border-white/5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-bold text-white text-sm">{p.name}</span>
-                  {key && <span className="text-[10px] font-black uppercase tracking-widest text-green-400 bg-green-500/10 px-2 py-1 rounded-lg">Connected</span>}
+        <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Settings</h2>
+        <p className="text-white/30 text-sm mb-6">Manage your plan, credits, and API keys.</p>
+
+        {/* Tabs */}
+        <div className="flex gap-1 bg-white/5 rounded-xl p-1 mb-8 w-fit">
+          {([
+            { id: "plan",  label: "Plan & Credits" },
+            { id: "usage", label: "Usage History"  },
+            { id: "keys",  label: "API Keys"       },
+          ] as const).map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className={cn("px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                tab === t.id ? "bg-white text-black" : "text-white/30 hover:text-white")}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {msg && (
+          <div className={cn("mb-4 p-3 rounded-xl text-xs font-bold", msg.type === "ok" ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-red-500/10 text-red-400 border border-red-500/20")}>
+            {msg.text}
+            <button onClick={() => setMsg(null)} className="ml-2 opacity-50 hover:opacity-100">✕</button>
+          </div>
+        )}
+
+        {/* ── PLAN & CREDITS TAB ── */}
+        {tab === "plan" && (
+          <div className="space-y-5">
+            {/* Current plan card */}
+            <div className={cn("p-5 rounded-2xl border", planBg)}>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-1">Current Plan</p>
+                  <p className={cn("text-2xl font-black tracking-tighter capitalize", planColor)}>
+                    {plan}
+                    {subscription?.status === "cancelled" && <span className="text-xs text-white/30 ml-2 font-normal">(cancels at period end)</span>}
+                  </p>
                 </div>
-                <div className="relative">
-                  <input type={show[p.id] ? "text" : "password"} value={key}
-                    onChange={e => updateProviderApiKey(p.id, e.target.value)}
-                    placeholder={p.placeholder}
-                    className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm font-mono text-white outline-none focus:border-white/20 transition-all pr-16" />
-                  <button onClick={() => setShow(s => ({ ...s, [p.id]: !s[p.id] }))}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors">
-                    {show[p.id] ? "Hide" : "Show"}
+                {user && (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white font-black text-sm">
+                    {(user.name || user.username || "U")[0].toUpperCase()}
+                  </div>
+                )}
+              </div>
+
+              {/* Credit bar */}
+              {credits !== null && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-white/40 font-bold">Credits remaining</span>
+                    <span className="text-xs font-black text-white tabular-nums">
+                      {credits.toLocaleString()} / {(creditLimit ?? 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-700",
+                        (creditPct ?? 100) > 50 ? "bg-white" : (creditPct ?? 100) > 20 ? "bg-amber-400" : "bg-red-400")}
+                      style={{ width: `${creditPct ?? 0}%` }}
+                    />
+                  </div>
+                  {(creditPct ?? 100) < 20 && (
+                    <p className="text-[10px] text-amber-400 mt-1.5 font-bold">Running low — upgrade to get more credits</p>
+                  )}
+                </div>
+              )}
+
+              {subscription?.next_payment && (
+                <p className="text-[10px] text-white/20 mt-3">
+                  Next renewal: {new Date(subscription.next_payment).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+
+            {/* Upgrade cards */}
+            {plan === "free" && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Pro */}
+                <div className="p-5 rounded-2xl border border-violet-500/20 bg-violet-500/5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-violet-400">Pro</span>
+                    <span className="text-lg font-black text-white">$19<span className="text-xs text-white/30">/mo</span></span>
+                  </div>
+                  <ul className="space-y-1.5 mb-4">
+                    {["2,000 credits/month", "All premium models", "Priority generation", "No watermarks"].map(f => (
+                      <li key={f} className="flex items-center gap-2 text-xs text-white/60">
+                        <Check className="w-3 h-3 text-violet-400 shrink-0" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={() => handleUpgrade("pro")} disabled={upgrading === "pro"}
+                    className="w-full py-2.5 rounded-xl bg-violet-500 text-white text-xs font-black hover:bg-violet-400 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+                    {upgrading === "pro" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Redirecting…</> : <><Crown className="w-3.5 h-3.5" /> Upgrade to Pro</>}
+                  </button>
+                </div>
+
+                {/* Agency */}
+                <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">Agency</span>
+                    <span className="text-lg font-black text-white">$79<span className="text-xs text-white/30">/mo</span></span>
+                  </div>
+                  <ul className="space-y-1.5 mb-4">
+                    {["10,000 credits/month", "Everything in Pro", "Team seats (coming soon)", "Priority support"].map(f => (
+                      <li key={f} className="flex items-center gap-2 text-xs text-white/60">
+                        <Check className="w-3 h-3 text-amber-400 shrink-0" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={() => handleUpgrade("agency")} disabled={upgrading === "agency"}
+                    className="w-full py-2.5 rounded-xl bg-amber-500 text-white text-xs font-black hover:bg-amber-400 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+                    {upgrading === "agency" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Redirecting…</> : <><Zap className="w-3.5 h-3.5" /> Upgrade to Agency</>}
                   </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
-        <div className="mt-8 p-6 rounded-2xl bg-white text-black">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-black text-lg tracking-tighter">Upgrade to Pro</p>
-              <p className="text-sm text-black/50 mt-1">2,000 credits/month, all 47 models</p>
+            )}
+
+            {/* Manage subscription (paid plans) */}
+            {plan !== "free" && subscription?.status === "active" && (
+              <div className="p-4 rounded-2xl border border-white/5 bg-white/[0.02] flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-white">Manage Subscription</p>
+                  <p className="text-xs text-white/30 mt-0.5">Cancel anytime — access continues until period end</p>
+                </div>
+                <button onClick={handleCancel} disabled={cancelLoading}
+                  className="px-4 py-2 rounded-xl border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-all disabled:opacity-50">
+                  {cancelLoading ? "Cancelling…" : "Cancel Plan"}
+                </button>
+              </div>
+            )}
+
+            {/* Credit cost reference */}
+            <div className="p-4 rounded-2xl border border-white/5 bg-white/[0.02]">
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-3">Credit Costs</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "Image (free model)", cost: 1 },
+                  { label: "Image (pro model)",  cost: 3 },
+                  { label: "Video",              cost: 10 },
+                  { label: "Audio",              cost: 3  },
+                  { label: "3D",                 cost: 5  },
+                ].map(item => (
+                  <div key={item.label} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
+                    <span className="text-xs text-white/40">{item.label}</span>
+                    <span className="text-xs font-black text-white">{item.cost} cr</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <button onClick={async () => {
-              const token = localStorage.getItem("pixza_token");
-              if (!token) { window.location.href = "/auth/signin"; return; }
-              try {
-                const { wpCreateCheckout } = await import("@/lib/wordpress");
-                const { checkout_url } = await wpCreateCheckout(token, "pro");
-                window.location.href = checkout_url;
-              } catch { window.location.href = "/settings"; }
-            }} className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-black/80 transition-all">
-              <Crown className="w-4 h-4" /> Upgrade
-            </button>
           </div>
-        </div>
+        )}
+
+        {/* ── USAGE HISTORY TAB ── */}
+        {tab === "usage" && (
+          <div>
+            {usageLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin" />
+              </div>
+            ) : usage.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-white/30 text-sm">No usage yet — generate something first!</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="grid grid-cols-4 gap-2 px-3 pb-2 border-b border-white/5">
+                  {["Action", "Model", "Credits", "Date"].map(h => (
+                    <span key={h} className="text-[10px] font-black uppercase tracking-widest text-white/20">{h}</span>
+                  ))}
+                </div>
+                {usage.map((row: any) => (
+                  <div key={row.id} className="grid grid-cols-4 gap-2 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors">
+                    <span className="text-xs text-white/60 capitalize truncate">{row.action}</span>
+                    <span className="text-xs text-white/30 truncate">{row.model || "—"}</span>
+                    <span className="text-xs font-black text-white">−{row.credits}</span>
+                    <span className="text-xs text-white/20">{new Date(row.created_at).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── API KEYS TAB ── */}
+        {tab === "keys" && (
+          <div className="space-y-3">
+            <p className="text-white/30 text-sm mb-4">Add your own keys. Stored locally in your browser.</p>
+            {PROVIDERS.map(p => {
+              const key = providerSettings.providers[p.id as keyof typeof providerSettings.providers]?.apiKey || "";
+              return (
+                <div key={p.id} className="p-5 rounded-2xl bg-white/5 border border-white/5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-bold text-white text-sm">{p.name}</span>
+                    {key && <span className="text-[10px] font-black uppercase tracking-widest text-green-400 bg-green-500/10 px-2 py-1 rounded-lg">Connected</span>}
+                  </div>
+                  <div className="relative">
+                    <input type={show[p.id] ? "text" : "password"} value={key}
+                      onChange={e => updateProviderApiKey(p.id, e.target.value)}
+                      placeholder={p.placeholder}
+                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm font-mono text-white outline-none focus:border-white/20 transition-all pr-16" />
+                    <button onClick={() => setShow(s => ({ ...s, [p.id]: !s[p.id] }))}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors">
+                      {show[p.id] ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </BlurFade>
     </div>
   );
@@ -679,9 +940,21 @@ export default function CreatePage() {
   useEffect(() => {
     const token = localStorage.getItem("pixza_token");
     if (token) {
+      // Fetch live credits from server (not stale meta)
+      fetch("/api/credits").then(r => r.json()).then(d => {
+        setCredits(d.credits ?? null);
+      }).catch(() => {});
       import("@/lib/wordpress").then(({ wpGetMe }) => {
-        wpGetMe(token).then(u => { setUser(u); setCredits(u.meta?.credits ?? null); }).catch(() => {});
+        wpGetMe(token).then(u => { setUser(u); }).catch(() => {});
       });
+    }
+    // If returning from Stripe checkout, switch to settings and refresh
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("upgraded") === "1") {
+        setScreen("settings");
+        window.history.replaceState({}, "", window.location.pathname);
+      }
     }
   }, []);
 

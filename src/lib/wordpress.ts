@@ -177,7 +177,9 @@ export async function wpGetCredits(token: string): Promise<{ credits: number; li
 export async function wpDeductCredits(
   userId: number,
   amount: number,
-  reason: string
+  reason: string,
+  model?: string,
+  provider?: string,
 ): Promise<{ credits: number; limit: number }> {
   const res = await fetch(`${WP_API}/pixza/v1/credits/deduct`, {
     method: "POST",
@@ -185,7 +187,7 @@ export async function wpDeductCredits(
       "Content-Type": "application/json",
       "X-WP-Secret": WP_SECRET,
     },
-    body: JSON.stringify({ user_id: userId, amount, reason }),
+    body: JSON.stringify({ user_id: userId, amount, reason, model: model ?? "", provider: provider ?? "" }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

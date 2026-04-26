@@ -23,7 +23,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { freeLimiter, proLimiter, checkRateLimit } from "@/lib/ratelimit";
 import { uploadToStorage, contentTypeForOutput } from "@/lib/storage";
-import { wpGetMe } from "@/lib/wordpress";
+import { wpGetMe, wpDeductCredits, CREDIT_COSTS } from "@/lib/wordpress";
 // Re-export for backward compatibility (test file imports from route)
 export const clearFalInputMappingCache = _clearFalInputMappingCache;
 
@@ -88,7 +88,12 @@ function buildMediaResponse(output: { type: string; data: string; url?: string }
 async function buildMediaResponseWithStorage(
   output: { type: string; data: string; url?: string },
   generationId: string | null,
-  userId: string | null
+  userId: string | null,
+  wpUserId?: number | null,
+  creditCost?: number,
+  mediaType?: string,
+  modelId?: string,
+  provider?: string,
 ): Promise<NextResponse> {
   let storedUrl: string | undefined = output.url;
 
@@ -110,10 +115,20 @@ async function buildMediaResponseWithStorage(
         data: { 
           status: "done", 
           outputUrl: storedUrl ?? output.url ?? null,
-          // If it was base64, we don't store the whole blob in DB, just the R2 link
         },
       });
     } catch (e) {
+    }
+  }
+
+  // ── Deduct WP credits on success ─────────────────────────
+  if (wpUserId && process.env.WP_API_SECRET) {
+    try {
+      const cost = creditCost ?? CREDIT_COSTS[mediaType ?? "image"] ?? 1;
+      await wpDeductCredits(wpUserId, cost, mediaType ?? "image", modelId, provider);
+    } catch (e) {
+      // Non-fatal — generation already succeeded, just log
+      console.warn("[credits] deduction failed:", e instanceof Error ? e.message : e);
     }
   }
 
@@ -135,6 +150,7 @@ export async function POST(request: NextRequest) {
   const session = await auth();
   let userId = session?.user?.id ?? null;
   let plan = (session?.user as { plan?: string })?.plan ?? "FREE";
+  let wpUserId: number | null = null; // WP numeric user ID for credit deduction
 
   if (!userId) {
     const wpToken = request.cookies.get("pixza_token")?.value;
@@ -143,8 +159,9 @@ export async function POST(request: NextRequest) {
         const me = await wpGetMe(wpToken);
         if (me) {
           userId = me.id.toString();
+          wpUserId = me.id;
           plan = me.meta?.plan?.toUpperCase() || "FREE";
-          if (plan === "AGENCY") plan = "PRO"; // Treat agency as PRO for rate limiting
+          if (plan === "AGENCY") plan = "PRO";
         }
       } catch (e) {
       }
@@ -362,7 +379,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return buildMediaResponseWithStorage(output, generationId, userId);
+      return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
     }
 
     if (provider === "fal") {
@@ -435,7 +452,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return buildMediaResponseWithStorage(output, generationId, userId);
+      return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
     }
 
     if (provider === "kie") {
@@ -513,7 +530,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return buildMediaResponseWithStorage(output, generationId, userId);
+      return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
     }
 
     if (provider === "wavespeed") {
@@ -591,7 +608,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return buildMediaResponseWithStorage(output, generationId, userId);
+      return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
     }
 
     if (provider === "cloudflare") {
@@ -651,7 +668,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return buildMediaResponseWithStorage(output, generationId, userId);
+      return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
     }
 
     // Default: Use Gemini
@@ -742,7 +759,7 @@ export async function POST(request: NextRequest) {
         const geminiData = await geminiResult.clone().json();
         if (geminiData.success && geminiData.image) {
           // Trigger storage in background or wait? Better wait to ensure DB consistency
-          await buildMediaResponseWithStorage({ type: "image", data: geminiData.image }, generationId, userId);
+          await buildMediaResponseWithStorage({ type: "image", data: geminiData.image }, generationId, userId, wpUserId, CREDIT_COSTS["image"], "image", geminiModel as string, "gemini");
         }
       } catch (e) {
       }
@@ -784,4 +801,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json<GenerateResponse>({ success: false, error: errorMessage }, { status: 500 });
   }
 }
+
+
 
