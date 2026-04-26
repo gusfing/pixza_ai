@@ -17,17 +17,16 @@ interface EdgeData extends WorkflowEdgeData {
   offsetY?: number;
 }
 
-// Colors for different connection types (dimmed for softer appearance)
 const EDGE_COLORS: Record<string, string> = {
-  image: "#0d9668", // Green for image connections
-  prompt: "#2563eb", // Blue for prompt connections
-  default: "#64748b", // Gray for unknown
-  pause: "#ea580c", // Orange for paused edges
-  reference: "#52525b", // Gray for reference connections
-  video: "#a855f7", // Purple for video connections
-  audio: "#f97316", // Orange for audio connections
-  text: "#2563eb", // Blue for text connections
-  "3d": "#06b6d4", // Cyan for 3D connections
+  image: "#0d9668",     // Green for image connections
+  prompt: "#a1a1a1",    // Neutral for prompt connections
+  default: "#525252",   // Gray for unknown
+  pause: "#ea580c",     // Orange for paused edges
+  reference: "#404040", // Dark gray for reference connections
+  video: "#a855f7",     // Purple for video connections
+  audio: "#f97316",     // Orange for audio connections
+  text: "#a1a1a1",      // Neutral for text connections
+  "3d": "#06b6d4",      // Cyan for 3D connections
   easeCurve: "#f59e0b", // Amber for ease curve connections
 };
 

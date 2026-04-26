@@ -274,10 +274,9 @@ export function BaseNode({
         {/* Top Categorical Glow */}
         {accentColor && (
           <div 
-            className="absolute top-0 left-0 right-0 h-1 z-10"
+            className="absolute top-0 left-0 right-0 h-px z-10"
             style={{ 
-              background: `linear-gradient(to right, transparent, ${accentColor}, transparent)`,
-              boxShadow: `0 0 15px ${accentColor}`
+              background: `linear-gradient(to right, transparent, ${accentColor}60, transparent)`,
             }} 
           />
         )}

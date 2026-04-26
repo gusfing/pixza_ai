@@ -6,13 +6,13 @@
 
 const EDGE_COLORS: Record<string, string> = {
   image: "#0d9668",
-  prompt: "#2563eb",
-  default: "#64748b",
+  prompt: "#a1a1a1",
+  default: "#525252",
   pause: "#ea580c",
-  reference: "#52525b",
+  reference: "#404040",
   video: "#a855f7",
   audio: "#f97316",
-  text: "#2563eb",
+  text: "#a1a1a1",
   "3d": "#06b6d4",
   easeCurve: "#f59e0b",
 };

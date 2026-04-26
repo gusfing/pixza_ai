@@ -412,7 +412,7 @@ export function WorkflowCanvas() {
       case 'audioInput': return '#f97316';
       case 'videoInput': return '#a855f7';
       case 'prompt':
-      case 'promptConstructor': return '#2563eb';
+      case 'promptConstructor': return '#ffffff';
       case 'nanoBanana':
       case 'generateVideo':
       case 'llmGenerate': return '#8b5cf6';
