@@ -7,10 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ImageIcon, Video, Music, Box, Sparkles, Settings, Compass,
   Download, X, RefreshCw, Upload, ChevronDown, Check,
-  Wand2, Zap, Crown, ArrowRight, ShoppingBag
+  Wand2, Zap, Crown, ArrowRight, ShoppingBag,
+  Palette, Lightbulb, ScanSearch, AlertTriangle, MessageSquare,
+  Star, Copy, ChevronRight, Layers, Eye, RotateCcw
 } from "lucide-react";import { useWorkflowStore } from "@/store/workflowStore";
 import { ImageTools } from "@/components/ui/image-tools";
 import { CFreeTools } from "@/components/ui/cf-free-tools";
+import { CatalogueScreen } from "@/components/ui/catalogue-screen";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { AIInputWithSearch } from "@/components/ui/ai-input-with-search";
@@ -273,7 +276,6 @@ function CreateScreen() {
   const TabIcon = TAB_CONFIG[tab].icon;
   const outputType = tab === "Video" ? "video" : tab === "Audio" ? "audio" : "image";
   const result = results[0] ?? null; // backward compat for single result display
-  const outputType = tab === "Video" ? "video" : tab === "Audio" ? "audio" : "image";
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -720,221 +722,7 @@ function ToolsScreen() {
   );
 }
 
-/* ── Product Catalogue Screen ───────────────────────────────── */
-const CATALOGUE_SHOTS = [
-  { id: "hero",       label: "Hero Shot",        prompt: "Professional hero product shot, centered on pure white background, dramatic studio lighting, sharp focus, commercial photography style, 8K" },
-  { id: "lifestyle",  label: "Lifestyle",         prompt: "Lifestyle product photography, natural environment, warm ambient light, shallow depth of field, aspirational mood, editorial style" },
-  { id: "flat-lay",   label: "Flat Lay",          prompt: "Flat lay product photography, overhead shot, clean minimal background, styled composition, professional commercial photography" },
-  { id: "360",        label: "360° View",         prompt: "Product shot from 45-degree angle, clean background, professional studio lighting, showing product details and texture" },
-  { id: "closeup",    label: "Detail Close-up",   prompt: "Extreme close-up macro product photography, showing material texture and fine details, studio lighting, sharp focus" },
-  { id: "dark",       label: "Dark & Moody",      prompt: "Dark moody product photography, dramatic shadows, luxury feel, black background, cinematic lighting, high-end commercial" },
-  { id: "outdoor",    label: "Outdoor Scene",     prompt: "Product in natural outdoor setting, golden hour lighting, lifestyle photography, environmental context, editorial quality" },
-  { id: "minimal",    label: "Minimal Clean",     prompt: "Minimalist product photography, pure white or light grey background, soft shadows, clean composition, Scandinavian aesthetic" },
-];
-
-function CatalogueScreen() {
-  const [productImage, setProductImage] = useState<string | null>(null);
-  const [selectedShots, setSelectedShots] = useState<string[]>(["hero", "lifestyle", "flat-lay", "dark"]);
-  const [generating, setGenerating] = useState(false);
-  const [results, setResults] = useState<{ id: string; label: string; url: string }[]>([]);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const toggleShot = (id: string) => {
-    setSelectedShots(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
-  };
-
-  const generate = async () => {
-    if (!productImage || selectedShots.length === 0) return;
-    setGenerating(true); setError(""); setResults([]); setProgress(0);
-
-    const shots = CATALOGUE_SHOTS.filter(s => selectedShots.includes(s.id));
-    const generated: { id: string; label: string; url: string }[] = [];
-
-    for (let i = 0; i < shots.length; i++) {
-      const shot = shots[i];
-      try {
-        const body = {
-          prompt: shot.prompt,
-          selectedModel: { provider: "fal", modelId: "fal-ai/flux-pro", displayName: "FLUX Pro" },
-          aspectRatio: "1:1",
-          images: [productImage],
-          dynamicInputs: { image_url: productImage },
-        };
-        const res = await fetch("/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        const data = await res.json();
-        if (data.success && data.image) {
-          generated.push({ id: shot.id, label: shot.label, url: data.image });
-        }
-      } catch { /* skip failed shots */ }
-      setProgress(Math.round(((i + 1) / shots.length) * 100));
-      setResults([...generated]);
-    }
-
-    setGenerating(false);
-  };
-
-  return (
-    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-24 max-w-5xl mx-auto w-full">
-      <BlurFade delay={0.1} inView>
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Product Catalogue</h2>
-            <p className="text-white/30 text-sm">Upload your product — get a full professional catalogue automatically.</p>
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-violet-400 bg-violet-500/10 border border-violet-500/20 px-3 py-1.5 rounded-full">Pro</span>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Upload + shot selection */}
-          <div className="space-y-5">
-            {/* Product image upload */}
-            <div
-              onClick={() => !productImage && fileRef.current?.click()}
-              onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) { const r = new FileReader(); r.onload = ev => setProductImage(ev.target?.result as string); r.readAsDataURL(f); } }}
-              onDragOver={e => e.preventDefault()}
-              className={cn(
-                "aspect-square rounded-2xl border overflow-hidden transition-all",
-                productImage ? "border-white/10" : "border-white/5 bg-white/5 hover:bg-white/10 cursor-pointer hover:border-white/10"
-              )}
-            >
-              {productImage ? (
-                <div className="relative h-full">
-                  <img src={productImage} alt="Product" className="w-full h-full object-contain" />
-                  <button
-                    onClick={e => { e.stopPropagation(); setProductImage(null); setResults([]); }}
-                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all text-sm"
-                  >×</button>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center">
-                    <Upload className="w-5 h-5 text-white/20" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-white/40">Upload product image</p>
-                    <p className="text-xs text-white/20 mt-1">PNG, JPG — transparent bg works best</p>
-                  </div>
-                </div>
-              )}
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = ev => setProductImage(ev.target?.result as string); r.readAsDataURL(f); } }} />
-            </div>
-
-            {/* Shot selection */}
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-3">
-                Select shots ({selectedShots.length}/{CATALOGUE_SHOTS.length})
-              </p>
-              <div className="space-y-2">
-                {CATALOGUE_SHOTS.map(shot => (
-                  <button
-                    key={shot.id}
-                    onClick={() => toggleShot(shot.id)}
-                    className={cn(
-                      "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm transition-all text-left",
-                      selectedShots.includes(shot.id)
-                        ? "bg-white/10 border-white/20 text-white font-bold"
-                        : "bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10"
-                    )}
-                  >
-                    <span>{shot.label}</span>
-                    {selectedShots.includes(shot.id) && (
-                      <Check className="w-3.5 h-3.5 text-white shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Generate button */}
-            <button
-              onClick={generate}
-              disabled={!productImage || selectedShots.length === 0 || generating}
-              className={cn(
-                "w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2",
-                productImage && selectedShots.length > 0 && !generating
-                  ? "bg-white text-black hover:bg-white/90"
-                  : "bg-white/5 text-white/20 cursor-not-allowed"
-              )}
-            >
-              {generating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                  Generating {progress}%
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  Generate {selectedShots.length} Shot{selectedShots.length !== 1 ? "s" : ""}
-                </>
-              )}
-            </button>
-
-            {/* Progress bar */}
-            {generating && (
-              <div className="h-1 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full bg-white rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
-              </div>
-            )}
-
-            {error && <p className="text-xs text-red-400">{error}</p>}
-          </div>
-
-          {/* Right: Results grid */}
-          <div className="lg:col-span-2">
-            {results.length === 0 && !generating ? (
-              <div className="h-full flex flex-col items-center justify-center text-center py-20 border border-white/5 rounded-2xl bg-white/[0.02]">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-                  <ImageIcon className="w-8 h-8 text-white/10" />
-                </div>
-                <p className="text-white/30 text-sm font-medium">Your catalogue will appear here</p>
-                <p className="text-white/15 text-xs mt-1">Upload a product and select shots to begin</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {results.map(r => (
-                  <div key={r.id} className="group relative rounded-2xl overflow-hidden bg-black border border-white/5">
-                    <img src={r.url} alt={r.label} className="w-full object-cover" />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                      <p className="text-xs font-bold text-white">{r.label}</p>
-                    </div>
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <a href={r.url} download={`pixza-${r.id}.png`}
-                        className="w-8 h-8 rounded-xl bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                        <Download className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                  </div>
-                ))}
-                {/* Skeleton placeholders while generating */}
-                {generating && Array.from({ length: selectedShots.length - results.length }).map((_, i) => (
-                  <div key={`skel-${i}`} className="aspect-square rounded-2xl bg-white/5 animate-pulse border border-white/5" />
-                ))}
-              </div>
-            )}
-
-            {/* Download all */}
-            {results.length > 1 && !generating && (
-              <button
-                onClick={() => results.forEach(r => { const a = document.createElement("a"); a.href = r.url; a.download = `pixza-${r.id}.png`; a.click(); })}
-                className="mt-4 w-full py-3 rounded-2xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" /> Download All {results.length} Images
-              </button>
-            )}
-          </div>
-        </div>
-      </BlurFade>
-    </div>
-  );
-}
+/* ── Product Catalogue Screen — imported from @/components/ui/catalogue-screen ── */
 
 /* ── Root Page ──────────────────────────────────────────────── */
 export default function CreatePage() {
