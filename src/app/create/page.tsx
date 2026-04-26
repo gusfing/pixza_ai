@@ -296,13 +296,16 @@ function CreateScreen() {
           </div>
         </BlurFade>
 
-        {/* AI Input */}
+        {/* AI Input with inline model selector */}
         <BlurFade delay={0.3} inView>
-          <div className="mb-4">
+          <div className="mb-8">
             <AIInputWithSearch
               placeholder={TAB_CONFIG[tab].placeholder}
+              models={tabModels}
+              selectedModelId={selModel.modelId}
+              onModelChange={setModelId}
+              userPlan={userPlan}
               onSubmit={(val) => {
-                // Check credits before generating
                 if (credits !== null && selModel && credits < selModel.creditCost) {
                   setError(`Not enough credits. You need ${selModel.creditCost} credits but have ${credits}. Upgrade to get more.`);
                   return;
@@ -315,22 +318,13 @@ function CreateScreen() {
                 r.readAsDataURL(file);
               }}
             />
-          </div>
 
-          {/* Model + ref image row */}
-          <div className="flex items-center justify-between px-1 mb-8 relative z-[100]">
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Model</span>
-              <ModelPicker models={tabModels} value={selModel.modelId} onChange={setModelId} userPlan={userPlan} />
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Credit cost indicator */}
-              {selModel && (
-                <span className="text-[10px] text-white/30 font-bold">
-                  {selModel.creditCost} credit{selModel.creditCost !== 1 ? "s" : ""}
-                  {credits !== null && <span className="text-white/20"> · {credits} left</span>}
-                </span>
-              )}
+            {/* Credit cost + ref image row */}
+            <div className="flex items-center justify-between px-1 relative z-[100]">
+              <span className="text-[10px] text-white/20 font-bold">
+                {selModel?.creditCost} credit{selModel?.creditCost !== 1 ? "s" : ""} per generation
+                {credits !== null && <span className="text-white/15"> · {credits} remaining</span>}
+              </span>
               {refImage && (
                 <div className="flex items-center gap-2">
                   <img src={refImage} className="w-7 h-7 rounded-lg object-cover border border-white/10" alt="ref" />
