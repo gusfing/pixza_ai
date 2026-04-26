@@ -277,46 +277,45 @@ function CreateScreen() {
   const outputType = tab === "Video" ? "video" : tab === "Audio" ? "audio" : "image";
   const result = results[0] ?? null; // backward compat for single result display
 
+  // Compute aspect ratio CSS for result container
+  const aspectMap: Record<string, string> = { "1:1": "aspect-square", "4:3": "aspect-[4/3]", "3:4": "aspect-[3/4]", "16:9": "aspect-video", "9:16": "aspect-[9/16]" };
+  const resultAspect = aspectMap[aspectRatio] ?? "aspect-square";
+
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-2xl mx-auto px-5 pt-8 pb-16">
 
-        {/* Greeting */}
-        <div className="text-center mb-10">
+        {/* Greeting — compact */}
+        {results.length === 0 && !loading && (
           <BlurFade delay={0.1} inView>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-3">
-              Good {greeting}.
-            </h1>
+            <div className="text-center mb-7">
+              <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white mb-2">
+                Good {greeting}.
+              </h1>
+              <p className="text-white/30 text-sm">Ready to create something?</p>
+            </div>
           </BlurFade>
-          <BlurFade delay={0.2} inView>
-            <p className="text-white/40 text-base font-medium">Ready to turn your ideas into art?</p>
-          </BlurFade>
-        </div>
+        )}
 
         {/* Tab selector */}
-        <BlurFade delay={0.25} inView>
-          <div className="flex items-center justify-center gap-2 mb-6">
+        <BlurFade delay={0.15} inView>
+          <div className="flex items-center justify-center gap-1.5 mb-5">
             {(["Image", "Video", "Audio", "3D"] as Tab[]).map(t => {
               const Ic = TAB_CONFIG[t].icon;
               return (
-                <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all",
-                    tab === t ? "bg-white text-black" : "text-white/40 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  <Ic className="w-4 h-4" />{t}
+                <button key={t} onClick={() => setTab(t)}
+                  className={cn("flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold transition-all",
+                    tab === t ? "bg-white text-black" : "text-white/40 hover:text-white hover:bg-white/5")}>
+                  <Ic className="w-3.5 h-3.5" />{t}
                 </button>
               );
             })}
           </div>
         </BlurFade>
 
-        {/* AI Input with inline model selector */}
-        <BlurFade delay={0.3} inView>
-          <div className="mb-8">
+        {/* AI Input */}
+        <BlurFade delay={0.2} inView>
+          <div className="mb-3">
             <AIInputWithSearch
               placeholder={TAB_CONFIG[tab].placeholder}
               models={tabModels}
@@ -325,7 +324,7 @@ function CreateScreen() {
               userPlan={userPlan}
               onSubmit={(val) => {
                 if (credits !== null && selModel && credits < selModel.creditCost * numImages) {
-                  setError(`Not enough credits. You need ${selModel.creditCost * numImages} credits but have ${credits}. Upgrade to get more.`);
+                  setError(`Not enough credits. You need ${selModel.creditCost * numImages} but have ${credits}.`);
                   return;
                 }
                 generate(val);
@@ -336,132 +335,110 @@ function CreateScreen() {
                 r.readAsDataURL(file);
               }}
             />
-
-            {/* Credit cost + options row */}
-            <div className="flex items-center justify-between px-1 relative z-[100]">
-              <div className="flex items-center gap-3 flex-wrap">
-                {/* Aspect ratio — image only */}
-                {tab === "Image" && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Ratio</span>
-                    <div className="flex gap-1">
-                      {["1:1", "4:3", "3:4", "16:9", "9:16"].map(r => (
-                        <button
-                          key={r}
-                          onClick={() => setAspectRatio(r)}
-                          className={cn(
-                            "px-2 py-1 rounded-lg text-[10px] font-bold transition-all",
-                            aspectRatio === r ? "bg-white text-black" : "bg-white/5 text-white/30 hover:text-white"
-                          )}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {/* Number of images — image only */}
-                {tab === "Image" && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Count</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 4].map(n => (
-                        <button
-                          key={n}
-                          onClick={() => setNumImages(n)}
-                          className={cn(
-                            "w-7 h-7 rounded-lg text-[10px] font-bold transition-all",
-                            numImages === n ? "bg-white text-black" : "bg-white/5 text-white/30 hover:text-white"
-                          )}
-                        >
-                          {n}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-white/20 font-bold">
-                  {selModel?.creditCost && numImages > 1 ? `${selModel.creditCost * numImages}cr total` : `${selModel?.creditCost}cr`}
-                  {credits !== null && <span className="text-white/15"> · {credits} left</span>}
-                </span>
-                {refImage && (
-                  <div className="flex items-center gap-2">
-                    <img src={refImage} className="w-7 h-7 rounded-lg object-cover border border-white/10" alt="ref" />
-                    <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </BlurFade>
 
-        {/* Result */}
+        {/* Options row — tight, unified pill bar */}
+        {tab === "Image" && (
+          <div className="flex items-center justify-between mb-5 px-1 relative z-[100]">
+            <div className="flex items-center gap-1 bg-white/5 rounded-xl p-1">
+              {["1:1", "4:3", "3:4", "16:9", "9:16"].map(r => (
+                <button key={r} onClick={() => setAspectRatio(r)}
+                  className={cn("px-2.5 py-1.5 rounded-lg text-[10px] font-black transition-all",
+                    aspectRatio === r ? "bg-white text-black" : "text-white/30 hover:text-white")}>
+                  {r}
+                </button>
+              ))}
+              <div className="w-px h-4 bg-white/10 mx-1" />
+              {[1, 2, 4].map(n => (
+                <button key={n} onClick={() => setNumImages(n)}
+                  className={cn("w-7 h-7 rounded-lg text-[10px] font-black transition-all",
+                    numImages === n ? "bg-white text-black" : "text-white/30 hover:text-white")}>
+                  {n}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              {refImage && (
+                <div className="flex items-center gap-1.5">
+                  <img src={refImage} className="w-6 h-6 rounded-lg object-cover border border-white/10" alt="ref" />
+                  <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              <span className="text-[10px] text-white/20 font-bold tabular-nums">
+                {selModel?.creditCost * numImages}cr
+                {credits !== null && <span className="text-white/10"> / {credits}</span>}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Result area */}
         <AnimatePresence mode="wait">
           {loading && (
             <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="flex flex-col items-center gap-4 py-16 text-center">
-              <div className="relative w-16 h-16">
+              className={cn("rounded-3xl border border-white/5 bg-white/[0.02] flex flex-col items-center justify-center gap-4",
+                results.length === 0 ? (tab === "Image" ? resultAspect : "aspect-video") : "py-16")}>
+              <div className="relative w-14 h-14">
                 <div className="absolute inset-0 rounded-full border-2 border-white/5" />
                 <div className="absolute inset-0 rounded-full border-2 border-t-white border-r-transparent border-b-transparent border-l-transparent animate-spin" />
-                <TabIcon className={cn("absolute inset-0 m-auto w-6 h-6", TAB_CONFIG[tab].color)} />
+                <TabIcon className={cn("absolute inset-0 m-auto w-5 h-5", TAB_CONFIG[tab].color)} />
               </div>
-              <p className="text-sm font-bold text-white">Generating your {tab.toLowerCase()}…</p>
+              <p className="text-sm font-bold text-white/60">Generating your {tab.toLowerCase()}…</p>
             </motion.div>
           )}
 
           {!loading && results.length > 0 && (
-            <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4">
-              {/* Grid for multiple images, single for one */}
+            <motion.div key="result" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }} className="flex flex-col gap-3">
+
               {results.length === 1 ? (
-                <div className="relative rounded-3xl overflow-hidden bg-black border border-white/5 group">
+                <div className="group relative rounded-3xl overflow-hidden bg-black border border-white/8">
                   {outputType === "video" ? (
-                    <video src={results[0]} controls autoPlay loop className="w-full max-h-[60vh] object-contain" />
+                    <video src={results[0]} controls autoPlay loop className="w-full" />
                   ) : outputType === "audio" ? (
-                    <div className="p-12 flex flex-col items-center gap-4">
-                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
-                        <Music className="w-8 h-8 text-amber-400" />
+                    <div className="p-10 flex flex-col items-center gap-4">
+                      <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center">
+                        <Music className="w-7 h-7 text-amber-400" />
                       </div>
                       <audio src={results[0]} controls className="w-full" />
                     </div>
                   ) : (
                     <div className="relative">
-                      <img src={results[0]} alt="Generated" className="w-full max-h-[60vh] object-contain" />
+                      <img src={results[0]} alt="Generated"
+                        className="w-full h-auto block" />
                       {selModel?.tier === "free" && (
-                        <div className="absolute inset-0 pointer-events-none flex items-end justify-end p-3">
-                          <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
-                            <img src="/pixza-logo.png" alt="" className="w-3 h-3 invert opacity-60" />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/50">Pixza Free</span>
-                          </div>
+                        <div className="absolute bottom-3 right-3 pointer-events-none flex items-center gap-1.5 bg-black/70 backdrop-blur-sm px-2.5 py-1.5 rounded-full border border-white/10">
+                          <img src="/pixza-logo.png" alt="" className="w-3 h-3 invert opacity-50" />
+                          <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Pixza Free</span>
                         </div>
                       )}
                     </div>
                   )}
-                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Hover actions */}
+                  <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <a href={results[0]} download={`pixza-${tab.toLowerCase()}`}
-                      className="w-9 h-9 rounded-xl bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                      className="w-9 h-9 rounded-xl bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
                       <Download className="w-4 h-4" />
                     </a>
                   </div>
                 </div>
               ) : (
-                <div className={cn("grid gap-3", results.length === 2 ? "grid-cols-2" : "grid-cols-2")}>
+                <div className="grid grid-cols-2 gap-3">
                   {results.map((r, i) => (
-                    <div key={i} className="relative rounded-2xl overflow-hidden bg-black border border-white/5 group">
-                      <img src={r} alt={`Generated ${i + 1}`} className="w-full object-contain" />
+                    <div key={i} className="group relative rounded-2xl overflow-hidden bg-black border border-white/5">
+                      <img src={r} alt={`Generated ${i + 1}`} className="w-full h-auto block" />
                       {selModel?.tier === "free" && (
-                        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
-                          <img src="/pixza-logo.png" alt="" className="w-2.5 h-2.5 invert opacity-50" />
-                          <span className="text-[8px] font-black text-white/40">Free</span>
+                        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full">
+                          <img src="/pixza-logo.png" alt="" className="w-2.5 h-2.5 invert opacity-40" />
+                          <span className="text-[8px] font-black text-white/30">Free</span>
                         </div>
                       )}
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <a href={r} download={`pixza-${i + 1}.png`}
-                          className="w-7 h-7 rounded-lg bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                          className="w-7 h-7 rounded-lg bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
                           <Download className="w-3 h-3" />
                         </a>
                       </div>
@@ -469,22 +446,27 @@ function CreateScreen() {
                   ))}
                 </div>
               )}
-              <div className="flex gap-3">
-                <button onClick={() => setResults([])} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all">New</button>
-                <button onClick={() => generate(lastPrompt)} disabled={!lastPrompt} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2 disabled:opacity-30">
-                  <RefreshCw className="w-4 h-4" /> Regenerate
+
+              {/* Action bar */}
+              <div className="flex gap-2">
+                <button onClick={() => setResults([])}
+                  className="px-4 py-2.5 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all">
+                  New
+                </button>
+                <button onClick={() => generate(lastPrompt)} disabled={!lastPrompt}
+                  className="flex-1 py-2.5 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2 disabled:opacity-30">
+                  <RefreshCw className="w-3.5 h-3.5" /> Regenerate
                 </button>
                 {results.length === 1 ? (
                   <a href={results[0]} download={`pixza-${tab.toLowerCase()}`}
-                    className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-black text-center hover:bg-white/90 transition-all flex items-center justify-center gap-2">
-                    <Download className="w-4 h-4" /> Save
+                    className="px-5 py-2.5 rounded-xl bg-white text-black text-sm font-black hover:bg-white/90 transition-all flex items-center gap-2">
+                    <Download className="w-3.5 h-3.5" /> Save
                   </a>
                 ) : (
                   <button
                     onClick={() => results.forEach((r, i) => { const a = document.createElement("a"); a.href = r; a.download = `pixza-${i + 1}.png`; a.click(); })}
-                    className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-black text-center hover:bg-white/90 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-4 h-4" /> Save All
+                    className="px-5 py-2.5 rounded-xl bg-white text-black text-sm font-black hover:bg-white/90 transition-all flex items-center gap-2">
+                    <Download className="w-3.5 h-3.5" /> Save All
                   </button>
                 )}
               </div>
@@ -493,7 +475,7 @@ function CreateScreen() {
 
           {!loading && error && (
             <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              className="mx-auto max-w-lg p-4 rounded-2xl bg-red-500/10 border border-red-500/20">
+              className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20">
               <p className="text-xs text-red-400 font-medium leading-relaxed">{error}</p>
               {error.includes("credits") ? (
                 <button
@@ -506,12 +488,12 @@ function CreateScreen() {
                       window.location.href = checkout_url;
                     } catch { window.location.href = "/settings"; }
                   }}
-                  className="mt-3 flex items-center gap-2 text-[11px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest"
-                >
+                  className="mt-3 flex items-center gap-2 text-[11px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest">
                   <Crown className="w-3 h-3" /> Upgrade to Pro
                 </button>
               ) : (
-                <button onClick={() => generate(lastPrompt)} className="mt-2 text-[11px] font-bold text-red-400 hover:text-red-300 flex items-center gap-1">
+                <button onClick={() => generate(lastPrompt)}
+                  className="mt-2 text-[11px] font-bold text-red-400 hover:text-red-300 flex items-center gap-1">
                   <RefreshCw className="w-3 h-3" /> Retry
                 </button>
               )}
@@ -521,31 +503,24 @@ function CreateScreen() {
 
         {/* Example cards — shown when idle */}
         {!loading && results.length === 0 && !error && (
-          <BlurFade delay={0.4} inView>
-            <div className="mt-4 relative z-0">
-              <h2 className="text-sm font-bold text-white/40 mb-4 uppercase tracking-widest">Created with Pixza</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <BlurFade delay={0.35} inView>
+            <div className="mt-6 relative z-0">
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-3">Created with Pixza</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 {EXAMPLE_CARDS.map((card, i) => (
-                  <motion.div
-                    key={card.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 * i, duration: 0.4 }}
-                    className="group relative rounded-2xl overflow-hidden cursor-pointer"
-                  >
-                    <div className="w-full h-[200px] overflow-hidden rounded-2xl">
-                      <img
-                        src={card.img}
-                        alt={card.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
+                  <motion.div key={card.title}
+                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.04 * i, duration: 0.35 }}
+                    className="group relative rounded-2xl overflow-hidden cursor-pointer">
+                    <div className="w-full h-[160px] overflow-hidden rounded-2xl">
+                      <img src={card.img} alt={card.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     </div>
-                    {/* View overlay */}
-                    <div className="absolute top-2 left-2 flex items-center gap-1 overflow-hidden rounded-full bg-black/70 backdrop-blur-sm px-2 py-1 w-7 h-7 group-hover:w-16 transition-all duration-300">
-                      <Sparkles className="w-3.5 h-3.5 text-white shrink-0" />
-                      <span className="text-white text-[11px] font-bold whitespace-nowrap overflow-hidden">Use</span>
+                    <div className="absolute top-2 left-2 flex items-center gap-1 overflow-hidden rounded-full bg-black/70 backdrop-blur-sm px-2 py-1 w-7 h-7 group-hover:w-14 transition-all duration-300">
+                      <Sparkles className="w-3 h-3 text-white shrink-0" />
+                      <span className="text-white text-[10px] font-bold whitespace-nowrap overflow-hidden">Use</span>
                     </div>
-                    <p className="text-center text-xs font-medium text-white/60 mt-2 pb-1">{card.title}</p>
+                    <p className="text-center text-[11px] font-medium text-white/50 mt-1.5 pb-0.5">{card.title}</p>
                   </motion.div>
                 ))}
               </div>
