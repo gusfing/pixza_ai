@@ -1,15 +1,14 @@
 ﻿"use client";
 
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ImageIcon, Video, Music, Box, Sparkles, Settings, Compass,
   Download, X, RefreshCw, Upload, ChevronDown, Check,
-  Wand2, Zap, Crown, ArrowRight
-} from "lucide-react";
-import { useWorkflowStore } from "@/store/workflowStore";
+  Wand2, Zap, Crown, ArrowRight, ShoppingBag
+} from "lucide-react";import { useWorkflowStore } from "@/store/workflowStore";
 import { ImageTools } from "@/components/ui/image-tools";
 import { CFreeTools } from "@/components/ui/cf-free-tools";
 import { BlurFade } from "@/components/ui/blur-fade";
@@ -19,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 /* ── Types ─────────────────────────────────────────────────── */
 type Tab = "Image" | "Video" | "Audio" | "3D";
-type NavScreen = "create" | "explore" | "tools" | "settings";
+type NavScreen = "create" | "explore" | "tools" | "settings" | "catalogue";
 interface Model {
   provider: string;
   modelId: string;
@@ -196,11 +195,14 @@ function CreateScreen() {
   const [modelId, setModelId] = useState(MODELS.filter(m => m.tabs.includes("Image"))[0].modelId);
   const [refImage, setRefImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
+  const [results, setResults] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [lastPrompt, setLastPrompt] = useState<string>("");
   const [userPlan, setUserPlan] = useState("free");
   const [credits, setCredits] = useState<number | null>(null);
+  // Generation options
+  const [aspectRatio, setAspectRatio] = useState("1:1");
+  const [numImages, setNumImages] = useState(1);
 
   useEffect(() => {
     const token = localStorage.getItem("pixza_token");
@@ -220,44 +222,57 @@ function CreateScreen() {
   useEffect(() => {
     const first = tabModels[0];
     if (first && !tabModels.find(m => m.modelId === modelId)) setModelId(first.modelId);
-    setResult(null); setError(null);
+    setResults([]); setError(null);
   }, [tab]);
 
   const generate = useCallback(async (prompt: string) => {
     if (!prompt.trim() || loading) return;
-    setLoading(true); setError(null); setResult(null);
+    setLoading(true); setError(null); setResults([]);
     setLastPrompt(prompt.trim());
     try {
       const body: Record<string, unknown> = {
         prompt: prompt.trim(),
         selectedModel: { provider: selModel.provider, modelId: selModel.modelId, displayName: selModel.label },
-        aspectRatio: "1:1",
+        aspectRatio,
       };
       if (refImage) { body.images = [refImage]; body.dynamicInputs = { image_url: refImage }; }
       if (tab === "Video") body.mediaType = "video";
       if (tab === "3D") body.mediaType = "3d";
       if (tab === "Audio") body.mediaType = "audio";
-      const res = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || "Generation failed");
-      let out: string | null = null;
-      if (data.video) out = `data:video/mp4;base64,${data.video}`;
-      else if (data.videoUrl) out = data.videoUrl;
-      else if (data.model3dUrl) out = data.model3dUrl;
-      else if (data.audio) out = `data:audio/mp3;base64,${data.audio}`;
-      else if (data.image) out = data.image;
-      else throw new Error("No output received");
-      setResult(out);
+
+      // Generate multiple images in parallel (only for image tab)
+      const count = tab === "Image" ? numImages : 1;
+      const promises = Array.from({ length: count }, () =>
+        fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+          .then(r => r.json())
+      );
+
+      const dataArr = await Promise.all(promises);
+      const outputs: string[] = [];
+      for (const data of dataArr) {
+        if (!data.success) throw new Error(data.error || "Generation failed");
+        let out: string | null = null;
+        if (data.video) out = `data:video/mp4;base64,${data.video}`;
+        else if (data.videoUrl) out = data.videoUrl;
+        else if (data.model3dUrl) out = data.model3dUrl;
+        else if (data.audio) out = `data:audio/mp3;base64,${data.audio}`;
+        else if (data.image) out = data.image;
+        if (out) outputs.push(out);
+      }
+      if (outputs.length === 0) throw new Error("No output received");
+      setResults(outputs);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
-  }, [selModel, refImage, tab, loading]);
+  }, [selModel, refImage, tab, loading, aspectRatio, numImages]);
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
   const TabIcon = TAB_CONFIG[tab].icon;
+  const outputType = tab === "Video" ? "video" : tab === "Audio" ? "audio" : "image";
+  const result = results[0] ?? null; // backward compat for single result display
   const outputType = tab === "Video" ? "video" : tab === "Audio" ? "audio" : "image";
 
   return (
@@ -307,8 +322,8 @@ function CreateScreen() {
               onModelChange={setModelId}
               userPlan={userPlan}
               onSubmit={(val) => {
-                if (credits !== null && selModel && credits < selModel.creditCost) {
-                  setError(`Not enough credits. You need ${selModel.creditCost} credits but have ${credits}. Upgrade to get more.`);
+                if (credits !== null && selModel && credits < selModel.creditCost * numImages) {
+                  setError(`Not enough credits. You need ${selModel.creditCost * numImages} credits but have ${credits}. Upgrade to get more.`);
                   return;
                 }
                 generate(val);
@@ -320,20 +335,64 @@ function CreateScreen() {
               }}
             />
 
-            {/* Credit cost + ref image row */}
+            {/* Credit cost + options row */}
             <div className="flex items-center justify-between px-1 relative z-[100]">
-              <span className="text-[10px] text-white/20 font-bold">
-                {selModel?.creditCost} credit{selModel?.creditCost !== 1 ? "s" : ""} per generation
-                {credits !== null && <span className="text-white/15"> · {credits} remaining</span>}
-              </span>
-              {refImage && (
-                <div className="flex items-center gap-2">
-                  <img src={refImage} className="w-7 h-7 rounded-lg object-cover border border-white/10" alt="ref" />
-                  <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white">
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Aspect ratio — image only */}
+                {tab === "Image" && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Ratio</span>
+                    <div className="flex gap-1">
+                      {["1:1", "4:3", "3:4", "16:9", "9:16"].map(r => (
+                        <button
+                          key={r}
+                          onClick={() => setAspectRatio(r)}
+                          className={cn(
+                            "px-2 py-1 rounded-lg text-[10px] font-bold transition-all",
+                            aspectRatio === r ? "bg-white text-black" : "bg-white/5 text-white/30 hover:text-white"
+                          )}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Number of images — image only */}
+                {tab === "Image" && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Count</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 4].map(n => (
+                        <button
+                          key={n}
+                          onClick={() => setNumImages(n)}
+                          className={cn(
+                            "w-7 h-7 rounded-lg text-[10px] font-bold transition-all",
+                            numImages === n ? "bg-white text-black" : "bg-white/5 text-white/30 hover:text-white"
+                          )}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-white/20 font-bold">
+                  {selModel?.creditCost && numImages > 1 ? `${selModel.creditCost * numImages}cr total` : `${selModel?.creditCost}cr`}
+                  {credits !== null && <span className="text-white/15"> · {credits} left</span>}
+                </span>
+                {refImage && (
+                  <div className="flex items-center gap-2">
+                    <img src={refImage} className="w-7 h-7 rounded-lg object-cover border border-white/10" alt="ref" />
+                    <button onClick={() => setRefImage(null)} className="text-white/30 hover:text-white">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </BlurFade>
@@ -352,49 +411,80 @@ function CreateScreen() {
             </motion.div>
           )}
 
-          {!loading && result && (
+          {!loading && results.length > 0 && (
             <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               className="flex flex-col gap-4">
-              <div className="relative rounded-3xl overflow-hidden bg-black border border-white/5 group">
-                {outputType === "video" ? (
-                  <video src={result} controls autoPlay loop className="w-full max-h-[60vh] object-contain" />
-                ) : outputType === "audio" ? (
-                  <div className="p-12 flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
-                      <Music className="w-8 h-8 text-amber-400" />
-                    </div>
-                    <audio src={result} controls className="w-full" />
-                  </div>
-                ) : (
-                  <div className="relative">
-                    <img src={result} alt="Generated" className="w-full max-h-[60vh] object-contain" />
-                    {/* Watermark for free tier */}
-                    {selModel?.tier === "free" && (
-                      <div className="absolute inset-0 pointer-events-none flex items-end justify-end p-3">
-                        <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
-                          <img src="/pixza-logo.png" alt="" className="w-3 h-3 invert opacity-60" />
-                          <span className="text-[9px] font-black uppercase tracking-widest text-white/50">Pixza Free</span>
-                        </div>
+              {/* Grid for multiple images, single for one */}
+              {results.length === 1 ? (
+                <div className="relative rounded-3xl overflow-hidden bg-black border border-white/5 group">
+                  {outputType === "video" ? (
+                    <video src={results[0]} controls autoPlay loop className="w-full max-h-[60vh] object-contain" />
+                  ) : outputType === "audio" ? (
+                    <div className="p-12 flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
+                        <Music className="w-8 h-8 text-amber-400" />
                       </div>
-                    )}
+                      <audio src={results[0]} controls className="w-full" />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <img src={results[0]} alt="Generated" className="w-full max-h-[60vh] object-contain" />
+                      {selModel?.tier === "free" && (
+                        <div className="absolute inset-0 pointer-events-none flex items-end justify-end p-3">
+                          <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
+                            <img src="/pixza-logo.png" alt="" className="w-3 h-3 invert opacity-60" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/50">Pixza Free</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <a href={results[0]} download={`pixza-${tab.toLowerCase()}`}
+                      className="w-9 h-9 rounded-xl bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                      <Download className="w-4 h-4" />
+                    </a>
                   </div>
-                )}
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <a href={result} download={`pixza-${tab.toLowerCase()}`}
-                    className="w-9 h-9 rounded-xl bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                    <Download className="w-4 h-4" />
-                  </a>
                 </div>
-              </div>
+              ) : (
+                <div className={cn("grid gap-3", results.length === 2 ? "grid-cols-2" : "grid-cols-2")}>
+                  {results.map((r, i) => (
+                    <div key={i} className="relative rounded-2xl overflow-hidden bg-black border border-white/5 group">
+                      <img src={r} alt={`Generated ${i + 1}`} className="w-full object-contain" />
+                      {selModel?.tier === "free" && (
+                        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
+                          <img src="/pixza-logo.png" alt="" className="w-2.5 h-2.5 invert opacity-50" />
+                          <span className="text-[8px] font-black text-white/40">Free</span>
+                        </div>
+                      )}
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <a href={r} download={`pixza-${i + 1}.png`}
+                          className="w-7 h-7 rounded-lg bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                          <Download className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="flex gap-3">
-                <button onClick={() => { setResult(null); }} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all">New</button>
+                <button onClick={() => setResults([])} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all">New</button>
                 <button onClick={() => generate(lastPrompt)} disabled={!lastPrompt} className="flex-1 py-3 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2 disabled:opacity-30">
                   <RefreshCw className="w-4 h-4" /> Regenerate
                 </button>
-                <a href={result} download={`pixza-${tab.toLowerCase()}`}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-black text-center hover:bg-white/90 transition-all flex items-center justify-center gap-2">
-                  <Download className="w-4 h-4" /> Save
-                </a>
+                {results.length === 1 ? (
+                  <a href={results[0]} download={`pixza-${tab.toLowerCase()}`}
+                    className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-black text-center hover:bg-white/90 transition-all flex items-center justify-center gap-2">
+                    <Download className="w-4 h-4" /> Save
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => results.forEach((r, i) => { const a = document.createElement("a"); a.href = r; a.download = `pixza-${i + 1}.png`; a.click(); })}
+                    className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-black text-center hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" /> Save All
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
@@ -428,7 +518,7 @@ function CreateScreen() {
         </AnimatePresence>
 
         {/* Example cards — shown when idle */}
-        {!loading && !result && !error && (
+        {!loading && results.length === 0 && !error && (
           <BlurFade delay={0.4} inView>
             <div className="mt-4 relative z-0">
               <h2 className="text-sm font-bold text-white/40 mb-4 uppercase tracking-widest">Created with Pixza</h2>
@@ -630,6 +720,222 @@ function ToolsScreen() {
   );
 }
 
+/* ── Product Catalogue Screen ───────────────────────────────── */
+const CATALOGUE_SHOTS = [
+  { id: "hero",       label: "Hero Shot",        prompt: "Professional hero product shot, centered on pure white background, dramatic studio lighting, sharp focus, commercial photography style, 8K" },
+  { id: "lifestyle",  label: "Lifestyle",         prompt: "Lifestyle product photography, natural environment, warm ambient light, shallow depth of field, aspirational mood, editorial style" },
+  { id: "flat-lay",   label: "Flat Lay",          prompt: "Flat lay product photography, overhead shot, clean minimal background, styled composition, professional commercial photography" },
+  { id: "360",        label: "360° View",         prompt: "Product shot from 45-degree angle, clean background, professional studio lighting, showing product details and texture" },
+  { id: "closeup",    label: "Detail Close-up",   prompt: "Extreme close-up macro product photography, showing material texture and fine details, studio lighting, sharp focus" },
+  { id: "dark",       label: "Dark & Moody",      prompt: "Dark moody product photography, dramatic shadows, luxury feel, black background, cinematic lighting, high-end commercial" },
+  { id: "outdoor",    label: "Outdoor Scene",     prompt: "Product in natural outdoor setting, golden hour lighting, lifestyle photography, environmental context, editorial quality" },
+  { id: "minimal",    label: "Minimal Clean",     prompt: "Minimalist product photography, pure white or light grey background, soft shadows, clean composition, Scandinavian aesthetic" },
+];
+
+function CatalogueScreen() {
+  const [productImage, setProductImage] = useState<string | null>(null);
+  const [selectedShots, setSelectedShots] = useState<string[]>(["hero", "lifestyle", "flat-lay", "dark"]);
+  const [generating, setGenerating] = useState(false);
+  const [results, setResults] = useState<{ id: string; label: string; url: string }[]>([]);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const toggleShot = (id: string) => {
+    setSelectedShots(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    );
+  };
+
+  const generate = async () => {
+    if (!productImage || selectedShots.length === 0) return;
+    setGenerating(true); setError(""); setResults([]); setProgress(0);
+
+    const shots = CATALOGUE_SHOTS.filter(s => selectedShots.includes(s.id));
+    const generated: { id: string; label: string; url: string }[] = [];
+
+    for (let i = 0; i < shots.length; i++) {
+      const shot = shots[i];
+      try {
+        const body = {
+          prompt: shot.prompt,
+          selectedModel: { provider: "fal", modelId: "fal-ai/flux-pro", displayName: "FLUX Pro" },
+          aspectRatio: "1:1",
+          images: [productImage],
+          dynamicInputs: { image_url: productImage },
+        };
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success && data.image) {
+          generated.push({ id: shot.id, label: shot.label, url: data.image });
+        }
+      } catch { /* skip failed shots */ }
+      setProgress(Math.round(((i + 1) / shots.length) * 100));
+      setResults([...generated]);
+    }
+
+    setGenerating(false);
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto px-6 pt-8 pb-24 max-w-5xl mx-auto w-full">
+      <BlurFade delay={0.1} inView>
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Product Catalogue</h2>
+            <p className="text-white/30 text-sm">Upload your product — get a full professional catalogue automatically.</p>
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-violet-400 bg-violet-500/10 border border-violet-500/20 px-3 py-1.5 rounded-full">Pro</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left: Upload + shot selection */}
+          <div className="space-y-5">
+            {/* Product image upload */}
+            <div
+              onClick={() => !productImage && fileRef.current?.click()}
+              onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) { const r = new FileReader(); r.onload = ev => setProductImage(ev.target?.result as string); r.readAsDataURL(f); } }}
+              onDragOver={e => e.preventDefault()}
+              className={cn(
+                "aspect-square rounded-2xl border overflow-hidden transition-all",
+                productImage ? "border-white/10" : "border-white/5 bg-white/5 hover:bg-white/10 cursor-pointer hover:border-white/10"
+              )}
+            >
+              {productImage ? (
+                <div className="relative h-full">
+                  <img src={productImage} alt="Product" className="w-full h-full object-contain" />
+                  <button
+                    onClick={e => { e.stopPropagation(); setProductImage(null); setResults([]); }}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all text-sm"
+                  >×</button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center">
+                  <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center">
+                    <Upload className="w-5 h-5 text-white/20" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white/40">Upload product image</p>
+                    <p className="text-xs text-white/20 mt-1">PNG, JPG — transparent bg works best</p>
+                  </div>
+                </div>
+              )}
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = ev => setProductImage(ev.target?.result as string); r.readAsDataURL(f); } }} />
+            </div>
+
+            {/* Shot selection */}
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-3">
+                Select shots ({selectedShots.length}/{CATALOGUE_SHOTS.length})
+              </p>
+              <div className="space-y-2">
+                {CATALOGUE_SHOTS.map(shot => (
+                  <button
+                    key={shot.id}
+                    onClick={() => toggleShot(shot.id)}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm transition-all text-left",
+                      selectedShots.includes(shot.id)
+                        ? "bg-white/10 border-white/20 text-white font-bold"
+                        : "bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10"
+                    )}
+                  >
+                    <span>{shot.label}</span>
+                    {selectedShots.includes(shot.id) && (
+                      <Check className="w-3.5 h-3.5 text-white shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Generate button */}
+            <button
+              onClick={generate}
+              disabled={!productImage || selectedShots.length === 0 || generating}
+              className={cn(
+                "w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2",
+                productImage && selectedShots.length > 0 && !generating
+                  ? "bg-white text-black hover:bg-white/90"
+                  : "bg-white/5 text-white/20 cursor-not-allowed"
+              )}
+            >
+              {generating ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  Generating {progress}%
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Generate {selectedShots.length} Shot{selectedShots.length !== 1 ? "s" : ""}
+                </>
+              )}
+            </button>
+
+            {/* Progress bar */}
+            {generating && (
+              <div className="h-1 rounded-full bg-white/10 overflow-hidden">
+                <div className="h-full bg-white rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+              </div>
+            )}
+
+            {error && <p className="text-xs text-red-400">{error}</p>}
+          </div>
+
+          {/* Right: Results grid */}
+          <div className="lg:col-span-2">
+            {results.length === 0 && !generating ? (
+              <div className="h-full flex flex-col items-center justify-center text-center py-20 border border-white/5 rounded-2xl bg-white/[0.02]">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+                  <ImageIcon className="w-8 h-8 text-white/10" />
+                </div>
+                <p className="text-white/30 text-sm font-medium">Your catalogue will appear here</p>
+                <p className="text-white/15 text-xs mt-1">Upload a product and select shots to begin</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {results.map(r => (
+                  <div key={r.id} className="group relative rounded-2xl overflow-hidden bg-black border border-white/5">
+                    <img src={r.url} alt={r.label} className="w-full object-cover" />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                      <p className="text-xs font-bold text-white">{r.label}</p>
+                    </div>
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <a href={r.url} download={`pixza-${r.id}.png`}
+                        className="w-8 h-8 rounded-xl bg-black/70 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                        <Download className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+                {/* Skeleton placeholders while generating */}
+                {generating && Array.from({ length: selectedShots.length - results.length }).map((_, i) => (
+                  <div key={`skel-${i}`} className="aspect-square rounded-2xl bg-white/5 animate-pulse border border-white/5" />
+                ))}
+              </div>
+            )}
+
+            {/* Download all */}
+            {results.length > 1 && !generating && (
+              <button
+                onClick={() => results.forEach(r => { const a = document.createElement("a"); a.href = r.url; a.download = `pixza-${r.id}.png`; a.click(); })}
+                className="mt-4 w-full py-3 rounded-2xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" /> Download All {results.length} Images
+              </button>
+            )}
+          </div>
+        </div>
+      </BlurFade>
+    </div>
+  );
+}
+
 /* ── Root Page ──────────────────────────────────────────────── */
 export default function CreatePage() {
   const [screen, setScreen] = useState<NavScreen>("create");
@@ -672,10 +978,11 @@ export default function CreatePage() {
         </Link>
 
         {([
-          { id: "create",   icon: Sparkles, label: "Create"    },
-          { id: "explore",  icon: Compass,  label: "Templates" },
-          { id: "tools",    icon: Wand2,    label: "Tools"     },
-          { id: "settings", icon: Settings, label: "Settings"  },
+          { id: "create",    icon: Sparkles,    label: "Create"    },
+          { id: "catalogue", icon: ShoppingBag, label: "Catalogue" },
+          { id: "explore",   icon: Compass,     label: "Templates" },
+          { id: "tools",     icon: Wand2,       label: "Tools"     },
+          { id: "settings",  icon: Settings,    label: "Settings"  },
         ] as { id: NavScreen; icon: any; label: string }[]).map(item => {
           const active = screen === item.id;
           return (
@@ -725,10 +1032,11 @@ export default function CreatePage() {
           </Link>
           <div className="flex gap-1">
             {([
-              { id: "create",   icon: Sparkles },
-              { id: "explore",  icon: Compass  },
-              { id: "tools",    icon: Wand2    },
-              { id: "settings", icon: Settings },
+              { id: "create",    icon: Sparkles    },
+              { id: "catalogue", icon: ShoppingBag },
+              { id: "explore",   icon: Compass     },
+              { id: "tools",     icon: Wand2       },
+              { id: "settings",  icon: Settings    },
             ] as { id: NavScreen; icon: any }[]).map(item => (
               <button key={item.id} onClick={() => setScreen(item.id)}
                 className={cn("w-9 h-9 rounded-xl flex items-center justify-center transition-all",
@@ -743,10 +1051,11 @@ export default function CreatePage() {
           <motion.div key={screen} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
             className="flex-1 flex flex-col overflow-hidden">
-            {screen === "create"   && <CreateScreen />}
-            {screen === "explore"  && <ExploreScreen onUse={(t) => { setScreen("create"); }} />}
-            {screen === "tools"    && <ToolsScreen />}
-            {screen === "settings" && <SettingsScreen />}
+            {screen === "create"    && <CreateScreen />}
+            {screen === "catalogue" && <CatalogueScreen />}
+            {screen === "explore"   && <ExploreScreen onUse={(t) => { setScreen("create"); }} />}
+            {screen === "tools"     && <ToolsScreen />}
+            {screen === "settings"  && <SettingsScreen />}
           </motion.div>
         </AnimatePresence>
       </div>
