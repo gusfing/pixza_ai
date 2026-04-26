@@ -89,7 +89,7 @@ export function QuickstartInitialView({ onNewProject, onSelectTemplates, onSelec
       <div
         className="flex-1 flex flex-col justify-center p-8 gap-3"
         style={{
-          background: "rgba(0,0,0,0.8)",
+          background: "rgba(29, 27, 27, 0.8)",
           backdropFilter: "blur(80px)",
           WebkitBackdropFilter: "blur(80px)",
         }}
