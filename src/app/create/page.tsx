@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { ImageTools } from "@/components/ui/image-tools";
+import { CFreeTools } from "@/components/ui/cf-free-tools";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { AIInputWithSearch } from "@/components/ui/ai-input-with-search";
@@ -581,12 +582,49 @@ function SettingsScreen() {
 
 /* ── Tools Screen ───────────────────────────────────────────── */
 function ToolsScreen() {
+  const [activeSection, setActiveSection] = useState<"local" | "cloud">("local");
+
   return (
     <div className="flex-1 overflow-y-auto px-6 pt-8 pb-24 max-w-3xl mx-auto w-full">
       <BlurFade delay={0.1} inView>
-        <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Image Tools</h2>
-        <p className="text-white/30 text-sm mb-8">Local AI — runs in your browser, zero API cost.</p>
-        <ImageTools />
+        <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Free AI Tools</h2>
+        <p className="text-white/30 text-sm mb-6">Zero credits, zero cost — powered by local AI and Cloudflare.</p>
+
+        {/* Section tabs */}
+        <div className="flex gap-2 mb-8">
+          <button
+            onClick={() => setActiveSection("local")}
+            className={cn("px-5 py-2 rounded-xl text-sm font-bold transition-all",
+              activeSection === "local" ? "bg-white text-black" : "bg-white/5 text-white/40 hover:text-white")}
+          >
+            🖥️ Local (Browser)
+          </button>
+          <button
+            onClick={() => setActiveSection("cloud")}
+            className={cn("px-5 py-2 rounded-xl text-sm font-bold transition-all",
+              activeSection === "cloud" ? "bg-white text-black" : "bg-white/5 text-white/40 hover:text-white")}
+          >
+            ☁️ Cloud (Cloudflare)
+          </button>
+        </div>
+
+        {activeSection === "local" && (
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-4">
+              Runs entirely in your browser — no uploads, no server
+            </p>
+            <ImageTools />
+          </div>
+        )}
+
+        {activeSection === "cloud" && (
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-4">
+              Powered by Cloudflare Workers AI — free tier, no credits needed
+            </p>
+            <CFreeTools />
+          </div>
+        )}
       </BlurFade>
     </div>
   );
