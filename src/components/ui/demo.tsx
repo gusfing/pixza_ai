@@ -61,13 +61,13 @@ export function DashedBackground({ x = 0, y = 0, zoom = 1 }: { x?: number; y?: n
           {/* Vertical line */}
           <line
             x1={0} y1={0} x2={0} y2={cellSize}
-            stroke="rgba(124,106,247,0.08)"
+            stroke="rgba(0,0,0,0.07)"
             strokeWidth="0.5"
           />
           {/* Horizontal line */}
           <line
             x1={0} y1={0} x2={cellSize} y2={0}
-            stroke="rgba(124,106,247,0.08)"
+            stroke="rgba(0,0,0,0.07)"
             strokeWidth="0.5"
           />
         </pattern>
@@ -83,12 +83,12 @@ export function DashedBackground({ x = 0, y = 0, zoom = 1 }: { x?: number; y?: n
         >
           <line
             x1={0} y1={0} x2={0} y2={subSize}
-            stroke="rgba(124,106,247,0.14)"
+            stroke="rgba(0,0,0,0.13)"
             strokeWidth="0.75"
           />
           <line
             x1={0} y1={0} x2={subSize} y2={0}
-            stroke="rgba(124,106,247,0.14)"
+            stroke="rgba(0,0,0,0.13)"
             strokeWidth="0.75"
           />
         </pattern>

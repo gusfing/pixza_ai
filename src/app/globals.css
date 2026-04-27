@@ -179,8 +179,8 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255,255,255,0.1);
 }
 
-/* ─── React Flow — Slate Theme ─────────────────────────────── */
-.react-flow { background: #0d1117; }
+/* ─── React Flow — White Canvas ─────────────────────────────── */
+.react-flow { background: #f8f9fb; }
 .react-flow__edge-path { stroke-width: 2; transition: stroke-width 0.2s ease; }
 .react-flow__handle {
   width: 10px !important;
