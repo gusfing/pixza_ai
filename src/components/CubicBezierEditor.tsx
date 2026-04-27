@@ -166,7 +166,7 @@ export function CubicBezierEditor({
   );
 
   return (
-    <div className="bg-neutral-900/50 rounded-lg border border-neutral-700 p-2">
+    <div className="bg-gray-50 rounded-lg border border-gray-200 p-2">
       <div ref={editorRef} className="relative w-full aspect-square">
         <svg
           viewBox="0 0 100 100"
@@ -252,3 +252,4 @@ export function CubicBezierEditor({
     </div>
   );
 }
+

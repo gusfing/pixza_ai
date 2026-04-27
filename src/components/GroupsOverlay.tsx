@@ -358,7 +358,7 @@ function GroupControls({ groupId, zoom }: GroupControlsProps) {
 
               {/* Vertical context menu - appears above the three-dot button */}
               {showMenu && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-neutral-800/90 backdrop-blur rounded-lg py-1 min-w-[130px] shadow-lg shadow-black/30" ref={colorPickerRef}>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-white rounded-lg border border-gray-200 py-1 min-w-[130px] shadow-lg shadow-black/30" ref={colorPickerRef}>
                   {/* Color fan - anchored to top-left corner of menu */}
                   {showColorPicker && (
                     <>
@@ -566,3 +566,4 @@ export function GroupControlsOverlay() {
 export function GroupsOverlay() {
   return <GroupControlsOverlay />;
 }
+

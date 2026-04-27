@@ -61,7 +61,7 @@ const shortcutGroups: ShortcutGroup[] = [
 
 function Kbd({ children }: { children: string }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 text-[11px] font-medium text-neutral-200 bg-neutral-700 border border-neutral-600 rounded shadow-sm">
+    <kbd className="inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 text-[11px] font-medium text-neutral-700 bg-gray-100 border border-neutral-600 rounded shadow-sm">
       {children}
     </kbd>
   );
@@ -91,13 +91,13 @@ export function KeyboardShortcutsDialog({ isOpen, onClose }: KeyboardShortcutsDi
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
       <div className="glass-modal rounded-xl w-[520px] max-h-[80vh] shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#92dce5]/15">
-          <h2 className="text-base font-semibold text-neutral-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+          <h2 className="text-base font-semibold text-neutral-900">
             Keyboard Shortcuts
           </h2>
           <button
             onClick={onClose}
-            className="p-1 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700 rounded transition-colors"
+            className="p-1 text-neutral-500 hover:text-neutral-700 hover:bg-gray-100 rounded transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -109,16 +109,16 @@ export function KeyboardShortcutsDialog({ isOpen, onClose }: KeyboardShortcutsDi
         <div className="overflow-y-auto px-5 py-4 space-y-5">
           {shortcutGroups.map((group) => (
             <div key={group.title}>
-              <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-2">
+              <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider mb-2">
                 {group.title}
               </h3>
               <div className="space-y-1.5">
                 {group.shortcuts.map((shortcut, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-neutral-700/40 transition-colors"
+                    className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-100/40 transition-colors"
                   >
-                    <span className="text-sm text-neutral-300">
+                    <span className="text-sm text-neutral-600">
                       {shortcut.description}
                     </span>
                     <div className="flex items-center gap-1 ml-4 shrink-0">
@@ -139,10 +139,10 @@ export function KeyboardShortcutsDialog({ isOpen, onClose }: KeyboardShortcutsDi
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-[#92dce5]/15 flex justify-end">
+        <div className="px-5 py-3 border-t border-gray-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs font-medium text-neutral-300 hover:text-neutral-100 bg-neutral-700 hover:bg-neutral-600 rounded transition-colors"
+            className="px-3 py-1.5 text-xs font-medium text-neutral-600 hover:text-neutral-900 bg-gray-100 hover:bg-neutral-600 rounded transition-colors"
           >
             Close
           </button>
@@ -151,4 +151,5 @@ export function KeyboardShortcutsDialog({ isOpen, onClose }: KeyboardShortcutsDi
     </div>
   );
 }
+
 

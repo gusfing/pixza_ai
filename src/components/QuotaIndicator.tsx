@@ -67,7 +67,7 @@ export function QuotaIndicator() {
             {remaining} / {limit} Generations
           </span>
         </div>
-        <div className="w-24 h-1.5 bg-neutral-800 rounded-full overflow-hidden relative border border-white/5">
+        <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden relative border border-gray-300">
           <div 
             className={`absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500 ${isExhausted ? 'bg-red-500' : isLow ? 'bg-orange-400' : 'bg-green-400'}`}
             style={{ width: `${percentage}%` }}
@@ -86,3 +86,4 @@ export function QuotaIndicator() {
     </div>
   );
 }
+

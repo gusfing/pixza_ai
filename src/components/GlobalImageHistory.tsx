@@ -51,7 +51,7 @@ function FanItem({
     <button
       draggable
       onDragStart={(e) => onDragStart(e, item)}
-      className="absolute w-14 h-14 rounded-lg overflow-hidden border-2 border-neutral-600 hover:border-blue-500 shadow-lg cursor-grab active:cursor-grabbing transition-colors duration-150 animate-fan-enter group"
+      className="absolute w-14 h-14 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-blue-500 shadow-lg cursor-grab active:cursor-grabbing transition-colors duration-150 animate-fan-enter group"
       style={
         {
           "--fan-x": `${x}px`,
@@ -132,11 +132,11 @@ function HistorySidebar({
   return createPortal(
     <div
       ref={sidebarRef}
-      className="w-80 max-h-[420px] bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl flex flex-col"
+      className="w-80 max-h-[420px] bg-white border border-gray-200 rounded-lg shadow-xl flex flex-col"
       style={sidebarStyle}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-neutral-700 flex items-center justify-between shrink-0">
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between shrink-0">
         <span className="text-sm text-neutral-200 font-medium">
           All History ({history.length})
         </span>
@@ -150,7 +150,7 @@ function HistorySidebar({
           </button>
           <button
             onClick={onClose}
-            className="w-5 h-5 rounded hover:bg-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+            className="w-5 h-5 rounded hover:bg-gray-100 flex items-center justify-center text-neutral-500 hover:text-neutral-900 transition-colors"
             title="Close"
           >
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -167,10 +167,10 @@ function HistorySidebar({
             key={item.id}
             draggable
             onDragStart={(e) => onDragStart(e, item)}
-            className="flex gap-3 p-2 rounded-lg hover:bg-neutral-700/50 cursor-grab active:cursor-grabbing group transition-colors"
+            className="flex gap-3 p-2 rounded-lg hover:bg-gray-100/50 cursor-grab active:cursor-grabbing group transition-colors"
           >
             {/* Thumbnail */}
-            <div className="w-14 h-14 rounded overflow-hidden shrink-0 border border-neutral-600 group-hover:border-blue-500 transition-colors">
+            <div className="w-14 h-14 rounded overflow-hidden shrink-0 border border-gray-200 group-hover:border-blue-500 transition-colors">
               <img
                 src={item.image}
                 alt={`History ${index + 1}`}
@@ -181,7 +181,7 @@ function HistorySidebar({
 
             {/* Info */}
             <div className="flex-1 min-w-0 flex flex-col justify-center">
-              <p className="text-[11px] text-neutral-300 truncate">
+              <p className="text-[11px] text-neutral-600 truncate">
                 {item.prompt?.substring(0, 60) || "No prompt"}
               </p>
               <p className="text-[10px] text-neutral-500 mt-0.5">
@@ -193,7 +193,7 @@ function HistorySidebar({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-2 border-t border-neutral-700 bg-neutral-900/50 shrink-0">
+      <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 shrink-0">
         <span className="text-[10px] text-neutral-500">Drag images to canvas to create nodes</span>
       </div>
     </div>,
@@ -296,8 +296,8 @@ export function GlobalImageHistory() {
         onClick={() => setIsOpen(!isOpen)}
         className={`
           relative w-8 h-8 rounded-lg flex items-center justify-center
-          bg-neutral-800 hover:bg-neutral-700 border border-neutral-600
-          text-neutral-400 hover:text-white
+          bg-white hover:bg-gray-100 border border-gray-200
+          text-neutral-500 hover:text-neutral-900
           shadow-lg transition-colors
         `}
         title={`${history.length} image${history.length > 1 ? "s" : ""} in history`}
@@ -317,7 +317,7 @@ export function GlobalImageHistory() {
           />
         </svg>
         {/* Badge showing count */}
-        <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-blue-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
+        <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-blue-500 rounded-full text-[10px] text-neutral-900 flex items-center justify-center font-bold">
           {history.length > 99 ? "99+" : history.length}
         </span>
       </button>
@@ -344,7 +344,7 @@ export function GlobalImageHistory() {
             return (
               <button
                 onClick={handleShowAll}
-                className="absolute animate-fan-enter bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-lg px-2 py-1 text-[10px] text-neutral-300 hover:text-white shadow-lg transition-colors whitespace-nowrap"
+                className="absolute animate-fan-enter bg-white hover:bg-gray-100 border border-gray-200 rounded-lg px-2 py-1 text-[10px] text-neutral-600 hover:text-neutral-900 shadow-lg transition-colors whitespace-nowrap"
                 style={
                   {
                     "--fan-x": `${topItemPos.x}px`,
@@ -374,3 +374,4 @@ export function GlobalImageHistory() {
     </div>
   );
 }
+

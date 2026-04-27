@@ -728,7 +728,7 @@ export function ConnectionDropMenu({
     <div
       ref={menuRef}
       tabIndex={-1}
-      className="fixed z-100 bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl overflow-hidden min-w-[160px] outline-none"
+      className="fixed z-100 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden min-w-[160px] outline-none"
       style={{
         left: position.x,
         top: position.y,
@@ -736,7 +736,7 @@ export function ConnectionDropMenu({
       }}
     >
       <div className="px-2 py-1.5 border-b border-neutral-700">
-        <span className="text-[10px] text-neutral-400 uppercase tracking-wide">
+        <span className="text-[10px] text-neutral-500 uppercase tracking-wide">
           Add {handleType} node
         </span>
       </div>
@@ -748,8 +748,8 @@ export function ConnectionDropMenu({
             onMouseEnter={() => setSelectedIndex(index)}
             className={`w-full px-3 py-2 text-left text-[11px] font-medium flex items-center gap-2 transition-colors ${
               index === selectedIndex
-                ? "bg-neutral-700 text-neutral-100"
-                : "text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100"
+                ? "bg-neutral-700 text-neutral-900"
+                : "text-neutral-600 hover:bg-gray-50 hover:text-neutral-900"
             }`}
           >
             {option.icon}
@@ -768,3 +768,4 @@ export function ConnectionDropMenu({
     </div>
   );
 }
+

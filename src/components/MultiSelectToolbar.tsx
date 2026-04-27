@@ -224,9 +224,9 @@ export function MultiSelectToolbar() {
         left: toolbarPosition.x,
         top: toolbarPosition.y,
         transform: "translateX(-50%)",
-        background: "var(--surface-1)",
-        border: "1px solid var(--border-md)",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+        background: "#ffffff",
+        border: "1px solid rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
       }}
     >
       <button onClick={handleStackHorizontally} className="btn-icon" style={{ width: 28, height: 28 }} title="Stack horizontally (H)">
@@ -259,3 +259,4 @@ export function MultiSelectToolbar() {
     </div>
   );
 }
+

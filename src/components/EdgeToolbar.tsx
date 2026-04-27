@@ -96,9 +96,9 @@ export function EdgeToolbar() {
         left: toolbarPosition.x,
         top: toolbarPosition.y,
         transform: "translateX(-50%)",
-        background: "var(--surface-1)",
-        border: "1px solid var(--border-md)",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+        background: "#ffffff",
+        border: "1px solid rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
       }}
     >
       {sequenceNumber !== null && (
@@ -123,3 +123,4 @@ export function EdgeToolbar() {
     </div>
   );
 }
+
