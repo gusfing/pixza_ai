@@ -213,7 +213,7 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
           <svg className="w-8 h-8 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
           </svg>
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-neutral-500">
             Your browser doesn&apos;t support video encoding.
           </span>
           <a
@@ -240,7 +240,7 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
       >
         {renderHandles()}
         <div className="flex-1 flex items-center justify-center">
-          <div className="flex items-center gap-2 text-neutral-400">
+          <div className="flex items-center gap-2 text-neutral-500">
             <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -279,7 +279,7 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
               className="absolute inset-0 w-full h-full object-contain rounded"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center border border-dashed border-neutral-600 rounded">
+            <div className="absolute inset-0 flex items-center justify-center border border-dashed border-gray-300 rounded">
               <span className="text-[10px] text-neutral-500">Connect a video to trim</span>
             </div>
           )}
@@ -291,8 +291,8 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
                 onClick={() => setShowOutput(false)}
                 className={`px-1.5 py-0.5 rounded text-[9px] font-medium transition-colors ${
                   !showOutput
-                    ? "bg-neutral-700 text-neutral-200"
-                    : "bg-neutral-900/70 text-neutral-500 hover:text-neutral-300"
+                    ? "bg-gray-200 text-neutral-700"
+                    : "bg-black/40 text-neutral-500 hover:text-neutral-600"
                 }`}
               >
                 Source
@@ -302,7 +302,7 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
                 className={`px-1.5 py-0.5 rounded text-[9px] font-medium transition-colors ${
                   showOutput
                     ? "bg-blue-600 text-white"
-                    : "bg-neutral-900/70 text-neutral-500 hover:text-neutral-300"
+                    : "bg-black/40 text-neutral-500 hover:text-neutral-600"
                 }`}
               >
                 Trimmed
@@ -317,7 +317,7 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
                 updateNodeData(id, { outputVideo: null, status: "idle" });
                 setShowOutput(false);
               }}
-              className="absolute top-1 right-1 w-5 h-5 bg-neutral-900/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+              className="absolute top-1 right-1 w-5 h-5 bg-white/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-500 hover:text-white transition-colors"
               title="Clear trimmed video"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -348,7 +348,7 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
               `}</style>
 
               {/* Track background */}
-              <div className="absolute left-0 right-0 h-1.5 bg-neutral-700 rounded-full" />
+              <div className="absolute left-0 right-0 h-1.5 bg-gray-200 rounded-full" />
 
               {/* Highlighted trim range */}
               <div
@@ -394,16 +394,16 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
             {/* Time labels */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col items-start">
-                <span className="text-[10px] text-neutral-400">Start</span>
-                <span className="text-[11px] text-neutral-200 font-mono">{formatTime(startTime)}</span>
+                <span className="text-[10px] text-neutral-500">Start</span>
+                <span className="text-[11px] text-neutral-700 font-mono">{formatTime(startTime)}</span>
               </div>
               <div className="flex flex-col items-center">
-                <span className="text-[10px] text-neutral-400">Duration</span>
-                <span className="text-[11px] text-neutral-200 font-mono">{formatTime(trimDuration)}</span>
+                <span className="text-[10px] text-neutral-500">Duration</span>
+                <span className="text-[11px] text-neutral-700 font-mono">{formatTime(trimDuration)}</span>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-neutral-400">End</span>
-                <span className="text-[11px] text-neutral-200 font-mono">{formatTime(endTime)}</span>
+                <span className="text-[10px] text-neutral-500">End</span>
+                <span className="text-[11px] text-neutral-700 font-mono">{formatTime(endTime)}</span>
               </div>
             </div>
           </div>
@@ -414,7 +414,7 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
           <button
             onClick={handleTrim}
             disabled={!canTrim || nodeData.status === "loading" || isRunning}
-            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed rounded text-white text-xs font-medium transition-colors"
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed rounded text-white text-xs font-medium transition-colors"
           >
             {nodeData.status === "loading" ? "Processing..." : "Trim"}
           </button>
@@ -422,12 +422,12 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
 
         {/* Processing overlay */}
         {nodeData.status === "loading" && (
-          <div className="absolute inset-0 bg-neutral-900/70 rounded flex flex-col items-center justify-center gap-2">
+          <div className="absolute inset-0 bg-white/80 rounded flex flex-col items-center justify-center gap-2">
             <svg className="w-6 h-6 animate-spin text-white" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            <span className="text-white text-xs">Processing... {Math.round(nodeData.progress)}%</span>
+            <span className="text-neutral-800 text-xs">Processing... {Math.round(nodeData.progress)}%</span>
           </div>
         )}
 
@@ -441,3 +441,5 @@ export function VideoTrimNode({ id, data, selected }: NodeProps<VideoTrimNodeTyp
     </BaseNode>
   );
 }
+
+

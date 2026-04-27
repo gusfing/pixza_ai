@@ -134,7 +134,7 @@ export function ControlPanel() {
   return (
     <div className="fixed top-0 right-6 h-screen z-[90] flex items-center pointer-events-none">
       <div
-        className="w-80 bg-neutral-800 border border-neutral-700 rounded-xl max-h-[80vh] overflow-y-auto pointer-events-auto transition-opacity duration-200 nowheel"
+        className="w-80 bg-gray-100 border border-gray-200 rounded-xl max-h-[80vh] overflow-y-auto pointer-events-auto transition-opacity duration-200 nowheel"
         style={{
           boxShadow: [
             '-1px 0 2px rgba(0,0,0,0.18)',
@@ -148,7 +148,7 @@ export function ControlPanel() {
       >
         <div className="p-4">
           {/* Header */}
-          <h3 className="text-sm font-medium text-neutral-200">
+          <h3 className="text-sm font-medium text-neutral-700">
             {getNodeTypeTitle(selectedNode.type as NodeType)}
           </h3>
 
@@ -381,7 +381,7 @@ function GenerateImageControls({ node }: { node: Node }) {
     <>
       <div className="space-y-3">
         {/* Model name + provider with link — sits directly under title divider */}
-        <div className="border-t border-neutral-700 pt-3">
+        <div className="border-t border-gray-200 pt-3">
           <div className="flex items-start gap-2">
             <div className="flex-1 min-w-0">
               <div className="text-sm text-neutral-100 truncate flex items-center gap-1.5">
@@ -401,7 +401,7 @@ function GenerateImageControls({ node }: { node: Node }) {
                     href={getModelPageUrl(currentProvider, nodeData.selectedModel.modelId) || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neutral-500 hover:text-neutral-300 transition-colors"
+                    className="text-neutral-500 hover:text-neutral-600 transition-colors"
                     title={`View on ${getProviderDisplayName(currentProvider)}`}
                     onClick={(e) => {
                       if (!getModelPageUrl(currentProvider, nodeData.selectedModel?.modelId || "")) {
@@ -418,7 +418,7 @@ function GenerateImageControls({ node }: { node: Node }) {
             </div>
             <button
               onClick={() => setIsBrowseDialogOpen(true)}
-              className="nodrag nopan shrink-0 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 transition-colors"
+              className="nodrag nopan shrink-0 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 transition-colors"
             >
               Browse
             </button>
@@ -429,11 +429,11 @@ function GenerateImageControls({ node }: { node: Node }) {
         {isGeminiProvider && (
           <>
             <div>
-              <label className="block text-xs font-medium text-neutral-300 mb-1">Aspect Ratio</label>
+              <label className="block text-xs font-medium text-neutral-600 mb-1">Aspect Ratio</label>
               <select
                 value={nodeData.aspectRatio || "1:1"}
                 onChange={handleAspectRatioChange}
-                className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 border border-gray-300 rounded text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 {aspectRatios.map(ar => (
                   <option key={ar} value={ar}>{ar}</option>
@@ -443,11 +443,11 @@ function GenerateImageControls({ node }: { node: Node }) {
 
             {supportsResolution && (
               <div>
-                <label className="block text-xs font-medium text-neutral-300 mb-1">Resolution</label>
+                <label className="block text-xs font-medium text-neutral-600 mb-1">Resolution</label>
                 <select
                   value={nodeData.resolution || "1K"}
                   onChange={handleResolutionChange}
-                  className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 border border-gray-300 rounded text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   {resolutions.map(res => (
                     <option key={res} value={res}>{res}</option>
@@ -463,9 +463,9 @@ function GenerateImageControls({ node }: { node: Node }) {
                   id={`google-search-${node.id}`}
                   checked={nodeData.useGoogleSearch || false}
                   onChange={handleGoogleSearchToggle}
-                  className="nodrag nopan w-3 h-3 text-blue-600 bg-neutral-700 border-neutral-600 rounded focus:ring-blue-500"
+                  className="nodrag nopan w-3 h-3 text-blue-600 bg-gray-200 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <label htmlFor={`google-search-${node.id}`} className="ml-2 text-xs text-neutral-300">
+                <label htmlFor={`google-search-${node.id}`} className="ml-2 text-xs text-neutral-600">
                   Google Search
                 </label>
               </div>
@@ -478,9 +478,9 @@ function GenerateImageControls({ node }: { node: Node }) {
                   id={`image-search-${node.id}`}
                   checked={nodeData.useImageSearch || false}
                   onChange={handleImageSearchToggle}
-                  className="nodrag nopan w-3 h-3 text-blue-600 bg-neutral-700 border-neutral-600 rounded focus:ring-blue-500"
+                  className="nodrag nopan w-3 h-3 text-blue-600 bg-gray-200 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <label htmlFor={`image-search-${node.id}`} className="ml-2 text-xs text-neutral-300">
+                <label htmlFor={`image-search-${node.id}`} className="ml-2 text-xs text-neutral-600">
                   Image Search
                 </label>
               </div>
@@ -503,7 +503,7 @@ function GenerateImageControls({ node }: { node: Node }) {
         <button
           onClick={() => regenerateNode(node.id)}
           disabled={isRunning}
-          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
           {isRunning ? "Running..." : "Run"}
@@ -554,7 +554,7 @@ function GenerateVideoControls({ node }: { node: Node }) {
     <>
       <div className="space-y-3">
         {/* Model name + provider with link */}
-        <div className="border-t border-neutral-700 pt-3">
+        <div className="border-t border-gray-200 pt-3">
           <div className="flex items-start gap-2">
             <div className="flex-1 min-w-0">
               <div className="text-sm text-neutral-100 truncate flex items-center gap-1.5">
@@ -574,7 +574,7 @@ function GenerateVideoControls({ node }: { node: Node }) {
                     href={getModelPageUrl(currentProvider, nodeData.selectedModel.modelId) || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neutral-500 hover:text-neutral-300 transition-colors"
+                    className="text-neutral-500 hover:text-neutral-600 transition-colors"
                     title={`View on ${getProviderDisplayName(currentProvider)}`}
                     onClick={(e) => {
                       if (!getModelPageUrl(currentProvider, nodeData.selectedModel?.modelId || "")) {
@@ -591,7 +591,7 @@ function GenerateVideoControls({ node }: { node: Node }) {
             </div>
             <button
               onClick={() => setIsBrowseDialogOpen(true)}
-              className="nodrag nopan shrink-0 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 transition-colors"
+              className="nodrag nopan shrink-0 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 transition-colors"
             >
               Browse
             </button>
@@ -612,7 +612,7 @@ function GenerateVideoControls({ node }: { node: Node }) {
         <button
           onClick={() => regenerateNode(node.id)}
           disabled={isRunning}
-          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
           {isRunning ? "Running..." : "Run"}
@@ -665,7 +665,7 @@ function Generate3DControls({ node }: { node: Node }) {
     <>
       <div className="space-y-3">
         {/* Model name + provider with link */}
-        <div className="border-t border-neutral-700 pt-3">
+        <div className="border-t border-gray-200 pt-3">
           <div className="flex items-start gap-2">
             <div className="flex-1 min-w-0">
               <div className="text-sm text-neutral-100 truncate flex items-center gap-1.5">
@@ -685,7 +685,7 @@ function Generate3DControls({ node }: { node: Node }) {
                     href={getModelPageUrl(currentProvider, nodeData.selectedModel.modelId) || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neutral-500 hover:text-neutral-300 transition-colors"
+                    className="text-neutral-500 hover:text-neutral-600 transition-colors"
                     title={`View on ${getProviderDisplayName(currentProvider)}`}
                     onClick={(e) => {
                       if (!getModelPageUrl(currentProvider, nodeData.selectedModel?.modelId || "")) {
@@ -702,7 +702,7 @@ function Generate3DControls({ node }: { node: Node }) {
             </div>
             <button
               onClick={() => setIsBrowseDialogOpen(true)}
-              className="nodrag nopan shrink-0 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 transition-colors"
+              className="nodrag nopan shrink-0 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 transition-colors"
             >
               Browse
             </button>
@@ -723,7 +723,7 @@ function Generate3DControls({ node }: { node: Node }) {
         <button
           onClick={() => regenerateNode(node.id)}
           disabled={isRunning}
-          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
           {isRunning ? "Running..." : "Run"}
@@ -749,14 +749,14 @@ function GenerateAudioControls({ node }: { node: Node }) {
 
   return (
     <div className="space-y-3">
-      <div className="text-xs text-neutral-400">
+      <div className="text-xs text-neutral-500">
         Audio generation settings
       </div>
       <div className="flex justify-end">
         <button
           onClick={() => regenerateNode(node.id)}
           disabled={isRunning}
-          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
           {isRunning ? "Running..." : "Run"}
@@ -816,11 +816,11 @@ function LLMControls({ node }: { node: Node }) {
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium text-neutral-300 mb-1">Provider</label>
+        <label className="block text-xs font-medium text-neutral-600 mb-1">Provider</label>
         <select
           value={provider}
           onChange={handleProviderChange}
-          className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 border border-gray-300 rounded text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           {LLM_PROVIDERS.map(p => (
             <option key={p.value} value={p.value}>{p.label}</option>
@@ -829,11 +829,11 @@ function LLMControls({ node }: { node: Node }) {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-neutral-300 mb-1">Model</label>
+        <label className="block text-xs font-medium text-neutral-600 mb-1">Model</label>
         <select
           value={nodeData.model || availableModels[0].value}
           onChange={handleModelChange}
-          className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 border border-gray-300 rounded text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           {availableModels.map(m => (
             <option key={m.value} value={m.value}>{m.label}</option>
@@ -842,7 +842,7 @@ function LLMControls({ node }: { node: Node }) {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-neutral-300 mb-1">
+        <label className="block text-xs font-medium text-neutral-600 mb-1">
           Temperature: {(nodeData.temperature ?? 0.7).toFixed(2)}
         </label>
         <input
@@ -852,12 +852,12 @@ function LLMControls({ node }: { node: Node }) {
           step="0.01"
           value={nodeData.temperature ?? 0.7}
           onChange={handleTemperatureChange}
-          className="nodrag nopan w-full h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+          className="nodrag nopan w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-neutral-300 mb-1">
+        <label className="block text-xs font-medium text-neutral-600 mb-1">
           Max Tokens: {(nodeData.maxTokens || 2048).toLocaleString()}
         </label>
         <input
@@ -867,7 +867,7 @@ function LLMControls({ node }: { node: Node }) {
           step="256"
           value={nodeData.maxTokens || 2048}
           onChange={handleMaxTokensChange}
-          className="nodrag nopan w-full h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+          className="nodrag nopan w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
         />
       </div>
 
@@ -875,7 +875,7 @@ function LLMControls({ node }: { node: Node }) {
         <button
           onClick={() => regenerateNode(node.id)}
           disabled={isRunning}
-          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
           {isRunning ? "Running..." : "Run"}
@@ -973,10 +973,10 @@ function EaseCurveControls({ node }: { node: Node }) {
     <div className="space-y-3 relative">
       {isInherited && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-900/90 rounded z-10">
-          <p className="text-sm text-neutral-200 font-medium">Settings inherited</p>
-          <p className="text-[11px] text-neutral-400 mt-1">Break connection to edit manually</p>
+          <p className="text-sm text-neutral-700 font-medium">Settings inherited</p>
+          <p className="text-[11px] text-neutral-500 mt-1">Break connection to edit manually</p>
           <button
-            className="nodrag nopan mt-3 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-xs text-neutral-200 transition-colors"
+            className="nodrag nopan mt-3 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-xs text-neutral-700 transition-colors"
             onClick={handleBreakInheritance}
           >
             Control manually
@@ -985,11 +985,11 @@ function EaseCurveControls({ node }: { node: Node }) {
       )}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="block text-xs font-medium text-neutral-300">Easing Function</label>
+          <label className="block text-xs font-medium text-neutral-600">Easing Function</label>
           <button
             ref={presetsButtonRef}
             onClick={() => setShowPresets(!showPresets)}
-            className="nodrag nopan text-xs px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 transition-colors"
+            className="nodrag nopan text-xs px-2 py-0.5 bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 transition-colors"
           >
             Presets
           </button>
@@ -1001,14 +1001,14 @@ function EaseCurveControls({ node }: { node: Node }) {
           easingCurve={editorEasingCurve}
         />
         {nodeData.easingPreset && (
-          <div className="text-xs text-neutral-400 mt-1">
+          <div className="text-xs text-neutral-500 mt-1">
             Current: {nodeData.easingPreset}
           </div>
         )}
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-neutral-300 mb-1">
+        <label className="block text-xs font-medium text-neutral-600 mb-1">
           Output Duration: {nodeData.outputDuration?.toFixed(1) || "1.5"}s
         </label>
         <input
@@ -1018,7 +1018,7 @@ function EaseCurveControls({ node }: { node: Node }) {
           step="0.1"
           value={nodeData.outputDuration || 1.5}
           onChange={handleDurationChange}
-          className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 border border-gray-300 rounded text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
@@ -1026,7 +1026,7 @@ function EaseCurveControls({ node }: { node: Node }) {
         <button
           onClick={() => regenerateNode(node.id)}
           disabled={isRunning}
-          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           {isRunning ? "Applying..." : "Apply"}
@@ -1036,7 +1036,7 @@ function EaseCurveControls({ node }: { node: Node }) {
       {showPresets && typeof document !== 'undefined' && createPortal(
         <div
           ref={presetsPopupRef}
-          className="fixed z-[100] bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl p-2 max-h-[60vh] overflow-y-auto nowheel"
+          className="fixed z-[100] bg-gray-100 border border-gray-300 rounded-lg shadow-xl p-2 max-h-[60vh] overflow-y-auto nowheel"
           style={{
             top: presetsButtonRef.current?.getBoundingClientRect().bottom || 0,
             right: window.innerWidth - (presetsButtonRef.current?.getBoundingClientRect().left || 0),
@@ -1048,7 +1048,7 @@ function EaseCurveControls({ node }: { node: Node }) {
               <button
                 key={name}
                 onClick={() => handleSelectEasing(name)}
-                className="nodrag nopan p-1 bg-neutral-900 hover:bg-neutral-700 rounded flex flex-col items-center gap-1 transition-colors"
+                className="nodrag nopan p-1 bg-gray-50 hover:bg-gray-200 rounded flex flex-col items-center gap-1 transition-colors"
                 title={name}
               >
                 <svg width="36" height="36" viewBox="0 0 36 36" className="flex-shrink-0">
@@ -1059,7 +1059,7 @@ function EaseCurveControls({ node }: { node: Node }) {
                     strokeWidth="1.5"
                   />
                 </svg>
-                <span className="text-[8px] text-neutral-400 text-center break-words w-full">
+                <span className="text-[8px] text-neutral-500 text-center break-words w-full">
                   {name}
                 </span>
               </button>
@@ -1134,7 +1134,7 @@ function ConditionalSwitchControls({ node }: { node: Node }) {
   return (
     <div className="space-y-2">
       {nodeData.rules.map((rule, index) => (
-        <div key={rule.id} className="border border-neutral-600 rounded p-2 space-y-2">
+        <div key={rule.id} className="border border-gray-300 rounded p-2 space-y-2">
           <div className="flex items-center justify-between">
             <input
               type="text"
@@ -1142,7 +1142,7 @@ function ConditionalSwitchControls({ node }: { node: Node }) {
               onChange={(e) => handleLabelEdit(rule.id, e.target.value)}
               onFocus={() => setEditingId(rule.id)}
               onBlur={() => setEditingId(null)}
-              className="nodrag nopan flex-1 px-1 py-0.5 text-xs bg-transparent border-none text-neutral-200 focus:outline-none"
+              className="nodrag nopan flex-1 px-1 py-0.5 text-xs bg-transparent border-none text-neutral-700 focus:outline-none"
             />
             {nodeData.rules.length > 1 && (
               <button
@@ -1160,7 +1160,7 @@ function ConditionalSwitchControls({ node }: { node: Node }) {
           <select
             value={rule.mode}
             onChange={(e) => handleModeChange(rule.id, e.target.value as MatchMode)}
-            className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 border border-gray-300 rounded text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="exact">Exact match</option>
             <option value="contains">Contains</option>
@@ -1173,13 +1173,13 @@ function ConditionalSwitchControls({ node }: { node: Node }) {
             value={rule.value}
             onChange={(e) => handleRuleValueChange(rule.id, e.target.value)}
             placeholder="Enter match value"
-            className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 border border-gray-300 rounded text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
 
           {rule.isMatched !== undefined && (
             <div className="flex items-center gap-1">
               <div className={`w-2 h-2 rounded-full ${rule.isMatched ? 'bg-green-500' : 'bg-neutral-600'}`} />
-              <span className="text-xs text-neutral-400">
+              <span className="text-xs text-neutral-500">
                 {rule.isMatched ? 'Matched' : 'Not matched'}
               </span>
             </div>
@@ -1189,7 +1189,7 @@ function ConditionalSwitchControls({ node }: { node: Node }) {
 
       <button
         onClick={handleAddRule}
-        className="nodrag nopan w-full px-2 py-1 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 transition-colors"
+        className="nodrag nopan w-full px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 transition-colors"
       >
         + Add Rule
       </button>
@@ -1198,7 +1198,7 @@ function ConditionalSwitchControls({ node }: { node: Node }) {
         <button
           onClick={() => regenerateNode(node.id)}
           disabled={isRunning}
-          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+          className="nodrag nopan inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
           {isRunning ? "Running..." : "Run"}
@@ -1207,3 +1207,5 @@ function ConditionalSwitchControls({ node }: { node: Node }) {
     </div>
   );
 }
+
+

@@ -171,7 +171,7 @@ export function OutputNode({ id, data, selected }: NodeProps<OutputNodeType>) {
                   />
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none">
-                  <span className="text-[10px] font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-2 py-1 rounded">
+                  <span className="text-[10px] font-medium text-neutral-800 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-2 py-1 rounded">
                     View full size
                   </span>
                 </div>
@@ -188,7 +188,7 @@ export function OutputNode({ id, data, selected }: NodeProps<OutputNodeType>) {
             </button>
           </>
         ) : (
-          <div className="w-full h-full bg-neutral-900/40 flex flex-col items-center justify-center">
+          <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center">
             <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
@@ -236,3 +236,5 @@ export function OutputNode({ id, data, selected }: NodeProps<OutputNodeType>) {
     </>
   );
 }
+
+

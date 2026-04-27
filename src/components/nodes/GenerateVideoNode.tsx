@@ -655,7 +655,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
             />
             {/* Loading overlay for generation */}
             {nodeData.status === "loading" && (
-              <div className="absolute inset-0 bg-neutral-900/70 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                 <svg
                   className="w-6 h-6 animate-spin text-white"
                   fill="none"
@@ -689,13 +689,13 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-white text-xs font-medium">Generation failed</span>
+                <span className="text-neutral-800 text-xs font-medium">Generation failed</span>
                 <span className="text-white/70 text-[10px]">See toast for details</span>
               </div>
             )}
             {/* Loading overlay for carousel navigation */}
             {isLoadingCarouselVideo && (
-              <div className="absolute inset-0 bg-neutral-900/50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                 <svg
                   className="w-4 h-4 animate-spin text-white"
                   fill="none"
@@ -721,7 +721,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
             <div className="absolute top-1 right-1">
               <button
                 onClick={handleClearVideo}
-                className="w-5 h-5 bg-neutral-900/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+                className="w-5 h-5 bg-white/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-500 hover:text-white transition-colors"
                 title="Clear video"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -732,7 +732,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
 
             {/* Carousel controls - overlaid on video bottom */}
             {hasCarouselVideos && (
-              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2 py-1.5 bg-neutral-900/80">
+              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2 py-1.5 bg-black/50">
                 <button
                   onClick={handleCarouselPrevious}
                   disabled={isLoadingCarouselVideo}
@@ -760,10 +760,10 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
             )}
           </>
         ) : (
-          <div className="w-full h-full min-h-[112px] bg-neutral-900/40 flex flex-col items-center justify-center">
+          <div className="w-full h-full min-h-[112px] bg-gray-100 flex flex-col items-center justify-center">
             {nodeData.status === "loading" ? (
               <svg
-                className="w-4 h-4 animate-spin text-neutral-400"
+                className="w-4 h-4 animate-spin text-neutral-500"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -822,3 +822,5 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
     </>
   );
 }
+
+

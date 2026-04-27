@@ -251,7 +251,7 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
             {/* Model selector: Browse button + current model display */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <div className="text-[11px] text-neutral-200 truncate">
+                <div className="text-[11px] text-neutral-700 truncate">
                   {displayTitle}
                 </div>
                 <div className="text-[9px] text-neutral-500">
@@ -260,7 +260,7 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
               </div>
               <button
                 onClick={() => setIsBrowseDialogOpen(true)}
-                className="nodrag nopan shrink-0 px-2 py-1 text-[10px] bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 transition-colors"
+                className="nodrag nopan shrink-0 px-2 py-1 text-[10px] bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 transition-colors"
               >
                 Browse
               </button>
@@ -296,19 +296,19 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
           <div className="relative group mt-2">
             {/* Waveform visualization */}
             {isLoadingWaveform ? (
-              <div className="flex items-center justify-center bg-neutral-900/50 rounded h-16">
+              <div className="flex items-center justify-center bg-black/20 rounded h-16">
                 <span className="text-xs text-neutral-500">Loading waveform...</span>
               </div>
             ) : waveformData ? (
               <div
                 ref={waveformContainerRef}
-                className="h-16 bg-neutral-900/50 rounded cursor-pointer relative"
+                className="h-16 bg-black/20 rounded cursor-pointer relative"
                 onClick={handleSeek}
               >
                 <canvas ref={canvasRef} className="w-full h-full" />
               </div>
             ) : (
-              <div className="flex items-center justify-center bg-neutral-900/50 rounded h-16">
+              <div className="flex items-center justify-center bg-black/20 rounded h-16">
                 <span className="text-xs text-neutral-500">Processing...</span>
               </div>
             )}
@@ -332,7 +332,7 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
               </button>
 
               {/* Progress bar */}
-              <div className="flex-1 h-1 bg-neutral-700 rounded-full overflow-hidden relative">
+              <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden relative">
                 {!!audioRef.current?.duration && isFinite(audioRef.current.duration) && (
                   <div
                     className="h-full bg-violet-500 transition-all"
@@ -351,7 +351,7 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
                 <>
                   <button
                     onClick={handleCarouselPrevious}
-                    className="w-5 h-5 flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 rounded transition-colors shrink-0"
+                    className="w-5 h-5 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded transition-colors shrink-0"
                     disabled={isLoadingCarouselAudio}
                     title="Previous"
                   >
@@ -364,7 +364,7 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
                   </span>
                   <button
                     onClick={handleCarouselNext}
-                    className="w-5 h-5 flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 rounded transition-colors shrink-0"
+                    className="w-5 h-5 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded transition-colors shrink-0"
                     disabled={isLoadingCarouselAudio}
                     title="Next"
                   >
@@ -393,7 +393,7 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
         {nodeData.status === "loading" && (
           <div className="flex items-center gap-2 mt-2">
             <div className="animate-spin w-3 h-3 border-2 border-violet-500 border-t-transparent rounded-full" />
-            <span className="text-xs text-neutral-400">Generating audio...</span>
+            <span className="text-xs text-neutral-500">Generating audio...</span>
           </div>
         )}
 
@@ -441,3 +441,4 @@ export function GenerateAudioNode({ id, data, selected }: NodeProps<GenerateAudi
     </>
   );
 }
+

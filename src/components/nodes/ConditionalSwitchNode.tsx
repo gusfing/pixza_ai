@@ -216,7 +216,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
         <div className="absolute top-2 right-2 z-10">
           <button
             onClick={handleClear}
-            className="nodrag nopan p-0.5 rounded transition-all duration-200 ease-in-out flex items-center overflow-hidden group pr-2 text-neutral-500 hover:text-neutral-200 border border-neutral-600 bg-neutral-800/90"
+            className="nodrag nopan p-0.5 rounded transition-all duration-200 ease-in-out flex items-center overflow-hidden group pr-2 text-neutral-500 hover:text-neutral-700 border border-gray-300 bg-neutral-800/90"
             title="Clear evaluation"
           >
             <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -247,7 +247,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
       {/* Body content */}
       <div className="px-2 py-1">
         {/* Text preview — fixed height, above the handle-aligned area */}
-        <div className="text-[10px] text-neutral-400 truncate h-5 flex items-center">
+        <div className="text-[10px] text-neutral-500 truncate h-5 flex items-center">
           {nodeData.evaluationPaused ? (
             <span className="text-yellow-400">Evaluation paused</span>
           ) : incomingText ? (
@@ -281,7 +281,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
             {/* Reorder buttons */}
             <div className="flex flex-col gap-0 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
-                className="text-neutral-400 hover:text-white disabled:opacity-30 disabled:hover:text-neutral-400"
+                className="text-neutral-500 hover:text-white disabled:opacity-30 disabled:hover:text-neutral-500"
                 onClick={() => handleMoveUp(index)}
                 disabled={index === 0}
                 title="Move up"
@@ -291,7 +291,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
                 </svg>
               </button>
               <button
-                className="text-neutral-400 hover:text-white disabled:opacity-30 disabled:hover:text-neutral-400"
+                className="text-neutral-500 hover:text-white disabled:opacity-30 disabled:hover:text-neutral-500"
                 onClick={() => handleMoveDown(index)}
                 disabled={index === nodeData.rules.length - 1}
                 title="Move down"
@@ -306,7 +306,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
             {editingId === rule.id ? (
               <input
                 type="text"
-                className="w-14 bg-neutral-700 text-neutral-100 text-[10px] px-1 py-0.5 rounded border border-teal-500 outline-none"
+                className="w-14 bg-gray-200 text-neutral-100 text-[10px] px-1 py-0.5 rounded border border-teal-500 outline-none"
                 defaultValue={rule.label}
                 autoFocus
                 onBlur={(e) => handleLabelEdit(rule.id, e.target.value)}
@@ -320,7 +320,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
               />
             ) : (
               <span
-                className="w-14 text-[10px] text-neutral-300 cursor-text truncate"
+                className="w-14 text-[10px] text-neutral-600 cursor-text truncate"
                 onDoubleClick={() => setEditingId(rule.id)}
                 title={rule.label}
               >
@@ -330,7 +330,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
 
             {/* Mode dropdown */}
             <select
-              className="bg-neutral-700 text-neutral-100 text-[9px] px-1 py-0.5 rounded border border-neutral-600 outline-none"
+              className="bg-gray-200 text-neutral-100 text-[9px] px-1 py-0.5 rounded border border-gray-300 outline-none"
               value={rule.mode}
               onChange={(e) => handleModeChange(rule.id, e.target.value as MatchMode)}
             >
@@ -343,7 +343,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
             {/* Value input */}
             <input
               type="text"
-              className="flex-1 bg-neutral-700 text-neutral-100 text-[10px] px-1 py-0.5 rounded border border-neutral-600 outline-none"
+              className="flex-1 bg-gray-200 text-neutral-100 text-[10px] px-1 py-0.5 rounded border border-gray-300 outline-none"
               placeholder="value,value2,..."
               value={rule.value}
               onChange={(e) => handleRuleValueChange(rule.id, e.target.value)}
@@ -352,7 +352,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
             {/* Delete button (hidden if only one rule) */}
             {nodeData.rules.length > 1 && (
               <button
-                className="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-400 transition-opacity flex-shrink-0"
+                className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-opacity flex-shrink-0"
                 onClick={() => handleDelete(rule.id)}
                 title="Delete rule"
               >
@@ -365,7 +365,7 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
         ))}
 
         {/* Default output row — 32px tall, immediately after rules to align with handle */}
-        <div ref={defaultRowRef} className="flex items-center gap-1 h-8 border-t border-neutral-700">
+        <div ref={defaultRowRef} className="flex items-center gap-1 h-8 border-t border-gray-200">
           <div className="w-3 h-3 flex items-center justify-center flex-shrink-0">
             {defaultMatched ? (
               <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -376,12 +376,12 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
             )}
           </div>
 
-          <span className="text-[10px] text-neutral-300 ml-4">Fallback</span>
+          <span className="text-[10px] text-neutral-600 ml-4">Fallback</span>
         </div>
 
         {/* Add rule button — after Default so it doesn't displace handle alignment */}
         <button
-          className="w-full flex items-center justify-center gap-1 text-neutral-400 hover:text-white text-[10px] py-1 mt-1 rounded hover:bg-teal-900/30 transition-colors"
+          className="w-full flex items-center justify-center gap-1 text-neutral-500 hover:text-white text-[10px] py-1 mt-1 rounded hover:bg-teal-900/30 transition-colors"
           onClick={handleAddRule}
         >
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -428,3 +428,4 @@ export const ConditionalSwitchNode = memo(({ id, data, selected }: NodeProps<Wor
 });
 
 ConditionalSwitchNode.displayName = "ConditionalSwitchNode";
+

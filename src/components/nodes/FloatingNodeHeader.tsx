@@ -354,7 +354,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                 onBlur={handleTitleSubmit}
                 onKeyDown={handleTitleKeyDown}
                 placeholder="Custom title..."
-                className="nodrag nopan w-full bg-transparent border-none outline-none text-xs font-semibold tracking-wide text-neutral-600 placeholder:text-neutral-400 uppercase"
+                className="nodrag nopan w-full bg-transparent border-none outline-none text-xs font-semibold tracking-wide text-neutral-600 placeholder:text-neutral-500 uppercase"
               />
             ) : (
               <span
@@ -364,7 +364,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
               >
                 {customTitle ? (
                   <>
-                    <span className="text-white">{customTitle}</span>
+                    <span className="text-neutral-800">{customTitle}</span>
                     <span className="mx-2 opacity-30">/</span>
                     <span className="opacity-50">{title}</span>
                   </>
@@ -402,7 +402,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                 className={`nodrag nopan p-0.5 rounded transition-colors ${
                   comment
                     ? "text-blue-500 hover:text-blue-700"
-                    : "text-neutral-400 hover:text-neutral-600 border border-neutral-300"
+                    : "text-neutral-500 hover:text-neutral-600 border border-neutral-300"
                 }`}
                 title={comment ? "Edit comment" : "Add comment"}
               >
@@ -421,7 +421,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
             {(showCommentTooltip || isCommentFocused) && comment && !isEditingComment && tooltipPosition && createPortal(
               <div
                 ref={tooltipRef}
-                className="fixed z-[9999] p-3 text-sm text-neutral-200 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl"
+                className="fixed z-[9999] p-3 text-sm text-neutral-700 bg-gray-50 border border-gray-200 rounded-lg shadow-xl"
                 style={{
                   top: tooltipPosition.top,
                   left: tooltipPosition.left,
@@ -429,20 +429,20 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                 }}
               >
                 {isCommentFocused && commentNavigation && (
-                  <div className="flex items-center justify-center gap-3 mb-2 pb-2 border-b border-neutral-700">
+                  <div className="flex items-center justify-center gap-3 mb-2 pb-2 border-b border-gray-200">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         commentNavigation.onPrevious();
                       }}
-                      className="nodrag nopan w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700 rounded transition-colors"
+                      className="nodrag nopan w-6 h-6 flex items-center justify-center text-neutral-500 hover:text-neutral-100 hover:bg-gray-200 rounded transition-colors"
                       title="Previous comment"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
-                    <span className="text-xs text-neutral-400 min-w-[32px] text-center">
+                    <span className="text-xs text-neutral-500 min-w-[32px] text-center">
                       {commentNavigation.currentIndex}/{commentNavigation.totalCount}
                     </span>
                     <button
@@ -450,7 +450,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                         e.stopPropagation();
                         commentNavigation.onNext();
                       }}
-                      className="nodrag nopan w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700 rounded transition-colors"
+                      className="nodrag nopan w-6 h-6 flex items-center justify-center text-neutral-500 hover:text-neutral-100 hover:bg-gray-200 rounded transition-colors"
                       title="Next comment"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -468,14 +468,14 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
 
             {/* Comment Edit Popover */}
             {isEditingComment && (
-              <div className="absolute z-[60] right-0 top-full mt-1 w-64 p-2 bg-neutral-800 border border-neutral-600 rounded shadow-lg">
+              <div className="absolute z-[60] right-0 top-full mt-1 w-64 p-2 bg-gray-100 border border-gray-300 rounded shadow-lg">
                 <textarea
                   value={editCommentValue}
                   onChange={(e) => setEditCommentValue(e.target.value)}
                   onKeyDown={handleCommentKeyDown}
                   placeholder="Add a comment..."
                   autoFocus
-                  className="nodrag nopan nowheel w-full h-20 p-2 text-xs text-neutral-100 bg-neutral-900/50 border border-neutral-700 rounded resize-none focus:outline-none focus:ring-1 focus:ring-neutral-600"
+                  className="nodrag nopan nowheel w-full h-20 p-2 text-xs text-neutral-100 bg-black/20 border border-gray-200 rounded resize-none focus:outline-none focus:ring-1 focus:ring-neutral-600"
                 />
                 <div className="flex justify-end gap-2 mt-2">
                   <button
@@ -483,7 +483,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                       setEditCommentValue(comment || "");
                       setIsEditingComment(false);
                     }}
-                    className="px-2 py-1 text-xs text-neutral-400 hover:text-neutral-200 transition-colors"
+                    className="px-2 py-1 text-xs text-neutral-500 hover:text-neutral-700 transition-colors"
                   >
                     Cancel
                   </button>
@@ -503,7 +503,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
             <div className="relative shrink-0 group">
               <button
                 onClick={() => onExpandNode(id, type)}
-                className="nodrag nopan p-0.5 rounded transition-all duration-200 ease-in-out text-neutral-500 group-hover:text-neutral-200 border border-neutral-600 flex items-center overflow-hidden group-hover:pr-2"
+                className="nodrag nopan p-0.5 rounded transition-all duration-200 ease-in-out text-neutral-500 group-hover:text-neutral-700 border border-gray-300 flex items-center overflow-hidden group-hover:pr-2"
                 title="Expand editor"
               >
                 <svg
@@ -533,7 +533,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
               <button
                 onClick={() => onRunNode(id)}
                 disabled={isExecuting}
-                className="nodrag nopan p-0.5 rounded transition-all duration-200 ease-in-out text-neutral-500 group-hover:text-neutral-200 border border-neutral-600 flex items-center overflow-hidden group-hover:pr-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="nodrag nopan p-0.5 rounded transition-all duration-200 ease-in-out text-neutral-500 group-hover:text-neutral-700 border border-gray-300 flex items-center overflow-hidden group-hover:pr-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Run this node"
               >
                 <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -550,3 +550,5 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
     </div>
   );
 });
+
+

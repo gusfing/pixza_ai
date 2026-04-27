@@ -108,7 +108,7 @@ export function ImageInputNode({ id, data, selected }: NodeProps<ImageInputNodeT
             className="w-full h-full object-cover rounded-lg"
           />
           {nodeData.isOptional && (
-            <span className="absolute bottom-2 left-2 text-[9px] font-medium text-neutral-300 bg-black/50 px-1.5 py-0.5 rounded">
+            <span className="absolute bottom-2 left-2 text-[9px] font-medium text-neutral-600 bg-black/50 px-1.5 py-0.5 rounded">
               Optional
             </span>
           )}
@@ -136,7 +136,7 @@ export function ImageInputNode({ id, data, selected }: NodeProps<ImageInputNodeT
           }}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className={`w-full h-full bg-neutral-900/40 flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-900/60 transition-colors ${nodeData.isOptional ? "border-2 border-dashed border-neutral-600" : ""}`}
+          className={`w-full h-full bg-gray-100 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors ${nodeData.isOptional ? "border-2 border-dashed border-gray-300" : ""}`}
         >
           <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -162,3 +162,4 @@ export function ImageInputNode({ id, data, selected }: NodeProps<ImageInputNodeT
     </BaseNode>
   );
 }
+

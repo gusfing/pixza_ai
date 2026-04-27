@@ -76,7 +76,7 @@ export function ImageCompareNode({
         style={{ top: "35%" }}
       />
       <div
-        className="absolute left-[-8px] top-[35%] -translate-y-1/2 -translate-x-full mr-1 text-[9px] text-neutral-400 font-medium"
+        className="absolute left-[-8px] top-[35%] -translate-y-1/2 -translate-x-full mr-1 text-[9px] text-neutral-500 font-medium"
         style={{ pointerEvents: "none" }}
       >
         A
@@ -90,7 +90,7 @@ export function ImageCompareNode({
         style={{ top: "65%" }}
       />
       <div
-        className="absolute left-[-8px] top-[65%] -translate-y-1/2 -translate-x-full mr-1 text-[9px] text-neutral-400 font-medium"
+        className="absolute left-[-8px] top-[65%] -translate-y-1/2 -translate-x-full mr-1 text-[9px] text-neutral-500 font-medium"
         style={{ pointerEvents: "none" }}
       >
         B
@@ -126,7 +126,7 @@ export function ImageCompareNode({
           </div>
         </div>
       ) : (
-        <div className="w-full flex-1 min-h-[200px] border border-dashed border-neutral-600 rounded flex flex-col items-center justify-center gap-2">
+        <div className="w-full flex-1 min-h-[200px] border border-dashed border-gray-300 rounded flex flex-col items-center justify-center gap-2">
           <span className="text-neutral-500 text-[10px] text-center px-4">
             {!imageA && !imageB
               ? "Connect 2 images to compare"
@@ -143,3 +143,4 @@ export function ImageCompareNode({
     </BaseNode>
   );
 }
+

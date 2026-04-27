@@ -200,7 +200,7 @@ export const SwitchNode = memo(({ id, data, selected }: NodeProps<WorkflowNode>)
                 {editingId === sw.id ? (
                   <input
                     type="text"
-                    className="flex-1 bg-neutral-700 text-neutral-100 text-xs px-1 py-0.5 rounded border border-violet-500 outline-none"
+                    className="flex-1 bg-gray-200 text-neutral-100 text-xs px-1 py-0.5 rounded border border-violet-500 outline-none"
                     defaultValue={sw.name}
                     autoFocus
                     onBlur={(e) => handleNameEdit(sw.id, e.target.value)}
@@ -215,7 +215,7 @@ export const SwitchNode = memo(({ id, data, selected }: NodeProps<WorkflowNode>)
                 ) : (
                   <span
                     className={`flex-1 text-xs cursor-text ${
-                      sw.enabled ? "text-neutral-300" : "text-neutral-500"
+                      sw.enabled ? "text-neutral-600" : "text-neutral-500"
                     }`}
                     onDoubleClick={() => setEditingId(sw.id)}
                   >
@@ -226,7 +226,7 @@ export const SwitchNode = memo(({ id, data, selected }: NodeProps<WorkflowNode>)
                 {/* Delete button (hidden if only one switch) */}
                 {nodeData.switches.length > 1 && (
                   <button
-                    className="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-400 transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-opacity"
                     onClick={() => handleDelete(sw.id)}
                     title="Delete switch"
                   >
@@ -250,7 +250,7 @@ export const SwitchNode = memo(({ id, data, selected }: NodeProps<WorkflowNode>)
 
             {/* Add switch button */}
             <button
-              className="w-full flex items-center justify-center gap-1 text-neutral-400 hover:text-white text-xs py-1 mt-2 rounded hover:bg-violet-900/30 transition-colors"
+              className="w-full flex items-center justify-center gap-1 text-neutral-500 hover:text-white text-xs py-1 mt-2 rounded hover:bg-violet-900/30 transition-colors"
               onClick={handleAddSwitch}
             >
               <svg
@@ -276,3 +276,4 @@ export const SwitchNode = memo(({ id, data, selected }: NodeProps<WorkflowNode>)
 });
 
 SwitchNode.displayName = "SwitchNode";
+

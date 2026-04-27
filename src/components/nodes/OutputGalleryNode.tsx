@@ -134,7 +134,7 @@ export function OutputGalleryNode({ id, data, selected }: NodeProps<OutputGaller
         />
 
         {displayImages.length === 0 ? (
-          <div className="w-full flex-1 min-h-[200px] border border-dashed border-neutral-600 rounded flex items-center justify-center">
+          <div className="w-full flex-1 min-h-[200px] border border-dashed border-gray-300 rounded flex items-center justify-center">
             <span className="text-neutral-500 text-[10px] text-center px-4">
               Connect image nodes to view gallery
             </span>
@@ -146,7 +146,7 @@ export function OutputGalleryNode({ id, data, selected }: NodeProps<OutputGaller
                 <button
                   key={idx}
                   onClick={() => openLightbox(idx)}
-                  className="aspect-square rounded border border-neutral-700 hover:border-neutral-500 overflow-hidden transition-colors"
+                  className="aspect-square rounded border border-gray-200 hover:border-neutral-500 overflow-hidden transition-colors"
                 >
                   <AdaptiveGalleryThumbnail src={img} alt={`Image ${idx + 1}`} nodeId={id} />
                 </button>
@@ -226,3 +226,4 @@ export function OutputGalleryNode({ id, data, selected }: NodeProps<OutputGaller
     </>
   );
 }
+

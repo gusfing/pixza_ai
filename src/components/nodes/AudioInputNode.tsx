@@ -144,13 +144,13 @@ export function AudioInputNode({ id, data, selected }: NodeProps<AudioInputNodeT
       {nodeData.audioFile ? (
         <div className="relative group flex-1 flex flex-col min-h-0 gap-2">
           {nodeData.isOptional && (
-            <span className="absolute top-1 left-1 z-10 text-[9px] font-medium text-neutral-300 bg-black/50 px-1.5 py-0.5 rounded">
+            <span className="absolute top-1 left-1 z-10 text-[9px] font-medium text-neutral-600 bg-black/50 px-1.5 py-0.5 rounded">
               Optional
             </span>
           )}
           {/* Filename and duration */}
           <div className="flex items-center justify-between shrink-0">
-            <span className="text-[10px] text-neutral-400 truncate max-w-[150px]" title={nodeData.filename || ""}>
+            <span className="text-[10px] text-neutral-500 truncate max-w-[150px]" title={nodeData.filename || ""}>
               {nodeData.filename}
             </span>
             {nodeData.duration && (
@@ -162,19 +162,19 @@ export function AudioInputNode({ id, data, selected }: NodeProps<AudioInputNodeT
 
           {/* Waveform visualization */}
           {isLoading ? (
-            <div className="flex-1 flex items-center justify-center bg-neutral-900/50 rounded min-h-[60px]">
+            <div className="flex-1 flex items-center justify-center bg-black/20 rounded min-h-[60px]">
               <span className="text-xs text-neutral-500">Loading waveform...</span>
             </div>
           ) : waveformData ? (
             <div
               ref={waveformContainerRef}
-              className="flex-1 min-h-[60px] bg-neutral-900/50 rounded cursor-pointer relative"
+              className="flex-1 min-h-[60px] bg-black/20 rounded cursor-pointer relative"
               onClick={handleSeek}
             >
               <canvas ref={canvasRef} className="w-full h-full" />
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center bg-neutral-900/50 rounded min-h-[60px]">
+            <div className="flex-1 flex items-center justify-center bg-black/20 rounded min-h-[60px]">
               <span className="text-xs text-neutral-500">Processing...</span>
             </div>
           )}
@@ -198,7 +198,7 @@ export function AudioInputNode({ id, data, selected }: NodeProps<AudioInputNodeT
             </button>
 
             {/* Progress bar / scrubber */}
-            <div className="flex-1 h-1 bg-neutral-700 rounded-full overflow-hidden relative">
+            <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden relative">
               {audioRef.current?.duration && isFinite(audioRef.current.duration) && (
                 <div
                   className="h-full bg-violet-500 transition-all"
@@ -232,7 +232,7 @@ export function AudioInputNode({ id, data, selected }: NodeProps<AudioInputNodeT
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInputRef.current?.click(); } }}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className={`w-full h-full bg-neutral-900/40 flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-800/60 transition-colors ${nodeData.isOptional ? "border-2 border-dashed border-neutral-600" : ""}`}
+          className={`w-full h-full bg-gray-100 flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-800/60 transition-colors ${nodeData.isOptional ? "border-2 border-dashed border-gray-300" : ""}`}
         >
           <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
@@ -260,3 +260,4 @@ export function AudioInputNode({ id, data, selected }: NodeProps<AudioInputNodeT
     </BaseNode>
   );
 }
+

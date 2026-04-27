@@ -132,7 +132,7 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
           <div className="space-y-1.5 max-w-[280px]">
             {/* Provider */}
             <div className="flex items-center gap-2">
-              <label className="text-[11px] text-neutral-400 shrink-0">Provider</label>
+              <label className="text-[11px] text-neutral-500 shrink-0">Provider</label>
               <select
                 value={provider}
                 onChange={handleProviderChange}
@@ -146,7 +146,7 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
 
             {/* Model */}
             <div className="flex items-center gap-2">
-              <label className="text-[11px] text-neutral-400 shrink-0">Model</label>
+              <label className="text-[11px] text-neutral-500 shrink-0">Model</label>
               <select
                 value={nodeData.model || availableModels[0].value}
                 onChange={handleModelChange}
@@ -160,7 +160,7 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
 
             {/* Temperature */}
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-neutral-400">
+              <label className="text-[11px] text-neutral-500">
                 Temperature: {(nodeData.temperature ?? 0.7).toFixed(2)}
               </label>
               <input
@@ -170,13 +170,13 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
                 step="0.01"
                 value={nodeData.temperature ?? 0.7}
                 onChange={handleTemperatureChange}
-                className="nodrag nopan w-full h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                className="nodrag nopan w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
             </div>
 
             {/* Max Tokens */}
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-neutral-400">
+              <label className="text-[11px] text-neutral-500">
                 Max Tokens: {(nodeData.maxTokens || 2048).toLocaleString()}
               </label>
               <input
@@ -186,7 +186,7 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
                 step="256"
                 value={nodeData.maxTokens || 2048}
                 onChange={handleMaxTokensChange}
-                className="nodrag nopan w-full h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                className="nodrag nopan w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
             </div>
           </div>
@@ -219,9 +219,9 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
 
       <div className="relative w-full h-full min-h-0 overflow-hidden rounded-lg">
         {nodeData.status === "loading" ? (
-          <div className="w-full h-full bg-neutral-900/40 flex items-center justify-center">
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
             <svg
-              className="w-4 h-4 animate-spin text-neutral-400"
+              className="w-4 h-4 animate-spin text-neutral-500"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -251,20 +251,20 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-white text-xs font-medium">Generation failed</span>
+            <span className="text-neutral-800 text-xs font-medium">Generation failed</span>
             {nodeData.error && (
               <span className="text-red-200 text-[10px] text-center px-3 mt-1 line-clamp-3">{nodeData.error}</span>
             )}
           </div>
         ) : nodeData.outputText ? (
-          <div className="group/text relative w-full h-full bg-neutral-900/40 p-2 overflow-auto nowheel">
-            <p className="text-[10px] text-neutral-300 whitespace-pre-wrap break-words">
+          <div className="group/text relative w-full h-full bg-gray-100 p-2 overflow-auto nowheel">
+            <p className="text-[10px] text-neutral-600 whitespace-pre-wrap break-words">
               {nodeData.outputText}
             </p>
             <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover/text:opacity-100 transition-opacity">
               <button
                 onClick={handleCopyOutput}
-                className={`nodrag nopan w-5 h-5 ${copied ? "bg-green-600/80" : "bg-neutral-900/80 hover:bg-neutral-700/80"} rounded flex items-center justify-center text-neutral-400 hover:text-white transition-colors`}
+                className={`nodrag nopan w-5 h-5 ${copied ? "bg-green-600/80" : "bg-white/80 hover:bg-neutral-700/80"} rounded flex items-center justify-center text-neutral-500 hover:text-white transition-colors`}
                 title={copied ? "Copied!" : "Copy to clipboard"}
               >
                 {copied ? (
@@ -280,7 +280,7 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
               <button
                 onClick={handleRegenerate}
                 disabled={isRunning}
-                className="nodrag nopan w-5 h-5 bg-neutral-900/80 hover:bg-blue-600/80 disabled:opacity-50 disabled:cursor-not-allowed rounded flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+                className="nodrag nopan w-5 h-5 bg-white/80 hover:bg-blue-600/80 disabled:opacity-50 disabled:cursor-not-allowed rounded flex items-center justify-center text-neutral-500 hover:text-white transition-colors"
                 title="Regenerate"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -289,7 +289,7 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
               </button>
               <button
                 onClick={handleClearOutput}
-                className="nodrag nopan w-5 h-5 bg-neutral-900/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+                className="nodrag nopan w-5 h-5 bg-white/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-500 hover:text-white transition-colors"
                 title="Clear output"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -299,7 +299,7 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
             </div>
           </div>
         ) : (
-          <div className="w-full h-full bg-neutral-900/40 flex items-center justify-center">
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
             <span className="text-neutral-500 text-[10px]">
               Run to generate
             </span>
@@ -310,3 +310,5 @@ export function LLMGenerateNode({ id, data, selected }: NodeProps<LLMGenerateNod
     </BaseNode>
   );
 }
+
+

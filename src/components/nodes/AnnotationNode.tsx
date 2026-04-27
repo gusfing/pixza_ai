@@ -142,7 +142,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps<AnnotationNodeT
             </svg>
           </button>
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none">
-            <span className="text-xs font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-3 py-1.5 rounded">
+            <span className="text-xs font-medium text-neutral-800 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-3 py-1.5 rounded">
               {nodeData.annotations.length > 0 ? `Edit (${nodeData.annotations.length})` : "Add annotations"}
             </span>
           </div>
@@ -152,7 +152,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps<AnnotationNodeT
           onClick={() => fileInputRef.current?.click()}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className="w-full h-full bg-neutral-900/40 flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-800/60 transition-colors"
+          className="w-full h-full bg-gray-100 flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-800/60 transition-colors"
         >
           <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -165,3 +165,5 @@ export function AnnotationNode({ id, data, selected }: NodeProps<AnnotationNodeT
     </BaseNode>
   );
 }
+
+

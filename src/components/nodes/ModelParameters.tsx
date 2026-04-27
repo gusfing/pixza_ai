@@ -233,9 +233,9 @@ function ModelParametersInner({
       {error ? (
         <span className="text-[9px] text-red-400">{error}</span>
       ) : isLoading ? (
-        <span className="text-[9px] text-neutral-400">Loading parameters...</span>
+        <span className="text-[9px] text-neutral-500">Loading parameters...</span>
       ) : schema.length === 0 ? (
-        <span className="text-[9px] text-neutral-400">No parameters available</span>
+        <span className="text-[9px] text-neutral-500">No parameters available</span>
       ) : (
         <div
           ref={gridRef}
@@ -300,7 +300,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
     return (
       <div className="flex items-center gap-2">
         <label
-          className="text-[11px] text-neutral-400 shrink-0"
+          className="text-[11px] text-neutral-500 shrink-0"
           title={param.description || undefined}
         >
           {displayName}
@@ -341,7 +341,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
     // Boolean: render as checkbox
     return (
       <label
-        className="flex items-center gap-1.5 text-[11px] text-neutral-300 cursor-pointer"
+        className="flex items-center gap-1.5 text-[11px] text-neutral-600 cursor-pointer"
         title={param.description || undefined}
       >
         <input
@@ -376,12 +376,12 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
       <div className="flex flex-col gap-0.5">
         <div className="flex items-center gap-2">
           <label
-            className="text-[11px] text-neutral-400 shrink-0 flex items-center gap-1"
+            className="text-[11px] text-neutral-500 shrink-0 flex items-center gap-1"
             title={param.description || undefined}
           >
             {displayName}
             {hasMin && hasMax && (
-              <span className="text-neutral-400 text-[9px]">
+              <span className="text-neutral-500 text-[9px]">
                 ({param.minimum}-{param.maximum})
               </span>
             )}
@@ -406,7 +406,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
               }
             }}
             placeholder={param.default !== undefined ? `${param.default}` : undefined}
-            className={`nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-gray-100 focus:outline-none focus:ring-1 text-neutral-800 placeholder:text-neutral-400 ${
+            className={`nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-gray-100 focus:outline-none focus:ring-1 text-neutral-800 placeholder:text-neutral-500 ${
               validationError
                 ? "ring-1 ring-red-500"
                 : "focus:ring-blue-400"
@@ -429,7 +429,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
   return (
     <div className="flex items-center gap-2">
       <label
-        className="text-[11px] text-neutral-400 shrink-0"
+        className="text-[11px] text-neutral-500 shrink-0"
         title={param.description || undefined}
       >
         {displayName}
@@ -446,7 +446,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
           handleChange(localValue || undefined);
         }}
         placeholder={param.default !== undefined ? `${param.default}` : undefined}
-        className="nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400 text-neutral-800 placeholder:text-neutral-400"
+        className="nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400 text-neutral-800 placeholder:text-neutral-500"
       />
     </div>
   );
@@ -455,5 +455,6 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
 // Memoized exports to prevent unnecessary re-renders
 export const ModelParameters = React.memo(ModelParametersInner);
 const ParameterInput = React.memo(ParameterInputInner);
+
 
 

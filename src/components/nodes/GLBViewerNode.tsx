@@ -375,7 +375,7 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
           {/* 3D Viewport — fills node edge-to-edge */}
           <div
             ref={viewportRef}
-            className={`nodrag nopan nowheel relative w-full flex-1 min-h-[200px] overflow-hidden bg-neutral-900 ${nodeData.capturedImage ? "" : "rounded-b-[5px]"}`}
+            className={`nodrag nopan nowheel relative w-full flex-1 min-h-[200px] overflow-hidden bg-gray-50 ${nodeData.capturedImage ? "" : "rounded-b-[5px]"}`}
             onPointerDown={() => setIsInteracting(true)}
             onPointerUp={() => setIsInteracting(false)}
           >
@@ -419,7 +419,7 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
             {/* Controls bar — overlaid on viewport */}
             <div className="absolute bottom-0 left-0 right-0 z-10 px-3 py-1.5 flex items-center justify-between gap-1 pointer-events-none bg-gradient-to-t from-black/60 to-transparent">
               <div className="flex items-center gap-1.5 min-w-0 pointer-events-auto">
-                <span className="text-[10px] text-neutral-400 truncate max-w-[100px]">
+                <span className="text-[10px] text-neutral-500 truncate max-w-[100px]">
                   {nodeData.filename}
                 </span>
                 <button
@@ -428,7 +428,7 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
                   className={`p-0.5 rounded transition-colors ${
                     autoRotate
                       ? "text-cyan-400 bg-cyan-400/10"
-                      : "text-neutral-500 hover:text-neutral-300"
+                      : "text-neutral-500 hover:text-neutral-600"
                   }`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -441,7 +441,7 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
                 <button
                   onClick={handleCapture}
                   title="Capture current view as image"
-                  className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-neutral-300 hover:text-neutral-100 bg-neutral-700 hover:bg-neutral-600 rounded transition-colors"
+                  className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600 hover:text-neutral-100 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
                 >
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -472,7 +472,7 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
                 </span>
                 <button
                   onClick={() => updateNodeData(id, { capturedImage: null })}
-                  className="text-[10px] text-neutral-500 hover:text-neutral-300 transition-colors"
+                  className="text-[10px] text-neutral-500 hover:text-neutral-600 transition-colors"
                 >
                   Clear
                 </button>
@@ -480,7 +480,7 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
               <img
                 src={adaptiveCapturedImage ?? undefined}
                 alt="Captured 3D render"
-                className="w-full rounded border border-neutral-700 bg-neutral-900"
+                className="w-full rounded border border-gray-200 bg-gray-50"
               />
             </div>
           )}
@@ -490,12 +490,12 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
           onClick={() => fileInputRef.current?.click()}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className="w-full flex-1 min-h-[150px] border border-dashed border-neutral-600 rounded flex flex-col items-center justify-center cursor-pointer hover:border-neutral-500 hover:bg-neutral-700/50 transition-colors"
+          className="w-full flex-1 min-h-[150px] border border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer hover:border-neutral-500 hover:bg-neutral-700/50 transition-colors"
         >
           <svg className="w-8 h-8 text-neutral-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
           </svg>
-          <span className="text-[10px] text-neutral-400">
+          <span className="text-[10px] text-neutral-500">
             Drop .GLB or click
           </span>
         </div>
@@ -541,3 +541,5 @@ export function GLBViewerNode({ id, data, selected }: NodeProps<GLBViewerNodeTyp
     </BaseNode>
   );
 }
+
+

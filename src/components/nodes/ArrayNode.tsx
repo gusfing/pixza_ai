@@ -228,7 +228,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
 
       <div className="flex flex-col gap-2 pt-3 flex-1 min-h-0">
         <div className="flex items-center gap-2">
-          <label className="shrink-0 text-[11px] text-neutral-400">Split</label>
+          <label className="shrink-0 text-[11px] text-neutral-500">Split</label>
           <select
             value={nodeData.splitMode}
             onChange={handleBasicModeChange}
@@ -245,7 +245,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
             className={`nodrag nopan shrink-0 py-1 px-2 rounded-md text-[11px] font-medium transition-colors ${
               nodeData.batchMode
                 ? "bg-blue-600/80 text-blue-100"
-                : "bg-[#1a1a1a] text-neutral-500 hover:text-neutral-300"
+                : "bg-[#1a1a1a] text-neutral-500 hover:text-neutral-600"
             }`}
             title={nodeData.batchMode ? "Batch mode: all items sent to one downstream node" : "Enable batch mode"}
           >
@@ -257,7 +257,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
               type="button"
               onClick={handleAutoRouteToPrompts}
               disabled={previewItems.length === 0}
-              className="nodrag nopan shrink-0 py-1 px-1.5 bg-[#1a1a1a] rounded-md text-neutral-400 hover:text-neutral-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="nodrag nopan shrink-0 py-1 px-1.5 bg-[#1a1a1a] rounded-md text-neutral-500 hover:text-neutral-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title="Auto-route to Prompts"
             >
               <svg className="w-3.5 h-3.5 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -272,7 +272,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
 
         {nodeData.splitMode === "delimiter" && (
           <div className="flex items-center gap-2 max-w-[75%]">
-            <label className="shrink-0 text-[11px] text-neutral-400">By</label>
+            <label className="shrink-0 text-[11px] text-neutral-500">By</label>
             <input
               value={nodeData.delimiter}
               onChange={(e) => updateSettingsAndReparse({ delimiter: e.target.value })}
@@ -284,7 +284,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
 
         {nodeData.splitMode === "regex" && (
           <div className="flex items-center gap-2 max-w-[75%]">
-            <label className="shrink-0 text-[11px] text-neutral-400">By</label>
+            <label className="shrink-0 text-[11px] text-neutral-500">By</label>
             <input
               value={nodeData.regexPattern}
               onChange={(e) => updateSettingsAndReparse({ regexPattern: e.target.value })}
@@ -298,7 +298,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
           <button
             type="button"
             onClick={() => setShowAdvanced((v) => !v)}
-            className="nodrag nopan flex items-center gap-1 text-[11px] text-neutral-500 hover:text-neutral-300 transition-colors"
+            className="nodrag nopan flex items-center gap-1 text-[11px] text-neutral-500 hover:text-neutral-600 transition-colors"
           >
             <svg className={`w-3 h-3 transition-transform ${showAdvanced ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -308,7 +308,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
 
           {showAdvanced && (
             <div className="px-2 pt-1.5 pb-0.5 flex items-center gap-3">
-              <label className="flex items-center gap-1.5 text-[11px] text-neutral-300">
+              <label className="flex items-center gap-1.5 text-[11px] text-neutral-600">
                 <input
                   type="checkbox"
                   checked={nodeData.trimItems}
@@ -317,7 +317,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
                 />
                 Trim
               </label>
-              <label className="flex items-center gap-1.5 text-[11px] text-neutral-300">
+              <label className="flex items-center gap-1.5 text-[11px] text-neutral-600">
                 <input
                   type="checkbox"
                   checked={nodeData.removeEmpty}
@@ -354,7 +354,7 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
                     className={`nodrag nopan w-[calc(100%-1rem)] mx-2 my-0.5 rounded-md px-2 py-1 text-[11px] text-left truncate transition-colors ${
                       isSelected
                         ? "bg-blue-900/40 text-blue-200 ring-1 ring-blue-500/60"
-                        : "bg-neutral-800/60 text-neutral-300 hover:bg-neutral-700/60"
+                        : "bg-neutral-800/60 text-neutral-600 hover:bg-neutral-700/60"
                     }`}
                     title={isSelected ? "Selected for next connection (click to unselect)" : "Click to select for next connection"}
                   >
@@ -376,3 +376,4 @@ export function ArrayNode({ id, data, selected }: NodeProps<ArrayNodeType>) {
     </BaseNode>
   );
 }
+

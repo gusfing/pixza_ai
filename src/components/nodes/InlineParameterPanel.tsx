@@ -34,7 +34,7 @@ function InlineParameterPanelInner({
       <button
         type="button"
         onClick={onToggle}
-        className={`nodrag nopan w-full flex items-center justify-center gap-1 py-1 text-neutral-400 hover:text-neutral-600 transition-colors ${expanded ? "bg-gray-50" : ""}`}
+        className={`nodrag nopan w-full flex items-center justify-center gap-1 py-1 text-neutral-500 hover:text-neutral-600 transition-colors ${expanded ? "bg-gray-50" : ""}`}
         aria-label={expanded ? "Collapse parameters" : "Expand parameters"}
         aria-expanded={expanded}
         aria-controls={`params-${nodeId}`}
@@ -70,3 +70,4 @@ function InlineParameterPanelInner({
 
 // Memoized export to prevent unnecessary re-renders
 export const InlineParameterPanel = React.memo(InlineParameterPanelInner);
+

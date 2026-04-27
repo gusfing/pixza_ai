@@ -111,12 +111,12 @@ export function PromptNode({ id, data, selected }: NodeProps<PromptNodeType>) {
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder={hasIncomingTextConnection ? "Text from connected node (editable)..." : nodeData.isOptional ? "Optional prompt (leave empty to skip)..." : "Describe what to generate..."}
-          className="nodrag nopan nowheel w-full h-full p-3 pb-7 text-xs leading-relaxed text-neutral-800 bg-transparent rounded-t-lg resize-none focus:outline-none placeholder:text-neutral-400"
+          className="nodrag nopan nowheel w-full h-full p-3 pb-7 text-xs leading-relaxed text-neutral-800 bg-transparent rounded-t-lg resize-none focus:outline-none placeholder:text-neutral-500"
         />
         <div className="absolute bottom-0 left-0 right-0 z-10 px-3 py-1.5 rounded-b-lg border-t border-gray-100">
           <button
             onClick={() => setShowVarDialog(true)}
-            className="nodrag nopan text-[10px] text-neutral-400 hover:text-blue-500 transition-colors"
+            className="nodrag nopan text-[10px] text-neutral-500 hover:text-blue-500 transition-colors"
             title="Set variable name"
           >
             {nodeData.variableName ? `@${nodeData.variableName}` : "Add variable"}
@@ -136,13 +136,13 @@ export function PromptNode({ id, data, selected }: NodeProps<PromptNodeType>) {
       {/* Variable Naming Dialog - rendered via portal */}
       {showVarDialog && createPortal(
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]">
-          <div className="bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl p-4 w-96">
+          <div className="bg-gray-100 border border-gray-300 rounded-lg shadow-xl p-4 w-96">
             <h3 className="text-sm font-semibold text-neutral-100 mb-3">Set Variable Name</h3>
-            <p className="text-xs text-neutral-400 mb-3">
+            <p className="text-xs text-neutral-500 mb-3">
               Use this prompt as a variable in PromptConstructor nodes
             </p>
             <div className="mb-4">
-              <label className="block text-xs text-neutral-300 mb-1">Variable name</label>
+              <label className="block text-xs text-neutral-600 mb-1">Variable name</label>
               <input
                 type="text"
                 value={varNameInput}
@@ -153,7 +153,7 @@ export function PromptNode({ id, data, selected }: NodeProps<PromptNodeType>) {
                   }
                 }}
                 placeholder="e.g. color, style, subject"
-                className="w-full px-3 py-2 text-sm text-neutral-100 bg-neutral-900 border border-neutral-700 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm text-neutral-100 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 autoFocus
               />
               {varNameInput && (
@@ -173,7 +173,7 @@ export function PromptNode({ id, data, selected }: NodeProps<PromptNodeType>) {
               )}
               <button
                 onClick={() => setShowVarDialog(false)}
-                className="px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-300 hover:bg-neutral-700 rounded transition-colors"
+                className="px-3 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-600 hover:bg-gray-200 rounded transition-colors"
               >
                 Cancel
               </button>
@@ -192,3 +192,5 @@ export function PromptNode({ id, data, selected }: NodeProps<PromptNodeType>) {
     </>
   );
 }
+
+

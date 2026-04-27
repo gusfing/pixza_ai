@@ -74,7 +74,7 @@ export const RouterNode = memo(({ id, data, selected }: NodeProps<WorkflowNode>)
       selected={selected}
       minWidth={200}
       minHeight={minHeight}
-      className="bg-neutral-800/80 border-neutral-600"
+      className="bg-neutral-800/80 border-gray-300"
     >
       {/* Input handles (left) */}
       {activeInputTypes.map((type, index) => (
@@ -137,3 +137,4 @@ export const RouterNode = memo(({ id, data, selected }: NodeProps<WorkflowNode>)
 });
 
 RouterNode.displayName = "RouterNode";
+

@@ -185,7 +185,7 @@ export function GroupNode({ id, data, selected }: NodeProps<GroupNodeType>) {
             />
           ) : (
             <span
-              className="flex-1 text-sm font-medium text-white truncate cursor-text"
+              className="flex-1 text-sm font-medium text-neutral-800 truncate cursor-text"
               onClick={() => setIsEditing(true)}
             >
               {group.name}
@@ -201,7 +201,7 @@ export function GroupNode({ id, data, selected }: NodeProps<GroupNodeType>) {
               title="Change color"
             />
             {showColorPicker && (
-              <div className="absolute top-full right-0 mt-1 p-2 bg-neutral-800 rounded-lg shadow-xl border border-neutral-600 grid grid-cols-4 gap-1.5 z-50">
+              <div className="absolute top-full right-0 mt-1 p-2 bg-gray-100 rounded-lg shadow-xl border border-gray-300 grid grid-cols-4 gap-1.5 z-50">
                 {COLOR_OPTIONS.map(({ color, label }) => (
                   <button
                     key={color}
@@ -237,3 +237,5 @@ export function GroupNode({ id, data, selected }: NodeProps<GroupNodeType>) {
     </>
   );
 }
+
+

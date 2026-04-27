@@ -206,7 +206,7 @@ export function PromptConstructorNode({ id, data, selected }: NodeProps<PromptCo
           {highlightedContent.length > 0 && (
             <div
               ref={highlightRef}
-              className={`absolute inset-0 p-3 text-xs leading-relaxed text-transparent bg-neutral-800 rounded-lg overflow-hidden whitespace-pre-wrap break-words pointer-events-none ${availableVariables.length > 0 || unresolvedVars.length > 0 ? "pb-7" : ""}`}
+              className={`absolute inset-0 p-3 text-xs leading-relaxed text-transparent bg-gray-100 rounded-lg overflow-hidden whitespace-pre-wrap break-words pointer-events-none ${availableVariables.length > 0 || unresolvedVars.length > 0 ? "pb-7" : ""}`}
               aria-hidden="true"
             >
               {highlightedContent}
@@ -221,14 +221,14 @@ export function PromptConstructorNode({ id, data, selected }: NodeProps<PromptCo
             onKeyDown={handleKeyDown}
             onScroll={handleScroll}
             placeholder="Type @ to insert variables..."
-            className={`nodrag nopan nowheel relative w-full h-full p-3 text-xs leading-relaxed text-neutral-100 rounded-lg resize-none focus:outline-none placeholder:text-neutral-500 ${highlightedContent.length > 0 ? "bg-transparent" : "bg-neutral-800"} ${availableVariables.length > 0 || unresolvedVars.length > 0 ? "pb-7" : ""}`}
+            className={`nodrag nopan nowheel relative w-full h-full p-3 text-xs leading-relaxed text-neutral-100 rounded-lg resize-none focus:outline-none placeholder:text-neutral-500 ${highlightedContent.length > 0 ? "bg-transparent" : "bg-gray-100"} ${availableVariables.length > 0 || unresolvedVars.length > 0 ? "pb-7" : ""}`}
             title={resolvedPreview ? `Preview: ${resolvedPreview}` : undefined}
           />
 
           {/* Autocomplete dropdown */}
           {showAutocomplete && filteredAutocompleteVars.length > 0 && (
             <div
-              className="absolute z-20 bg-neutral-800 border border-neutral-600 rounded shadow-xl max-h-40 overflow-y-auto"
+              className="absolute z-20 bg-gray-100 border border-gray-300 rounded shadow-xl max-h-40 overflow-y-auto"
               style={{
                 top: autocompletePosition.top,
                 left: autocompletePosition.left,
@@ -243,8 +243,8 @@ export function PromptConstructorNode({ id, data, selected }: NodeProps<PromptCo
                   }}
                   className={`w-full px-3 py-2 text-left text-[11px] flex flex-col gap-0.5 transition-colors ${
                     index === selectedAutocompleteIndex
-                      ? "bg-neutral-700 text-neutral-100"
-                      : "text-neutral-300 hover:bg-neutral-700"
+                      ? "bg-gray-200 text-neutral-100"
+                      : "text-neutral-600 hover:bg-gray-200"
                   }`}
                 >
                   <div className="font-medium text-blue-400">@{variable.name}</div>
@@ -283,3 +283,4 @@ export function PromptConstructorNode({ id, data, selected }: NodeProps<PromptCo
     </>
   );
 }
+

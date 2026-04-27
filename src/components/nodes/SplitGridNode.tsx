@@ -112,7 +112,7 @@ export function SplitGridNode({ id, data, selected }: NodeProps<SplitGridNodeTyp
             </div>
             {/* Loading overlay */}
             {nodeData.status === "loading" && (
-              <div className="absolute inset-0 bg-neutral-900/70 rounded-lg flex items-center justify-center">
+              <div className="absolute inset-0 bg-white/80 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 animate-spin text-white" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -121,13 +121,13 @@ export function SplitGridNode({ id, data, selected }: NodeProps<SplitGridNodeTyp
             )}
           </div>
         ) : (
-          <div className="w-full h-full min-h-[112px] bg-neutral-900/40 flex flex-col items-center justify-center rounded-lg">
+          <div className="w-full h-full min-h-[112px] bg-gray-100 flex flex-col items-center justify-center rounded-lg">
             {nodeData.status === "error" ? (
               <span className="text-[10px] text-red-400 text-center px-2">
                 {nodeData.error || "Error"}
               </span>
             ) : nodeData.status === "loading" ? (
-              <svg className="w-4 h-4 animate-spin text-neutral-400" fill="none" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 animate-spin text-neutral-500" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
@@ -147,7 +147,7 @@ export function SplitGridNode({ id, data, selected }: NodeProps<SplitGridNodeTyp
         {/* Controls overlay pinned at bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 px-3 py-2 bg-neutral-900/90 rounded-b-lg space-y-1">
           {/* Config summary */}
-          <div className="flex items-center justify-between text-[10px] text-neutral-400">
+          <div className="flex items-center justify-between text-[10px] text-neutral-500">
             <span>{nodeData.gridRows}x{nodeData.gridCols} grid ({nodeData.targetCount} images)</span>
             <button
               onClick={handleOpenSettings}
@@ -173,7 +173,7 @@ export function SplitGridNode({ id, data, selected }: NodeProps<SplitGridNodeTyp
             <button
               onClick={handleSplit}
               disabled={isRunning || !nodeData.isConfigured || !nodeData.sourceImage}
-              className="nodrag nopan px-2 py-0.5 text-[10px] border border-white hover:bg-white hover:text-neutral-900 disabled:border-neutral-600 disabled:text-neutral-600 disabled:cursor-not-allowed text-white rounded transition-colors"
+              className="nodrag nopan px-2 py-0.5 text-[10px] border border-white hover:bg-white hover:text-neutral-900 disabled:border-gray-300 disabled:text-neutral-600 disabled:cursor-not-allowed text-white rounded transition-colors"
               title={!nodeData.isConfigured ? "Configure node first" : !nodeData.sourceImage ? "Connect an image first" : "Split grid"}
             >
               Split
@@ -193,3 +193,5 @@ export function SplitGridNode({ id, data, selected }: NodeProps<SplitGridNodeTyp
     </>
   );
 }
+
+

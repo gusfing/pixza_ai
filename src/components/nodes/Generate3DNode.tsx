@@ -137,7 +137,7 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
           {/* Model selector: Browse button + current model display */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <div className="text-[11px] text-neutral-200 truncate">
+              <div className="text-[11px] text-neutral-700 truncate">
                 {displayTitle}
               </div>
               <div className="text-[9px] text-neutral-500">
@@ -146,7 +146,7 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
             </div>
             <button
               onClick={() => setIsBrowseDialogOpen(true)}
-              className="nodrag nopan shrink-0 px-2 py-1 text-[10px] bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 rounded text-neutral-300 transition-colors"
+              className="nodrag nopan shrink-0 px-2 py-1 text-[10px] bg-gray-200 hover:bg-gray-300 border border-gray-300 rounded text-neutral-600 transition-colors"
             >
               Browse
             </button>
@@ -356,7 +356,7 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
       <div className="flex-1 flex flex-col min-h-0 gap-2">
         {/* Preview area */}
         {nodeData.output3dUrl ? (
-          <div className="relative w-full flex-1 min-h-[80px] flex flex-col items-center justify-center gap-2 bg-neutral-800 rounded border border-neutral-700 p-3">
+          <div className="relative w-full flex-1 min-h-[80px] flex flex-col items-center justify-center gap-2 bg-gray-100 rounded border border-gray-200 p-3">
             <svg className="w-8 h-8 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
             </svg>
@@ -383,7 +383,7 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
                     useToast.getState().show("Failed to open file location", "error");
                   }
                 }}
-                className="nodrag nopan text-[10px] text-neutral-400 hover:text-orange-300 truncate max-w-full cursor-pointer transition-colors flex items-center gap-1"
+                className="nodrag nopan text-[10px] text-neutral-500 hover:text-orange-300 truncate max-w-full cursor-pointer transition-colors flex items-center gap-1"
                 title={`Open in explorer: ${nodeData.savedFilePath}`}
               >
                 <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -396,7 +396,7 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
             )}
             {/* Loading overlay for re-generation */}
             {nodeData.status === "loading" && (
-              <div className="absolute inset-0 bg-neutral-900/70 rounded flex items-center justify-center">
+              <div className="absolute inset-0 bg-white/80 rounded flex items-center justify-center">
                 <svg
                   className="w-6 h-6 animate-spin text-white"
                   fill="none"
@@ -413,14 +413,14 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
                 <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-white text-xs font-medium">Generation failed</span>
+                <span className="text-neutral-800 text-xs font-medium">Generation failed</span>
                 <span className="text-white/70 text-[10px]">See toast for details</span>
               </div>
             )}
             <div className="absolute top-1 right-1">
               <button
                 onClick={handleClear3D}
-                className="w-5 h-5 bg-neutral-900/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+                className="w-5 h-5 bg-white/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-500 hover:text-white transition-colors"
                 title="Clear 3D model"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -430,10 +430,10 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
             </div>
           </div>
         ) : (
-          <div className="w-full flex-1 min-h-[112px] border border-dashed border-neutral-600 rounded flex flex-col items-center justify-center">
+          <div className="w-full flex-1 min-h-[112px] border border-dashed border-gray-300 rounded flex flex-col items-center justify-center">
             {nodeData.status === "loading" ? (
               <svg
-                className="w-4 h-4 animate-spin text-neutral-400"
+                className="w-4 h-4 animate-spin text-neutral-500"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -479,3 +479,5 @@ export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeT
     </>
   );
 }
+
+

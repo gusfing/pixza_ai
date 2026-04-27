@@ -127,7 +127,7 @@ export function EaseCurveNode({ id, data, selected }: NodeProps<EaseCurveNodeTyp
           <svg className="w-8 h-8 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
           </svg>
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-neutral-500">
             Your browser doesn&apos;t support video encoding.
           </span>
           <a
@@ -155,7 +155,7 @@ export function EaseCurveNode({ id, data, selected }: NodeProps<EaseCurveNodeTyp
       >
         {renderHandles()}
         <div className="flex-1 flex items-center justify-center">
-          <div className="flex items-center gap-2 text-neutral-400">
+          <div className="flex items-center gap-2 text-neutral-500">
             <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -194,7 +194,7 @@ export function EaseCurveNode({ id, data, selected }: NodeProps<EaseCurveNodeTyp
           />
           <button
             onClick={() => updateNodeData(id, { outputVideo: null, status: "idle" })}
-            className="absolute top-1 right-1 w-5 h-5 bg-neutral-900/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+            className="absolute top-1 right-1 w-5 h-5 bg-white/80 hover:bg-red-600/80 rounded flex items-center justify-center text-neutral-500 hover:text-white transition-colors"
             title="Clear video"
           >
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -203,19 +203,19 @@ export function EaseCurveNode({ id, data, selected }: NodeProps<EaseCurveNodeTyp
           </button>
         </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-neutral-900/40 rounded-lg">
+        <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
           <span className="text-[10px] text-neutral-500">Run workflow to apply ease curve</span>
         </div>
       )}
 
       {/* Processing overlay */}
       {nodeData.status === "loading" && (
-        <div className="absolute inset-0 bg-neutral-900/70 rounded-lg flex flex-col items-center justify-center gap-2">
+        <div className="absolute inset-0 bg-white/80 rounded-lg flex flex-col items-center justify-center gap-2">
           <svg className="w-6 h-6 animate-spin text-white" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
-          <span className="text-white text-xs">Processing... {Math.round(nodeData.progress)}%</span>
+          <span className="text-neutral-800 text-xs">Processing... {Math.round(nodeData.progress)}%</span>
         </div>
       )}
 
@@ -228,3 +228,5 @@ export function EaseCurveNode({ id, data, selected }: NodeProps<EaseCurveNodeTyp
     </BaseNode>
   );
 }
+
+
