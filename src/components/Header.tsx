@@ -5,22 +5,17 @@ import Link from "next/link";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { useShallow } from "zustand/shallow";
 import { ProjectSetupModal } from "./ProjectSetupModal";
-import { CostIndicator } from "./CostIndicator";
 import { KeyboardShortcutsDialog } from "./KeyboardShortcutsDialog";
 import { WorkflowBrowserModal } from "./WorkflowBrowserModal";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { QuotaIndicator } from "./QuotaIndicator";
-import { 
-  FolderOpen, 
-  Save, 
-  Settings, 
-  ChevronRight, 
-  Command,
-  MessageSquare,
-  ExternalLink,
-  RotateCcw
+import { CostIndicator } from "./CostIndicator";
+import {
+  FolderOpen, Save, Settings, ExternalLink,
+  RotateCcw, MessageSquare, Keyboard, ArrowLeft,
 } from "lucide-react";
 
+// ── Comments navigation button ────────────────────────────────
 function CommentsBtn() {
   const nodes = useWorkflowStore((s) => s.nodes);
   const getNodesWithComments = useWorkflowStore((s) => s.getNodesWithComments);
@@ -28,29 +23,64 @@ function CommentsBtn() {
   const markCommentViewed = useWorkflowStore((s) => s.markCommentViewed);
   const setNavigationTarget = useWorkflowStore((s) => s.setNavigationTarget);
 
-  const nodesWithComments = useMemo(() => getNodesWithComments(), [getNodesWithComments, nodes]);
+  const nodesWithComments = useMemo(
+    () => getNodesWithComments(),
+    [getNodesWithComments, nodes]
+  );
   const unviewed = useMemo(
     () => nodesWithComments.filter((n) => !viewedCommentNodeIds.has(n.id)).length,
     [nodesWithComments, viewedCommentNodeIds]
   );
 
   const handleClick = useCallback(() => {
-    const target = nodesWithComments.find((n) => !viewedCommentNodeIds.has(n.id)) ?? nodesWithComments[0];
+    const target =
+      nodesWithComments.find((n) => !viewedCommentNodeIds.has(n.id)) ??
+      nodesWithComments[0];
     if (target) { markCommentViewed(target.id); setNavigationTarget(target.id); }
   }, [nodesWithComments, viewedCommentNodeIds, markCommentViewed, setNavigationTarget]);
 
   if (nodesWithComments.length === 0) return null;
 
   return (
-    <button onClick={handleClick} className="relative p-2 text-white/70 hover:text-white transition-colors" title={`${unviewed} unviewed comments`}>
+    <button
+      onClick={handleClick}
+      className="relative flex items-center justify-center w-7 h-7 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-black/5 transition-colors"
+      title={`${unviewed} unviewed comment${unviewed !== 1 ? "s" : ""}`}
+    >
       <MessageSquare className="w-4 h-4" />
       {unviewed > 0 && (
-        <span className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full border border-[#0A0A0A]" />
+        <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-white" />
       )}
     </button>
   );
 }
 
+// ── Icon button helper ────────────────────────────────────────
+function IconBtn({
+  onClick, title, children, dot = false, disabled = false,
+}: {
+  onClick?: () => void;
+  title: string;
+  children: React.ReactNode;
+  dot?: boolean;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className="relative flex items-center justify-center w-7 h-7 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-black/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      {children}
+      {dot && (
+        <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+      )}
+    </button>
+  );
+}
+
+// ── Main Header ───────────────────────────────────────────────
 export function Header() {
   const {
     workflowName, workflowId, saveDirectoryPath,
@@ -59,13 +89,20 @@ export function Header() {
     previousWorkflowSnapshot, revertToSnapshot,
     shortcutsDialogOpen, setShortcutsDialogOpen, setShowQuickstart,
   } = useWorkflowStore(useShallow((s) => ({
-    workflowName: s.workflowName, workflowId: s.workflowId,
-    saveDirectoryPath: s.saveDirectoryPath, hasUnsavedChanges: s.hasUnsavedChanges,
-    lastSavedAt: s.lastSavedAt, isSaving: s.isSaving,
-    setWorkflowMetadata: s.setWorkflowMetadata, saveToFile: s.saveToFile,
-    loadWorkflow: s.loadWorkflow, previousWorkflowSnapshot: s.previousWorkflowSnapshot,
-    revertToSnapshot: s.revertToSnapshot, shortcutsDialogOpen: s.shortcutsDialogOpen,
-    setShortcutsDialogOpen: s.setShortcutsDialogOpen, setShowQuickstart: s.setShowQuickstart,
+    workflowName: s.workflowName,
+    workflowId: s.workflowId,
+    saveDirectoryPath: s.saveDirectoryPath,
+    hasUnsavedChanges: s.hasUnsavedChanges,
+    lastSavedAt: s.lastSavedAt,
+    isSaving: s.isSaving,
+    setWorkflowMetadata: s.setWorkflowMetadata,
+    saveToFile: s.saveToFile,
+    loadWorkflow: s.loadWorkflow,
+    previousWorkflowSnapshot: s.previousWorkflowSnapshot,
+    revertToSnapshot: s.revertToSnapshot,
+    shortcutsDialogOpen: s.shortcutsDialogOpen,
+    setShortcutsDialogOpen: s.setShortcutsDialogOpen,
+    setShowQuickstart: s.setShowQuickstart,
   })));
 
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -75,11 +112,16 @@ export function Header() {
   const configured = !!workflowName;
   const canSave = !!(workflowId && workflowName && saveDirectoryPath);
 
-  const fmtTime = (ts: number) => new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const fmtTime = (ts: number) =>
+    new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
-  const saveStatus = configured
-    ? isSaving ? "Saving..." : lastSavedAt ? `Saved ${fmtTime(lastSavedAt)}` : "Unsaved"
-    : "Untitled Project";
+  const saveLabel = isSaving
+    ? "Saving…"
+    : lastSavedAt
+    ? `Saved ${fmtTime(lastSavedAt)}`
+    : hasUnsavedChanges
+    ? "Unsaved changes"
+    : "";
 
   const handleProjectSave = async (id: string, name: string, path: string) => {
     setWorkflowMetadata(id, name, path);
@@ -90,7 +132,11 @@ export function Header() {
   const handleOpenDir = async () => {
     if (!saveDirectoryPath) return;
     try {
-      const r = await fetch("/api/open-directory", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: saveDirectoryPath }) });
+      const r = await fetch("/api/open-directory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: saveDirectoryPath }),
+      });
       const d = await r.json();
       if (!r.ok || !d.success) alert(`Failed: ${d.error}`);
     } catch { alert("Failed to open folder."); }
@@ -102,73 +148,107 @@ export function Header() {
 
   return (
     <>
-      <ProjectSetupModal isOpen={showProjectModal} onClose={() => setShowProjectModal(false)} onSave={handleProjectSave} mode={projectModalMode} />
-      <WorkflowBrowserModal isOpen={showWorkflowBrowser} onClose={() => setShowWorkflowBrowser(false)}
-        onWorkflowLoaded={async (wf, dir) => { setShowWorkflowBrowser(false); await loadWorkflow(wf, dir); }} />
+      <ProjectSetupModal
+        isOpen={showProjectModal}
+        onClose={() => setShowProjectModal(false)}
+        onSave={handleProjectSave}
+        mode={projectModalMode}
+      />
+      <WorkflowBrowserModal
+        isOpen={showWorkflowBrowser}
+        onClose={() => setShowWorkflowBrowser(false)}
+        onWorkflowLoaded={async (wf, dir) => {
+          setShowWorkflowBrowser(false);
+          await loadWorkflow(wf, dir);
+        }}
+      />
 
-      <header className="h-11 flex items-center justify-between px-4 bg-neutral-900 border-b border-neutral-800 shrink-0 z-50">
-        {/* ── Left ── */}
-        <div className="flex items-center gap-6">
-          <Link href="/landing" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-400 via-violet-500 to-fuchsia-500 flex items-center justify-center transition-transform group-hover:rotate-12 group-hover:scale-110 shadow-[0_0_15px_rgba(34,211,238,0.4)]">
-              <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert brightness-200" />
-            </div>
+      {/* ── Header bar ── */}
+      <header className="h-11 shrink-0 z-50 flex items-center justify-between px-3 border-b"
+        style={{ background: "#ffffff", borderColor: "rgba(0,0,0,0.08)" }}>
+
+        {/* ── Left: logo + workflow name ── */}
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Back to create */}
+          <Link
+            href="/create"
+            className="flex items-center justify-center w-7 h-7 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-black/5 transition-colors shrink-0"
+            title="Back to Create"
+          >
+            <ArrowLeft className="w-4 h-4" />
           </Link>
 
-          <div className="flex items-center gap-2">
-            <span className={`text-sm font-bold tracking-tight ${configured ? "text-white" : "text-white/60"}`}>
-              {configured ? workflowName : "Untitled Studio"}
-            </span>
-            {configured && <CostIndicator />}
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/20 ml-2">
-              {saveStatus}
-            </span>
-          </div>
-        </div>
+          {/* Logo */}
+          <button
+            onClick={() => setShowQuickstart(true)}
+            className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
+            title="Open welcome screen"
+          >
+            <div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center">
+              <img src="/pixza-logo.png" alt="" className="w-3.5 h-3.5 invert" />
+            </div>
+          </button>
 
-        {/* ── Center Actions (Minimalist Pill) ── */}
-        <div className="hidden md:flex items-center gap-1 p-1 rounded-full glass-panel">
-          <button 
-            onClick={() => canSave ? saveToFile() : (setProjectModalMode("settings"), setShowProjectModal(true))}
-            className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all relative"
-            title="Save Project"
-          >
-            <Save className="w-4 h-4" />
-            {hasUnsavedChanges && !isSaving && (
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full" />
-            )}
-          </button>
-          <button 
-            onClick={() => setShowWorkflowBrowser(true)}
-            className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all"
-            title="Open Project"
-          >
-            <FolderOpen className="w-4 h-4" />
-          </button>
-          {saveDirectoryPath && (
-            <button 
-              onClick={handleOpenDir}
-              className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all"
-              title="Open Directory"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </button>
-          )}
-          <button 
+          {/* Divider */}
+          <div className="w-px h-4 bg-black/10 shrink-0" />
+
+          {/* Workflow name — click to rename */}
+          <button
             onClick={() => { setProjectModalMode(configured ? "settings" : "new"); setShowProjectModal(true); }}
-            className="p-2 hover:bg-white/5 rounded-full text-white/70 hover:text-white transition-all"
-            title="Settings"
+            className="text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors truncate max-w-[200px]"
+            title={configured ? "Rename project" : "Set up project"}
           >
-            <Settings className="w-4 h-4" />
+            {configured ? workflowName : "Untitled"}
           </button>
+
+          {/* Save status */}
+          {saveLabel && (
+            <span className="text-[11px] text-neutral-400 shrink-0 hidden sm:block">
+              {saveLabel}
+            </span>
+          )}
+
+          {/* Cost indicator */}
+          {configured && <CostIndicator />}
         </div>
 
-        {/* ── Right ── */}
-        <div className="flex items-center gap-4">
+        {/* ── Center: file actions ── */}
+        <div className="flex items-center gap-0.5">
+          <IconBtn
+            onClick={() => canSave ? saveToFile() : (setProjectModalMode("settings"), setShowProjectModal(true))}
+            title={canSave ? "Save project" : "Configure save location"}
+            dot={hasUnsavedChanges && !isSaving}
+            disabled={isSaving}
+          >
+            <Save className="w-3.5 h-3.5" />
+          </IconBtn>
+
+          <IconBtn onClick={() => setShowWorkflowBrowser(true)} title="Open project">
+            <FolderOpen className="w-3.5 h-3.5" />
+          </IconBtn>
+
+          {saveDirectoryPath && (
+            <IconBtn onClick={handleOpenDir} title="Open project folder">
+              <ExternalLink className="w-3.5 h-3.5" />
+            </IconBtn>
+          )}
+
+          <IconBtn
+            onClick={() => { setProjectModalMode(configured ? "settings" : "new"); setShowProjectModal(true); }}
+            title="Project settings"
+          >
+            <Settings className="w-3.5 h-3.5" />
+          </IconBtn>
+        </div>
+
+        {/* ── Right: status + tools + profile ── */}
+        <div className="flex items-center gap-1">
+          {/* Revert AI changes */}
           {previousWorkflowSnapshot && (
-            <button 
-              onClick={handleRevert} 
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors"
+            <button
+              onClick={handleRevert}
+              className="flex items-center gap-1.5 px-2.5 h-7 rounded-md text-[11px] font-medium text-neutral-500 hover:text-neutral-800 hover:bg-black/5 transition-colors border border-black/8"
+              title="Restore workflow from before AI changes"
             >
               <RotateCcw className="w-3 h-3" />
               Revert AI
@@ -176,23 +256,22 @@ export function Header() {
           )}
 
           <CommentsBtn />
-          
-          <div className="h-4 w-px bg-white/10 mx-2" />
-          
+
+          <IconBtn onClick={() => setShortcutsDialogOpen(true)} title="Keyboard shortcuts">
+            <Keyboard className="w-3.5 h-3.5" />
+          </IconBtn>
+
+          <div className="w-px h-4 bg-black/10 mx-1" />
+
           <QuotaIndicator />
           <ProfileDropdown />
-
-          <button 
-            onClick={() => setShortcutsDialogOpen(true)}
-            className="p-2 text-white/70 hover:text-white transition-colors"
-            title="Shortcuts"
-          >
-            <Command className="w-4 h-4" />
-          </button>
         </div>
       </header>
 
-      <KeyboardShortcutsDialog isOpen={shortcutsDialogOpen} onClose={() => setShortcutsDialogOpen(false)} />
+      <KeyboardShortcutsDialog
+        isOpen={shortcutsDialogOpen}
+        onClose={() => setShortcutsDialogOpen(false)}
+      />
     </>
   );
 }
