@@ -2089,11 +2089,11 @@ export function WorkflowCanvas() {
         <SharedEdgeGradients />
         <GroupBackgroundsPortal />
         <GroupControlsOverlay />
-        <Controls className="glass-panel !border-none !shadow-none !bg-transparent [&>button]:!bg-transparent [&>button]:!border-white/5 [&>button]:fill-white/40 [&>button:hover]:fill-white" />
+        <Controls className="!border-none !shadow-none !bg-transparent [&>button]:!bg-white [&>button]:!border-black/10 [&>button]:!shadow-sm [&>button:hover]:!bg-gray-50 [&>button_svg]:!fill-black/60" />
         <MiniMap
           className="rounded-xl overflow-hidden"
-          style={{ background: "var(--surface-1)", border: "1px solid var(--border-md)" }}
-          maskColor="rgba(0, 0, 0, 0.6)"
+          style={{ background: "#ffffff", border: "1px solid rgba(0,0,0,0.1)", boxShadow: "0 2px 12px rgba(0,0,0,0.1)" }}
+          maskColor="rgba(248,249,251,0.7)"
           pannable
           zoomable
           nodeColor={(node) => {

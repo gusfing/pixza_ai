@@ -245,24 +245,23 @@ export function BaseNode({
         isVisible={selected}
         minWidth={minWidth}
         minHeight={minHeight}
-        lineClassName="!border-white/15"
-        handleClassName="!w-3.5 !h-3.5 !bg-[#7c6af7] !rounded-full !shadow-lg !border-2 !border-[#0d1117]"
+        lineClassName="!border-violet-500/40"
+        handleClassName="!w-3 !h-3 !bg-violet-500 !rounded-full !shadow-md !border-2 !border-white"
         onResize={handleResize}
       />
       
       <div
         className={`
-          relative flex flex-col overflow-hidden transition-all duration-500 backdrop-blur-xl
-          ${fullBleed ? "" : "px-0 py-0"}
-          ${settingsExpanded ? "rounded-t-[28px]" : "rounded-[28px]"}
+          relative flex flex-col overflow-hidden transition-all duration-300
+          ${settingsExpanded ? "rounded-t-[20px]" : "rounded-[20px]"}
           ${selected 
-            ? "ring-[2px] ring-white/30 shadow-[0_0_40px_rgba(124,106,247,0.2),0_0_80px_rgba(124,106,247,0.08)] border-white/15" 
-            : "border-white/6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"}
-          ${isCurrentlyExecuting || isExecuting ? "ring-[2px] ring-violet-400 animate-pulse shadow-[0_0_30px_rgba(124,106,247,0.5)]" : "border"}
-          ${hasError ? "ring-[2px] ring-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]" : ""}
+            ? "ring-2 ring-violet-500/60 shadow-[0_0_0_1px_rgba(124,106,247,0.3),0_8px_32px_rgba(124,106,247,0.15)]" 
+            : "shadow-[0_2px_12px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.08)]"}
+          ${isCurrentlyExecuting || isExecuting ? "ring-2 ring-violet-500 shadow-[0_0_20px_rgba(124,106,247,0.3)]" : ""}
+          ${hasError ? "ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]" : ""}
           ${className}
         `}
-        style={{ background: fullBleed ? "rgba(22,27,34,0.85)" : "rgba(22,27,34,0.9)" }}
+        style={{ background: fullBleed ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.97)" }}
         onMouseEnter={(e) => {
           if (e.buttons !== 0 || isPanningRef.current || isDraggingNodeRef.current) return;
           setHoveredNodeId(id);
@@ -272,12 +271,12 @@ export function BaseNode({
           setHoveredNodeId(null);
         }}
       >
-        {/* Top Categorical Glow */}
+        {/* Top Categorical Accent Line */}
         {accentColor && (
           <div 
             className="absolute top-0 left-0 right-0 h-px z-10"
             style={{ 
-              background: `linear-gradient(to right, transparent, ${accentColor}60, transparent)`,
+              background: `linear-gradient(to right, transparent, ${accentColor}80, transparent)`,
             }} 
           />
         )}
@@ -290,8 +289,8 @@ export function BaseNode({
       </div>
 
       {settingsPanel && (
-        <div ref={settingsPanelRef} className="rounded-b-[24px] border-t p-4"
-          style={{ background: "rgba(22,27,34,0.95)", borderColor: "rgba(255,255,255,0.07)" }}>
+        <div ref={settingsPanelRef} className="rounded-b-[20px] border-t p-4"
+          style={{ background: "rgba(248,249,251,0.98)", borderColor: "rgba(0,0,0,0.08)" }}>
           {settingsPanel}
         </div>
       )}

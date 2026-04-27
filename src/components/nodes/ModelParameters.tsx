@@ -233,9 +233,9 @@ function ModelParametersInner({
       {error ? (
         <span className="text-[9px] text-red-400">{error}</span>
       ) : isLoading ? (
-        <span className="text-[9px] text-neutral-500">Loading parameters...</span>
+        <span className="text-[9px] text-black/30">Loading parameters...</span>
       ) : schema.length === 0 ? (
-        <span className="text-[9px] text-neutral-500">No parameters available</span>
+        <span className="text-[9px] text-black/30">No parameters available</span>
       ) : (
         <div
           ref={gridRef}
@@ -321,7 +321,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
               handleChange(val);
             }
           }}
-          className="nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-neutral-600 text-white"
+          className="nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-black/5 focus:outline-none focus:ring-1 focus:ring-violet-400 text-black/80"
         >
           <option value="">Default</option>
           {param.enum.map((opt) => (
@@ -348,7 +348,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
           type="checkbox"
           checked={effectiveValue}
           onChange={(e) => handleChange(e.target.checked)}
-          className="nodrag nopan w-3 h-3 rounded bg-[#1a1a1a] text-neutral-600 focus:ring-1 focus:ring-neutral-600 focus:ring-offset-0"
+          className="nodrag nopan w-3 h-3 rounded bg-black/5 text-black/50 focus:ring-1 focus:ring-violet-400 focus:ring-offset-0"
         />
         <span>{displayName}</span>
       </label>
@@ -381,7 +381,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
           >
             {displayName}
             {hasMin && hasMax && (
-              <span className="text-neutral-500 text-[9px]">
+              <span className="text-black/30 text-[9px]">
                 ({param.minimum}-{param.maximum})
               </span>
             )}
@@ -406,10 +406,10 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
               }
             }}
             placeholder={param.default !== undefined ? `${param.default}` : undefined}
-            className={`nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-[#1a1a1a] focus:outline-none focus:ring-1 text-white placeholder:text-neutral-500 ${
+            className={`nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-black/5 focus:outline-none focus:ring-1 text-black/80 placeholder:text-black/30 ${
               validationError
                 ? "ring-1 ring-red-500"
-                : "focus:ring-neutral-600"
+                : "focus:ring-violet-400"
             }`}
           />
         </div>
@@ -446,7 +446,7 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
           handleChange(localValue || undefined);
         }}
         placeholder={param.default !== undefined ? `${param.default}` : undefined}
-        className="nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-neutral-600 text-white placeholder:text-neutral-500"
+        className="nodrag nopan flex-1 min-w-0 text-[11px] py-1 px-2 rounded-md bg-black/5 focus:outline-none focus:ring-1 focus:ring-violet-400 text-black/80 placeholder:text-black/30"
       />
     </div>
   );
@@ -455,3 +455,4 @@ function ParameterInputInner({ param, name, value, onChange }: ParameterInputPro
 // Memoized exports to prevent unnecessary re-renders
 export const ModelParameters = React.memo(ModelParametersInner);
 const ParameterInput = React.memo(ParameterInputInner);
+

@@ -319,12 +319,12 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
     const themeClass = customAccentColor 
       ? "" 
       : isInput 
-      ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400" 
+      ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-600" 
       : isGenerate 
-      ? "bg-violet-500/10 border-violet-500/30 text-violet-400" 
+      ? "bg-violet-500/10 border-violet-500/30 text-violet-600" 
       : isOutput 
-      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-      : "bg-white/5 border-white/10 text-white/70";
+      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
+      : "bg-black/5 border-black/10 text-black/60";
 
     return (
       <div
@@ -337,7 +337,7 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
         }}
       >
         <div
-          className={`px-4 py-2 flex items-center justify-between w-full pointer-events-auto cursor-grab backdrop-blur-xl rounded-full border shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all ${themeClass} ${selected ? 'ring-1 ring-white/20' : ''}`}
+          className={`px-4 py-2 flex items-center justify-between w-full pointer-events-auto cursor-grab backdrop-blur-xl rounded-full border shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all ${themeClass} ${selected ? 'ring-1 ring-black/20' : ''}`}
           style={customAccentColor ? { 
             backgroundColor: `${customAccentColor}10`, 
             borderColor: `${customAccentColor}30`,
@@ -359,14 +359,14 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                 onBlur={handleTitleSubmit}
                 onKeyDown={handleTitleKeyDown}
                 placeholder="Custom title..."
-                className="nodrag nopan w-full bg-transparent border-none outline-none text-[11px] font-black tracking-tight text-white placeholder:text-white/20 uppercase"
+                className="nodrag nopan w-full bg-transparent border-none outline-none text-[11px] font-black tracking-tight text-black/80 placeholder:text-black/20 uppercase"
               />
             ) : (
               <span
                 className="nodrag text-[11px] font-black uppercase tracking-[0.15em] cursor-text truncate drop-shadow-sm"
                 onClick={() => setIsEditingTitle(true)}
                 title="Click to edit title"
-                style={{ color: selected ? '#ffffff' : undefined }}
+                style={{ color: selected ? '#111111' : undefined }}
               >
                 {customTitle ? (
                   <>
@@ -407,8 +407,8 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                 onMouseLeave={() => setShowCommentTooltip(false)}
                 className={`nodrag nopan p-1 rounded-lg transition-all ${
                   comment
-                    ? "text-cyan-400 bg-cyan-400/10 hover:bg-cyan-400/20"
-                    : "text-white/20 hover:text-white/40 border border-white/5"
+                    ? "text-cyan-600 bg-cyan-500/10 hover:bg-cyan-500/20"
+                    : "text-black/20 hover:text-black/50 border border-black/10"
                 }`}
                 title={comment ? "Edit comment" : "Add comment"}
               >
