@@ -28,9 +28,9 @@ export function WorkflowBrowserModal({
         aria-labelledby="workflow-browser-title"
         className="w-full max-w-2xl mx-4 rounded-2xl overflow-clip max-h-[85vh] flex flex-col"
         style={{
-          background: "var(--surface-1)",
-          border: "1px solid var(--border-md)",
-          boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset, 0 40px 100px rgba(0,0,0,0.9)",
+          background: "#ffffff",
+          border: "1px solid rgba(0,0,0,0.1)",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -42,3 +42,4 @@ export function WorkflowBrowserModal({
     </div>
   );
 }
+
