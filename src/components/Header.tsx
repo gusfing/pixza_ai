@@ -164,8 +164,8 @@ export function Header() {
       />
 
       {/* ── Header bar ── */}
-      <header className="h-11 shrink-0 z-50 flex items-center justify-between px-3 border-b"
-        style={{ background: "#ffffff", borderColor: "rgba(0,0,0,0.08)" }}>
+      <header className="h-11 shrink-0 z-50 flex items-center justify-between border-b"
+        style={{ background: "#ffffff", borderColor: "rgba(0,0,0,0.08)", padding: "20px 12px" }}>
 
         {/* ── Left: logo + workflow name ── */}
         <div className="flex items-center gap-3 min-w-0">

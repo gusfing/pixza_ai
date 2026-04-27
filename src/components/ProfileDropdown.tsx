@@ -49,7 +49,7 @@ export function ProfileDropdown() {
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <Link href="/auth/signin" className="px-4 py-2 text-xs font-bold text-white/70 hover:text-white transition-colors uppercase tracking-widest">
+        <Link href="/auth/signin" className="px-4 py-2 text-xs font-bold text-black hover:text-neutral-600 transition-colors uppercase tracking-widest">
           Sign In
         </Link>
         <Link href="/auth/signup" className="px-6 py-2 text-xs font-black uppercase tracking-tighter bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 text-white rounded-full hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)]">
