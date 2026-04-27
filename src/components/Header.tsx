@@ -106,7 +106,7 @@ export function Header() {
       <WorkflowBrowserModal isOpen={showWorkflowBrowser} onClose={() => setShowWorkflowBrowser(false)}
         onWorkflowLoaded={async (wf, dir) => { setShowWorkflowBrowser(false); await loadWorkflow(wf, dir); }} />
 
-      <header className="h-16 flex items-center justify-between px-6 bg-[#0A0A0A] border-b border-white/5 shrink-0 z-50">
+      <header className="h-11 flex items-center justify-between px-4 bg-neutral-900 border-b border-neutral-800 shrink-0 z-50">
         {/* ── Left ── */}
         <div className="flex items-center gap-6">
           <Link href="/landing" className="flex items-center gap-2 group">

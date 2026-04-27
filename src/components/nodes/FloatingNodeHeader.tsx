@@ -328,21 +328,16 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
 
     return (
       <div
-        className="absolute pointer-events-none transition-all duration-300"
+        className="absolute pointer-events-none transition-opacity duration-200"
         style={{
           left: `${position.x}px`,
-          top: `${position.y - 32}px`,
+          top: `${position.y - 26}px`,
           width: `${width}px`,
           zIndex: selected ? 10000 : 9000,
         }}
       >
         <div
-          className={`px-4 py-2 flex items-center justify-between w-full pointer-events-auto cursor-grab backdrop-blur-xl rounded-full border shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all ${themeClass} ${selected ? 'ring-1 ring-black/20' : ''}`}
-          style={customAccentColor ? { 
-            backgroundColor: `${customAccentColor}10`, 
-            borderColor: `${customAccentColor}30`,
-            color: customAccentColor
-          } : undefined}
+          className="px-1 py-1 flex items-center justify-between w-full pointer-events-auto cursor-grab"
           onMouseEnter={() => setIsHeaderHovered(true)}
           onMouseLeave={() => setIsHeaderHovered(false)}
           onPointerDown={handleHeaderPointerDown}
@@ -359,14 +354,13 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                 onBlur={handleTitleSubmit}
                 onKeyDown={handleTitleKeyDown}
                 placeholder="Custom title..."
-                className="nodrag nopan w-full bg-transparent border-none outline-none text-[11px] font-black tracking-tight text-black/80 placeholder:text-black/20 uppercase"
+                className="nodrag nopan w-full bg-transparent border-none outline-none text-xs font-semibold tracking-wide text-neutral-600 placeholder:text-neutral-400 uppercase"
               />
             ) : (
               <span
-                className="nodrag text-[11px] font-black uppercase tracking-[0.15em] cursor-text truncate drop-shadow-sm"
+                className="nodrag text-xs font-semibold uppercase tracking-wide text-neutral-500 cursor-text truncate"
                 onClick={() => setIsEditingTitle(true)}
                 title="Click to edit title"
-                style={{ color: selected ? '#111111' : undefined }}
               >
                 {customTitle ? (
                   <>
@@ -405,10 +399,10 @@ export const FloatingNodeHeader = memo(function FloatingNodeHeader({
                 onClick={() => setIsEditingComment(!isEditingComment)}
                 onMouseEnter={() => comment && !isCommentFocused && setShowCommentTooltip(true)}
                 onMouseLeave={() => setShowCommentTooltip(false)}
-                className={`nodrag nopan p-1 rounded-lg transition-all ${
+                className={`nodrag nopan p-0.5 rounded transition-colors ${
                   comment
-                    ? "text-cyan-600 bg-cyan-500/10 hover:bg-cyan-500/20"
-                    : "text-black/20 hover:text-black/50 border border-black/10"
+                    ? "text-blue-500 hover:text-blue-700"
+                    : "text-neutral-400 hover:text-neutral-600 border border-neutral-300"
                 }`}
                 title={comment ? "Edit comment" : "Add comment"}
               >

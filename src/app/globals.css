@@ -1,46 +1,169 @@
 @import "tailwindcss";
 
-/* ─── Pixza Design System — Slate Dark ─────────────────────── */
 @theme {
-  --color-canvas-bg: #0d1117;
-  --color-surface: #161b22;
-  --color-surface-high: #21262d;
-  --radius-xl: 24px;
+  --color-canvas-bg: #f8f9fb;
 }
 
 :root {
-  /* Slate Palette */
-  --bg:           #0d1117;   /* canvas / page bg */
-  --surface:      #161b22;   /* cards, panels */
-  --surface-high: #21262d;   /* elevated surfaces */
-  --surface-low:  #0d1117;   /* inset / recessed */
-
-  /* Accent — soft violet */
-  --accent:       #7c6af7;
-  --accent-dim:   rgba(124,106,247,0.12);
-
-  /* Text */
-  --text-primary:   #e6edf3;
-  --text-secondary: #8b949e;
-  --text-dim:       #484f58;
-
-  /* Borders */
-  --border:    rgba(255,255,255,0.07);
-  --border-md: rgba(255,255,255,0.13);
-
-  /* Glassmorphism */
-  --glass-bg:     rgba(255,255,255,0.03);
-  --glass-border: rgba(255,255,255,0.08);
-  --glass-blur:   blur(24px);
-
-  /* Radius & Spacing */
-  --radius-lg:   24px;
-  --radius-pill: 9999px;
-
-  /* Shadows */
-  --shadow-soft:  0 40px 100px -20px rgba(0,0,0,0.7);
-  --shadow-inner: inset 0 0 0 1px rgba(255,255,255,0.04);
+  --background: #f8f9fb;
+  --foreground: #111111;
+  /* Handle colors */
+  --handle-color-image: #10b981;
+  --handle-color-text: #3b82f6;
+  --handle-color-3d: #f97316;
+  --handle-color-audio: #a855f7;
+  --handle-color-video: #ec4899;
 }
+
+html {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  color-scheme: light;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overscroll-behavior-x: none;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* ─── React Flow ─────────────────────────────────────────────── */
+.react-flow {
+  background: #f8f9fb;
+  overscroll-behavior-x: none;
+  touch-action: none;
+}
+
+.react-flow__node { font-family: inherit; }
+
+.react-flow__node img { pointer-events: none; }
+
+.canvas-interacting .react-flow__node > * { pointer-events: none; }
+
+.react-flow__node-output {
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.react-flow__node.switch-dimmed {
+  opacity: 0.4;
+  transition: opacity 250ms ease-in-out;
+}
+
+.react-flow__node.node-skipped {
+  opacity: 0.35;
+  transition: opacity 250ms ease-in-out;
+}
+
+.react-flow__node:not(.switch-dimmed):not(.node-skipped) {
+  transition: opacity 250ms ease-in-out;
+}
+
+/* Handles */
+.react-flow__handle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  z-index: 5;
+}
+
+.react-flow__handle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.react-flow__handle-left  { left: -7px; }
+.react-flow__handle-right { right: -7px; }
+
+.react-flow__handle[data-handletype="image"] { background: #10b981; }
+.react-flow__handle[data-handletype="text"]  { background: #3b82f6; }
+.react-flow__handle[data-handletype="audio"] { background: #a855f7; }
+.react-flow__handle[data-handletype="video"] { background: #ec4899; }
+.react-flow__handle[data-handletype="3d"]    { background: #f97316; }
+
+/* Edges */
+.react-flow__edge-path {
+  stroke: #94a3b8;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: #3b82f6;
+}
+
+/* Resize controls */
+.react-flow__resize-control {
+  opacity: 0 !important;
+  pointer-events: auto !important;
+}
+.react-flow__resize-control.left,
+.react-flow__resize-control.right  { cursor: ew-resize !important; width: 16px !important; }
+.react-flow__resize-control.top,
+.react-flow__resize-control.bottom { cursor: ns-resize !important; height: 16px !important; }
+.react-flow__resize-control.top.left,
+.react-flow__resize-control.bottom.right { cursor: nwse-resize !important; }
+.react-flow__resize-control.top.right,
+.react-flow__resize-control.bottom.left  { cursor: nesw-resize !important; }
+
+/* Controls */
+.react-flow__controls {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
+}
+.react-flow__controls-button {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+.react-flow__controls-button svg       { fill: #6b7280 !important; }
+.react-flow__controls-button svg path  { fill: #6b7280 !important; }
+.react-flow__controls-button:hover     { background: #f9fafb !important; }
+.react-flow__controls-button:hover svg,
+.react-flow__controls-button:hover svg path { fill: #111827 !important; }
+.react-flow__controls-button:last-child { border-bottom: none !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+.react-flow__nodesselection-rect { pointer-events: none !important; }
+
+/* Edge pulse animation */
+@keyframes flowPulse {
+  0%   { stroke-dashoffset: 50; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Fan animation */
+@keyframes fanEnter {
+  0%   { opacity: 0; transform: scale(0.3) translate(0, 0); }
+  100% { opacity: 1; transform: scale(1) translate(var(--fan-x), var(--fan-y)); }
+}
+@keyframes fanExit {
+  0%   { opacity: 1; transform: scale(1) translate(var(--fan-x), var(--fan-y)); }
+  100% { opacity: 0; transform: scale(0.3) translate(0, 0); }
+}
+.animate-fan-enter { animation: fanEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-fan-exit  { animation: fanExit 0.15s ease-in forwards; }
 
 /* Minimal Button */
 .btn-minimal {
@@ -51,226 +174,26 @@
   border-radius: 9999px;
   font-weight: 700;
   font-size: 13px;
-  letter-spacing: -0.01em;
   transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
   cursor: pointer;
-  text-decoration: none;
   border: none;
 }
+.btn-minimal-primary { background: #111111; color: #ffffff; }
+.btn-minimal-primary:hover { background: #333333; transform: scale(1.02); }
+.btn-minimal-secondary { background: rgba(0,0,0,0.05); color: #111111; border: 1px solid rgba(0,0,0,0.1); }
+.btn-minimal-secondary:hover { background: rgba(0,0,0,0.08); }
 
-.btn-minimal-primary {
-  background: #ffffff;
-  color: #000000;
-}
-.btn-minimal-primary:hover {
-  background: #f0f0f0;
-  transform: scale(1.02);
-}
-
-.btn-minimal-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.btn-minimal-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* ─── Grain Overlay ────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
-
-html {
-  overflow-x: hidden;
-  overscroll-behavior-x: none;
-  color-scheme: dark;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text-primary);
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-outfit), var(--font-inter), sans-serif;
-}
-
-/* ─── Minimal Scrollbar ────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.1); }
-
-/* ─── Obsidian Utility Classes ─────────────────────────────── */
-
-/* Minimal Glass Panel */
+/* Glass panel (kept for compatibility) */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-inner);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.08);
 }
 
-/* Media Card */
-.obsidian-card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.3s ease;
-  box-shadow: var(--shadow-soft), var(--shadow-inner);
-}
-.obsidian-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 50px 120px -30px rgba(0,0,0,0.9), var(--shadow-inner);
-}
-
-/* Minimal Input */
-.minimal-input {
-  background: var(--surface-low);
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  color: var(--text-primary);
-  padding: 12px 20px;
-  outline: none;
-  transition: border-color 0.2s, background 0.2s;
-}
-.minimal-input:focus {
-  border-color: rgba(255,255,255,0.2);
-  background: var(--surface);
-}
-
-/* ─── Elevated Button System ────────────────────────────────── */
-
-.btn-minimal {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 24px;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
-  cursor: pointer;
-  border: none;
-}
-
-/* Primary - White on Black */
-.btn-minimal-primary {
-  background: #ffffff;
-  color: #0a0a0a;
-}
-.btn-minimal-primary:hover {
-  background: #e5e5e5;
-  transform: scale(1.02);
-}
-
-/* Secondary - Glass/Ghost */
-.btn-minimal-secondary {
-  background: rgba(255,255,255,0.05);
-  color: #ffffff;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-.btn-minimal-secondary:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-/* ─── React Flow — White Canvas ─────────────────────────────── */
-.react-flow { background: #f8f9fb; }
-.react-flow__edge-path { stroke-width: 2; transition: stroke-width 0.2s ease; }
-.react-flow__handle {
-  width: 10px !important;
-  height: 10px !important;
-  background: #ffffff !important;
-  border: 2px solid #7c6af7 !important;
-  box-shadow: 0 0 0 1px rgba(124,106,247,0.3) !important;
-  transition: all 0.2s ease !important;
-}
-.react-flow__handle:hover {
-  transform: scale(1.4) !important;
-  box-shadow: 0 0 8px rgba(124,106,247,0.6) !important;
-}
-.react-flow__handle-connecting {
-  background: #7c6af7 !important;
-  box-shadow: 0 0 10px rgba(124,106,247,0.6) !important;
-}
-.react-flow__node {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
-/* Controls styling for white canvas */
-.react-flow__controls button {
-  background: #ffffff !important;
-  border: 1px solid rgba(0,0,0,0.1) !important;
-  color: #333 !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
-}
-.react-flow__controls button:hover {
-  background: #f0f0f0 !important;
-}
-.react-flow__controls button svg { fill: #333 !important; }
-
-/* ─── Animations ───────────────────────────────────────────── */
+/* Animations */
 @keyframes fadeInSlide {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes float {
-  0%, 100% { transform: translateY(0) translateX(0); }
-  25% { transform: translateY(-15px) translateX(15px); }
-  50% { transform: translateY(5px) translateX(25px); }
-  75% { transform: translateY(20px) translateX(10px); }
-}
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.2; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.15); }
-}
-.animate-obsidian {
-  animation: fadeInSlide 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-}
-.animate-float { animation: float 25s ease-in-out infinite; }
-.animate-pulse-slow { animation: pulse-slow 15s ease-in-out infinite; }
-
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(calc(-100% - var(--gap))); }
-}
-.animate-marquee {
-  animation: marquee var(--duration, 40s) linear infinite;
-}
-
-/* ─── Responsive Adjustments ────────────────────────────────── */
-@media (max-width: 768px) {
-  .radius-mobile-none { border-radius: 0 !important; }
-  .padding-mobile-sm { padding: 16px !important; }
-  
-  .obsidian-card {
-    border-radius: 16px; /* Slightly tighter on mobile */
-  }
-}
-
-/* ─── User Specific Aesthetic Adjustments ───────────────────── */
-.h-16.flex.items-center.justify-between.px-6.bg-\[\#0A0A0A\].border-b.border-white\/5.shrink-0.z-50 {
-  border-radius: 20px !important;
-  margin: 10px 20px 0px !important;
-}
-
-.flex.items-center.gap-2.p-2.rounded-full.glass-panel.shadow-2xl {
-  padding: 8px !important;
-  border-radius: 10px !important;
-}
-
-.md\:flex.items-center.gap-1.p-1.rounded-full.glass-panel,
-.btn-minimal.btn-minimal-primary.px-5.py-2.text-xs {
-  border-radius: 10px !important;
-}
-
-.react-flow__pane.draggable {
-  opacity: 1 !important;
-}
+.animate-obsidian { animation: fadeInSlide 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards; }

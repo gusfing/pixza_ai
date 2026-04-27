@@ -111,13 +111,12 @@ export function PromptNode({ id, data, selected }: NodeProps<PromptNodeType>) {
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder={hasIncomingTextConnection ? "Text from connected node (editable)..." : nodeData.isOptional ? "Optional prompt (leave empty to skip)..." : "Describe what to generate..."}
-          className="nodrag nopan nowheel w-full h-full p-3 pb-7 text-xs leading-relaxed text-black/80 bg-white rounded-t-lg resize-none focus:outline-none placeholder:text-black/25"
+          className="nodrag nopan nowheel w-full h-full p-3 pb-7 text-xs leading-relaxed text-neutral-800 bg-transparent rounded-t-lg resize-none focus:outline-none placeholder:text-neutral-400"
         />
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-3 py-1.5 rounded-b-lg border-t"
-          style={{ background: "rgba(248,249,251,0.95)", borderColor: "rgba(0,0,0,0.07)" }}>
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-3 py-1.5 rounded-b-lg border-t border-gray-100">
           <button
             onClick={() => setShowVarDialog(true)}
-            className="nodrag nopan text-[10px] text-black/30 hover:text-violet-600 transition-colors"
+            className="nodrag nopan text-[10px] text-neutral-400 hover:text-blue-500 transition-colors"
             title="Set variable name"
           >
             {nodeData.variableName ? `@${nodeData.variableName}` : "Add variable"}

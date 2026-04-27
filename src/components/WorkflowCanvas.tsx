@@ -1956,7 +1956,7 @@ export function WorkflowCanvas() {
   return (
     <div
       ref={reactFlowWrapper}
-      className={`flex-1 bg-transparent relative ${isDragOver ? "ring-2 ring-inset ring-white/20" : ""}`}
+      className={`flex-1 bg-[#f8f9fb] relative ${isDragOver ? "ring-2 ring-inset ring-blue-400/30" : ""}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -1964,9 +1964,9 @@ export function WorkflowCanvas() {
       <DashedBackground x={x} y={y} zoom={zoom} />
       {/* Drop overlay indicator */}
       {isDragOver && (
-        <div className="absolute inset-0 bg-blue-500/10 z-50 pointer-events-none flex items-center justify-center">
-          <div className="bg-neutral-800 border border-neutral-600 rounded-lg px-6 py-4 shadow-xl">
-            <p className="text-neutral-200 text-sm font-medium">
+        <div className="absolute inset-0 bg-blue-500/5 z-50 pointer-events-none flex items-center justify-center">
+          <div className="bg-white border border-blue-200 rounded-lg px-6 py-4 shadow-xl">
+            <p className="text-neutral-700 text-sm font-medium">
               {dropType === "workflow"
                 ? "Drop to load workflow"
                 : dropType === "node"
@@ -2091,9 +2091,9 @@ export function WorkflowCanvas() {
         <GroupControlsOverlay />
         <Controls className="!border-none !shadow-none !bg-transparent [&>button]:!bg-white [&>button]:!border-black/10 [&>button]:!shadow-sm [&>button:hover]:!bg-gray-50 [&>button_svg]:!fill-black/60" />
         <MiniMap
-          className="rounded-xl overflow-hidden"
-          style={{ background: "#ffffff", border: "1px solid rgba(0,0,0,0.1)", boxShadow: "0 2px 12px rgba(0,0,0,0.1)" }}
-          maskColor="rgba(248,249,251,0.7)"
+          className="rounded-lg overflow-hidden"
+          style={{ background: "#ffffff", border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}
+          maskColor="rgba(248,249,251,0.75)"
           pannable
           zoomable
           nodeColor={(node) => {

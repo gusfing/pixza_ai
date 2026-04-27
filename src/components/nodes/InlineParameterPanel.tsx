@@ -34,7 +34,7 @@ function InlineParameterPanelInner({
       <button
         type="button"
         onClick={onToggle}
-        className={`nodrag nopan w-full flex items-center justify-center gap-1 py-1 text-black/40 hover:text-black/70 transition-colors ${expanded ? "bg-black/5" : ""}`}
+        className={`nodrag nopan w-full flex items-center justify-center gap-1 py-1 text-neutral-400 hover:text-neutral-600 transition-colors ${expanded ? "bg-gray-50" : ""}`}
         aria-label={expanded ? "Collapse parameters" : "Expand parameters"}
         aria-expanded={expanded}
         aria-controls={`params-${nodeId}`}
@@ -57,7 +57,7 @@ function InlineParameterPanelInner({
       {/* Content area — smooth height animation */}
       <div
         id={`params-${nodeId}`}
-        className="nodrag nopan nowheel bg-black/[0.03] overflow-hidden transition-[max-height] duration-150 ease-out rounded-b-lg border-t border-black/5"
+        className="nodrag nopan nowheel bg-gray-50 overflow-hidden transition-[max-height] duration-150 ease-out rounded-b-lg border-t border-gray-100"
         style={{ maxHeight: expanded ? contentHeight : 0 }}
       >
         <div ref={contentRef} className="px-3 pt-2 pb-3 rounded-b-lg">

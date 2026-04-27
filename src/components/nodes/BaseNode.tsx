@@ -238,30 +238,32 @@ export function BaseNode({
 
   return (
     <div
-      className={hasExpandedSettings ? "relative flex flex-col w-full h-full animate-obsidian" : "contents"}
+      className={hasExpandedSettings
+        ? `relative flex flex-col w-full h-full overflow-visible bg-white rounded-lg ${selected ? "ring-2 ring-blue-500/40 shadow-lg shadow-blue-500/10" : "shadow-sm"}`
+        : "contents"}
       onDoubleClick={handleResizeHandleDblClick}
     >
       <NodeResizer
         isVisible={selected}
         minWidth={minWidth}
         minHeight={minHeight}
-        lineClassName="!border-violet-500/40"
-        handleClassName="!w-3 !h-3 !bg-violet-500 !rounded-full !shadow-md !border-2 !border-white"
+        lineClassName="!border-transparent"
+        handleClassName="!w-5 !h-5 !bg-transparent !border-none"
         onResize={handleResize}
       />
-      
       <div
         className={`
-          relative flex flex-col overflow-hidden transition-all duration-300
-          ${settingsExpanded ? "rounded-t-[20px]" : "rounded-[20px]"}
-          ${selected 
-            ? "ring-2 ring-violet-500/60 shadow-[0_0_0_1px_rgba(124,106,247,0.3),0_8px_32px_rgba(124,106,247,0.15)]" 
-            : "shadow-[0_2px_12px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.08)]"}
-          ${isCurrentlyExecuting || isExecuting ? "ring-2 ring-violet-500 shadow-[0_0_20px_rgba(124,106,247,0.3)]" : ""}
-          ${hasError ? "ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]" : ""}
+          ${hasExpandedSettings ? "flex-1 min-h-0 w-full" : "h-full w-full"} flex flex-col overflow-visible relative
+          ${fullBleed
+            ? `${settingsExpanded ? "rounded-t-lg border-b-0" : "rounded-lg"} bg-white border border-gray-200/80`
+            : `bg-white ${settingsExpanded ? "rounded-t-lg border-b-0" : "rounded-lg"} shadow-sm border`}
+          ${fullBleed ? "" : (isCurrentlyExecuting || isExecuting ? "border-blue-400 ring-1 ring-blue-400/20" : "border-gray-200")}
+          ${fullBleed ? "" : (hasError ? "border-red-400" : "")}
+          ${fullBleed && selected && !settingsExpanded ? "ring-2 ring-blue-500/40 shadow-lg shadow-blue-500/10" : ""}
+          ${!fullBleed && selected && !settingsExpanded ? "border-blue-400 ring-2 ring-blue-500/40 shadow-lg shadow-blue-500/10" : ""}
+          ${!fullBleed && selected && settingsExpanded ? "border-blue-400" : ""}
           ${className}
         `}
-        style={{ background: fullBleed ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.97)" }}
         onMouseEnter={(e) => {
           if (e.buttons !== 0 || isPanningRef.current || isDraggingNodeRef.current) return;
           setHoveredNodeId(id);
@@ -271,26 +273,13 @@ export function BaseNode({
           setHoveredNodeId(null);
         }}
       >
-        {/* Top Categorical Accent Line */}
-        {accentColor && (
-          <div 
-            className="absolute top-0 left-0 right-0 h-px z-10"
-            style={{ 
-              background: `linear-gradient(to right, transparent, ${accentColor}80, transparent)`,
-            }} 
-          />
-        )}
-        <div 
-          ref={contentRef} 
-          className={contentClassName ?? (fullBleed ? "flex-1 min-h-0 relative" : "px-6 py-6 flex-1 min-h-0 flex flex-col")}
-        >
+        <div ref={contentRef} style={{ contain: "layout style" }}
+          className={contentClassName ?? (fullBleed ? "flex-1 min-h-0 relative" : "px-3 pb-4 flex-1 min-h-0 overflow-visible flex flex-col")}>
           {children}
         </div>
       </div>
-
       {settingsPanel && (
-        <div ref={settingsPanelRef} className="rounded-b-[20px] border-t p-4"
-          style={{ background: "rgba(248,249,251,0.98)", borderColor: "rgba(0,0,0,0.08)" }}>
+        <div ref={settingsPanelRef}>
           {settingsPanel}
         </div>
       )}

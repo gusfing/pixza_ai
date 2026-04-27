@@ -64,7 +64,7 @@ function BarDropdown({ trigger, children, icon }: { trigger: string; children: R
         <ChevronUp className={`w-3 h-3 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-56 glass-panel rounded-[32px] overflow-hidden p-2 animate-obsidian shadow-2xl">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-56 bg-white border border-gray-200 rounded-2xl overflow-hidden p-2 shadow-xl animate-obsidian">
           {children}
         </div>
       )}
@@ -105,7 +105,7 @@ export function FloatingActionBar() {
             <button 
               key={n.type} 
               onClick={() => addAt(n.type)}
-              className="w-full text-left px-4 py-2 text-xs font-bold text-white/70 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+              className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:bg-gray-50 rounded-xl transition-all"
             >
               {n.label}
             </button>
@@ -117,7 +117,7 @@ export function FloatingActionBar() {
             <button 
               key={n.type} 
               onClick={() => addAt(n.type)}
-              className="w-full text-left px-4 py-2 text-xs font-bold text-white/50 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+              className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:bg-gray-50 rounded-xl transition-all"
             >
               {n.label}
             </button>
@@ -178,3 +178,5 @@ export function FloatingActionBar() {
     </div>
   );
 }
+
+
