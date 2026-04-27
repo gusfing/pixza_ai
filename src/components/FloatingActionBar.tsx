@@ -55,8 +55,14 @@ function BarDropdown({ trigger, children, icon }: { trigger: string; children: R
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
-          open ? "bg-white text-black" : trigger === "Input" ? "text-cyan-400/70 hover:text-cyan-400 hover:bg-cyan-400/5" : trigger === "Generate" ? "text-violet-400/70 hover:text-violet-400 hover:bg-violet-400/5" : "text-white/70 hover:text-white hover:bg-white/5"
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+          open
+            ? "bg-white/10 text-white"
+            : trigger === "Input"
+              ? "text-cyan-400 hover:text-cyan-300 hover:bg-white/8"
+              : trigger === "Generate"
+                ? "text-violet-400 hover:text-violet-300 hover:bg-white/8"
+                : "text-neutral-400 hover:text-white hover:bg-white/8"
         }`}
       >
         {icon}
@@ -64,7 +70,8 @@ function BarDropdown({ trigger, children, icon }: { trigger: string; children: R
         <ChevronUp className={`w-3 h-3 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-56 bg-white border border-gray-200 rounded-2xl overflow-hidden p-2 shadow-xl animate-obsidian">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-52 rounded-xl overflow-hidden p-1.5 shadow-2xl"
+          style={{ background: "#1c1c1e", border: "1px solid rgba(255,255,255,0.1)" }}>
           {children}
         </div>
       )}
@@ -96,80 +103,75 @@ export function FloatingActionBar() {
   const { valid } = validateWorkflow();
 
   return (
-    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] animate-obsidian">
-      <div className="flex items-center gap-2 p-2 rounded-full glass-panel shadow-2xl">
-        
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100]">
+      <div className="flex items-center gap-1 px-2 py-2 rounded-2xl shadow-xl"
+        style={{ background: "#1c1c1e", border: "1px solid rgba(255,255,255,0.08)" }}>
+
         {/* Quick Add Actions */}
-        <BarDropdown trigger="Input" icon={<Plus className="w-4 h-4" />}>
+        <BarDropdown trigger="Input" icon={<Plus className="w-3.5 h-3.5" />}>
           {NODE_CATEGORIES[0].nodes.map(n => (
-            <button 
-              key={n.type} 
+            <button
+              key={n.type}
               onClick={() => addAt(n.type)}
-              className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:bg-gray-50 rounded-xl transition-all"
+              className="w-full text-left px-3 py-2 text-xs font-medium text-neutral-300 hover:text-white hover:bg-white/8 rounded-lg transition-all"
             >
               {n.label}
             </button>
           ))}
         </BarDropdown>
 
-        <BarDropdown trigger="Generate" icon={<Zap className="w-4 h-4" />}>
+        <BarDropdown trigger="Generate" icon={<Zap className="w-3.5 h-3.5" />}>
           {NODE_CATEGORIES[2].nodes.map(n => (
-            <button 
-              key={n.type} 
+            <button
+              key={n.type}
               onClick={() => addAt(n.type)}
-              className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:bg-gray-50 rounded-xl transition-all"
+              className="w-full text-left px-3 py-2 text-xs font-medium text-neutral-300 hover:text-white hover:bg-white/8 rounded-lg transition-all"
             >
               {n.label}
             </button>
           ))}
         </BarDropdown>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-5 bg-white/10 mx-1" />
 
-        <button 
+        <button
           onClick={() => setModelSearchOpen(true)}
-          className="p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all"
+          className="p-2.5 text-neutral-400 hover:text-white hover:bg-white/8 rounded-xl transition-all"
           title="Search Models"
         >
           <Search className="w-4 h-4" />
         </button>
 
-        <button 
+        <button
           onClick={() => setEdgeStyle(edgeStyle === "angular" ? "curved" : "angular")}
-          className="p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all"
+          className="p-2.5 text-neutral-400 hover:text-white hover:bg-white/8 rounded-xl transition-all"
           title="Toggle Edge Style"
         >
           <Spline className="w-4 h-4" />
         </button>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-5 bg-white/10 mx-1" />
 
-        {/* Execution Engine */}
+        {/* Run button */}
         <button
           onClick={() => isRunning ? stopWorkflow() : executeWorkflow()}
           disabled={!valid && !isRunning}
-          className={`flex items-center gap-2 px-7 py-3 rounded-full font-black uppercase tracking-tighter text-sm transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.1)] ${
-            isRunning 
-              ? "bg-red-500 text-white animate-pulse" 
-              : valid 
-                ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:scale-105 active:scale-95 hover:shadow-[0_0_40px_rgba(139,92,246,0.5)]" 
-                : "bg-white/5 text-white/20"
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all ${
+            isRunning
+              ? "bg-red-500 text-white"
+              : valid
+                ? "bg-white text-black hover:bg-white/90 active:scale-95"
+                : "bg-white/8 text-white/25 cursor-not-allowed"
           }`}
         >
           {isRunning ? (
-            <>
-              <Square className="w-4 h-4 fill-current" />
-              Stop
-            </>
+            <><Square className="w-3.5 h-3.5 fill-current" /> Stop</>
           ) : (
-            <>
-              <Play className="w-4 h-4 fill-current" />
-              Run Studio
-            </>
+            <><Play className="w-3.5 h-3.5 fill-current" /> Run</>
           )}
         </button>
 
-        <button className="p-3 text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all">
+        <button className="p-2.5 text-neutral-400 hover:text-white hover:bg-white/8 rounded-xl transition-all">
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>
@@ -178,5 +180,6 @@ export function FloatingActionBar() {
     </div>
   );
 }
+
 
 
