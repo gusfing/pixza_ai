@@ -29,29 +29,74 @@ export default function Demo() {
 	);
 }
 
-// Canvas dashed background grid — used by WorkflowCanvas
+// Canvas grid background — used by WorkflowCanvas
+// Mimics the minimal grid canvas style (like Mixboard/Figma)
 export function DashedBackground({ x = 0, y = 0, zoom = 1 }: { x?: number; y?: number; zoom?: number }) {
-  const size = 24 * zoom;
-  const offsetX = x % size;
-  const offsetY = y % size;
+  // Cell size scales with zoom so grid moves naturally with pan/zoom
+  const cellSize = 32 * zoom;
+  const offsetX = ((x % cellSize) + cellSize) % cellSize;
+  const offsetY = ((y % cellSize) + cellSize) % cellSize;
+
+  // Sub-grid: every 4 cells draw a slightly brighter line
+  const subSize = cellSize * 4;
+  const subOffsetX = ((x % subSize) + subSize) % subSize;
+  const subOffsetY = ((y % subSize) + subSize) % subSize;
+
   return (
     <svg
       className="absolute inset-0 w-full h-full pointer-events-none"
       style={{ zIndex: 0 }}
+      xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
+        {/* Fine grid lines */}
         <pattern
-          id="dashed-grid"
+          id="grid-fine"
           x={offsetX}
           y={offsetY}
-          width={size}
-          height={size}
+          width={cellSize}
+          height={cellSize}
           patternUnits="userSpaceOnUse"
         >
-          <circle cx={0} cy={0} r={0.8} fill="rgba(255,255,255,0.12)" />
+          {/* Vertical line */}
+          <line
+            x1={0} y1={0} x2={0} y2={cellSize}
+            stroke="rgba(124,106,247,0.08)"
+            strokeWidth="0.5"
+          />
+          {/* Horizontal line */}
+          <line
+            x1={0} y1={0} x2={cellSize} y2={0}
+            stroke="rgba(124,106,247,0.08)"
+            strokeWidth="0.5"
+          />
+        </pattern>
+
+        {/* Major grid lines — every 4 cells */}
+        <pattern
+          id="grid-major"
+          x={subOffsetX}
+          y={subOffsetY}
+          width={subSize}
+          height={subSize}
+          patternUnits="userSpaceOnUse"
+        >
+          <line
+            x1={0} y1={0} x2={0} y2={subSize}
+            stroke="rgba(124,106,247,0.14)"
+            strokeWidth="0.75"
+          />
+          <line
+            x1={0} y1={0} x2={subSize} y2={0}
+            stroke="rgba(124,106,247,0.14)"
+            strokeWidth="0.75"
+          />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill="url(#dashed-grid)" />
+
+      {/* Fill with fine grid first, then overlay major grid */}
+      <rect width="100%" height="100%" fill="url(#grid-fine)" />
+      <rect width="100%" height="100%" fill="url(#grid-major)" />
     </svg>
   );
 }
