@@ -16,7 +16,7 @@ function MobileGate({ onContinue }: { onContinue: () => void }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[9999] bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-center"
+      className="fixed inset-0 z-[9999] bg-[#0d1117] flex flex-col items-center justify-center p-8 text-center"
     >
       {/* Icon */}
       <motion.div
@@ -111,7 +111,7 @@ export default function StudioPage() {
   return (
     <ReactFlowProvider>
       {showMobileGate && <MobileGate onContinue={() => setShowMobileGate(false)} />}
-      <div className="h-screen flex flex-col bg-[#0A0A0A] overflow-hidden relative">
+      <div className="h-screen flex flex-col bg-[#0d1117] overflow-hidden relative">
         <Header />
         <WorkflowCanvas />
         <FloatingActionBar />

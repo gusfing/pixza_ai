@@ -245,23 +245,24 @@ export function BaseNode({
         isVisible={selected}
         minWidth={minWidth}
         minHeight={minHeight}
-        lineClassName="!border-white/20"
-        handleClassName="!w-4 !h-4 !bg-white !rounded-full !shadow-xl !border-4 !border-[#0A0A0A]"
+        lineClassName="!border-white/15"
+        handleClassName="!w-3.5 !h-3.5 !bg-[#7c6af7] !rounded-full !shadow-lg !border-2 !border-[#0d1117]"
         onResize={handleResize}
       />
       
       <div
         className={`
           relative flex flex-col overflow-hidden transition-all duration-500 backdrop-blur-xl
-          ${fullBleed ? "bg-black/20" : "bg-neutral-950/40"}
+          ${fullBleed ? "" : "px-0 py-0"}
           ${settingsExpanded ? "rounded-t-[28px]" : "rounded-[28px]"}
           ${selected 
-            ? "ring-[2px] ring-white/40 shadow-[0_0_50px_rgba(255,255,255,0.15),0_0_100px_rgba(255,255,255,0.05)] border-white/20" 
-            : "border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"}
-          ${isCurrentlyExecuting || isExecuting ? "ring-[3px] ring-indigo-500 animate-pulse shadow-[0_0_30px_rgba(99,102,241,0.4)]" : "border"}
-          ${hasError ? "ring-[3px] ring-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]" : ""}
+            ? "ring-[2px] ring-white/30 shadow-[0_0_40px_rgba(124,106,247,0.2),0_0_80px_rgba(124,106,247,0.08)] border-white/15" 
+            : "border-white/6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"}
+          ${isCurrentlyExecuting || isExecuting ? "ring-[2px] ring-violet-400 animate-pulse shadow-[0_0_30px_rgba(124,106,247,0.5)]" : "border"}
+          ${hasError ? "ring-[2px] ring-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]" : ""}
           ${className}
         `}
+        style={{ background: fullBleed ? "rgba(22,27,34,0.85)" : "rgba(22,27,34,0.9)" }}
         onMouseEnter={(e) => {
           if (e.buttons !== 0 || isPanningRef.current || isDraggingNodeRef.current) return;
           setHoveredNodeId(id);
@@ -289,7 +290,8 @@ export function BaseNode({
       </div>
 
       {settingsPanel && (
-        <div ref={settingsPanelRef} className="glass-panel rounded-b-[24px] border-t-0 p-4">
+        <div ref={settingsPanelRef} className="rounded-b-[24px] border-t p-4"
+          style={{ background: "rgba(22,27,34,0.95)", borderColor: "rgba(255,255,255,0.07)" }}>
           {settingsPanel}
         </div>
       )}

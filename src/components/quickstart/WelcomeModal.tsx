@@ -43,9 +43,9 @@ export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: Wel
           transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
           className={`w-full ${dialogWidth} mx-4 rounded-2xl overflow-hidden ${dialogHeight} flex flex-col`}
           style={{
-            background: "#111111",
+            background: "#161b22",
             border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset, 0 50px 120px rgba(0,0,0,0.95)",
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset, 0 50px 120px rgba(0,0,0,0.8)",
           }}
           onClick={e => e.stopPropagation()}
         >

@@ -46,7 +46,7 @@ export function PromptWorkflowView({ onBack, onWorkflowGenerated }: PromptWorkfl
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
       className="flex flex-col h-full"
-      style={{ background: "#111111" }}
+      style={{ background: "#161b22" }}
     >
       {/* Header */}
       <div className="px-6 py-4 flex items-center gap-3"

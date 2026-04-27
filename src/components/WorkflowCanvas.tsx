@@ -408,19 +408,19 @@ export function WorkflowCanvas() {
   // Helper to get node accent color
   const getNodeAccentColor = (type: string) => {
     switch (type) {
-      case 'imageInput': return '#0d9668';
-      case 'audioInput': return '#f97316';
+      case 'imageInput': return '#22c55e';
+      case 'audioInput': return '#f59e0b';
       case 'videoInput': return '#a855f7';
       case 'prompt':
-      case 'promptConstructor': return '#ffffff';
+      case 'promptConstructor': return '#7c6af7';
       case 'nanoBanana':
       case 'generateVideo':
-      case 'llmGenerate': return '#8b5cf6';
+      case 'llmGenerate': return '#7c6af7';
       case 'output':
-      case 'outputGallery': return '#10b981';
+      case 'outputGallery': return '#22c55e';
       case 'glbViewer':
       case 'generate3d': return '#06b6d4';
-      default: return '#64748b';
+      default: return '#4b5563';
     }
   };
 

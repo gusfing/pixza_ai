@@ -18,16 +18,16 @@ interface EdgeData extends WorkflowEdgeData {
 }
 
 const EDGE_COLORS: Record<string, string> = {
-  image: "#0d9668",     // Green for image connections
-  prompt: "#a1a1a1",    // Neutral for prompt connections
-  default: "#525252",   // Gray for unknown
-  pause: "#ea580c",     // Orange for paused edges
-  reference: "#404040", // Dark gray for reference connections
-  video: "#a855f7",     // Purple for video connections
-  audio: "#f97316",     // Orange for audio connections
-  text: "#a1a1a1",      // Neutral for text connections
-  "3d": "#06b6d4",      // Cyan for 3D connections
-  easeCurve: "#f59e0b", // Amber for ease curve connections
+  image: "#22c55e",     // Green
+  prompt: "#7c6af7",    // Violet accent
+  default: "#4b5563",   // Slate gray
+  pause: "#f97316",     // Orange
+  reference: "#374151", // Dark slate
+  video: "#a855f7",     // Purple
+  audio: "#f59e0b",     // Amber
+  text: "#7c6af7",      // Violet accent
+  "3d": "#06b6d4",      // Cyan
+  easeCurve: "#f59e0b", // Amber
 };
 
 export function EditableEdge({

@@ -273,7 +273,7 @@ export function TemplateExplorerView({ onBack, onWorkflowSelected }: TemplateExp
   const isLoading = loadingId !== null;
 
   return (
-    <div className="flex flex-col h-full min-h-0" style={{ background: "#111111" }}>
+    <div className="flex flex-col h-full min-h-0" style={{ background: "#161b22" }}>
       {/* Header */}
       <div className="shrink-0 flex items-center gap-3 px-5 py-3.5"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -310,7 +310,7 @@ export function TemplateExplorerView({ onBack, onWorkflowSelected }: TemplateExp
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <aside className="w-40 shrink-0 flex flex-col gap-5 p-4 overflow-y-auto"
-          style={{ borderRight: "1px solid rgba(255,255,255,0.06)", background: "rgba(0,0,0,0.2)" }}>
+          style={{ borderRight: "1px solid rgba(255,255,255,0.06)", background: "rgba(13,17,23,0.5)" }}>
           {/* Category */}
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-2">Category</p>

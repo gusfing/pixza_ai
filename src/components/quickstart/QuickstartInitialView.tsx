@@ -79,7 +79,7 @@ export function QuickstartInitialView({
         className="w-60 shrink-0 flex flex-col p-7"
         style={{
           borderRight: "1px solid rgba(255,255,255,0.06)",
-          background: "linear-gradient(160deg, #141414 0%, #0e0e0e 100%)",
+          background: "linear-gradient(160deg, #1a1f2e 0%, #161b22 100%)",
         }}
       >
         {/* Logo */}
@@ -133,7 +133,7 @@ export function QuickstartInitialView({
 
       {/* ── Right panel: actions ── */}
       <div className="flex-1 flex flex-col justify-center p-7 gap-2.5"
-        style={{ background: "#111111" }}>
+        style={{ background: "#161b22" }}>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

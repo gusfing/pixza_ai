@@ -978,12 +978,12 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans antialiased">
+    <div className="min-h-screen bg-[#0d1117] text-white flex font-sans antialiased">
       {/* Dot pattern background */}
       <DotPattern className={cn("[mask-image:radial-gradient(600px_circle_at_center,white,transparent)]")} />
 
       {/* ── Sidebar ── */}
-      <aside className="hidden lg:flex flex-col items-center py-6 w-20 shrink-0 bg-[#0A0A0A] border-r border-white/5 z-50 relative">
+      <aside className="hidden lg:flex flex-col items-center py-6 w-20 shrink-0 bg-[#0d1117] border-r border-white/5 z-50 relative">
         <Link href="/landing" className="mb-10 group">
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
             <img src="/pixza-logo.png" alt="" className="w-5 h-5 invert" />

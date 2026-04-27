@@ -1,37 +1,45 @@
 @import "tailwindcss";
 
-/* ─── Obsidian Gallery Design System ───────────────────────── */
+/* ─── Pixza Design System — Slate Dark ─────────────────────── */
 @theme {
-  --color-canvas-bg: #0a0a0a;
-  --color-surface: #131313;
-  --color-surface-high: #202020;
+  --color-canvas-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-high: #21262d;
   --radius-xl: 24px;
 }
 
 :root {
-  /* Obsidian Palette */
-  --bg: #0a0a0a;
-  --surface: #131313;
-  --surface-high: #1c1c1c;
-  --surface-low: #0e0e0e;
-  
-  /* Monochromatic Tones */
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1a1;
-  --text-dim: #555555;
-  
+  /* Slate Palette */
+  --bg:           #0d1117;   /* canvas / page bg */
+  --surface:      #161b22;   /* cards, panels */
+  --surface-high: #21262d;   /* elevated surfaces */
+  --surface-low:  #0d1117;   /* inset / recessed */
+
+  /* Accent — soft violet */
+  --accent:       #7c6af7;
+  --accent-dim:   rgba(124,106,247,0.12);
+
+  /* Text */
+  --text-primary:   #e6edf3;
+  --text-secondary: #8b949e;
+  --text-dim:       #484f58;
+
+  /* Borders */
+  --border:    rgba(255,255,255,0.07);
+  --border-md: rgba(255,255,255,0.13);
+
   /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: blur(24px);
+  --glass-bg:     rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-blur:   blur(24px);
 
   /* Radius & Spacing */
-  --radius-lg: 24px;
+  --radius-lg:   24px;
   --radius-pill: 9999px;
-  
-  /* Shadows (Ambient Occlusion style) */
-  --shadow-soft: 0 40px 100px -20px rgba(0,0,0,0.8);
-  --shadow-inner: inset 0 0 0 1px rgba(255,255,255,0.05);
+
+  /* Shadows */
+  --shadow-soft:  0 40px 100px -20px rgba(0,0,0,0.7);
+  --shadow-inner: inset 0 0 0 1px rgba(255,255,255,0.04);
 }
 
 /* Minimal Button */
@@ -171,28 +179,26 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255,255,255,0.1);
 }
 
-/* ─── React Flow Minimal ───────────────────────────────────── */
+/* ─── React Flow — Slate Theme ─────────────────────────────── */
 .react-flow { background: var(--bg); }
-.react-flow__edge-path { stroke-width: 2.5; transition: stroke-width 0.2s ease; }
+.react-flow__edge-path { stroke-width: 2; transition: stroke-width 0.2s ease; }
 .react-flow__handle {
-  width: 10px !important; 
+  width: 10px !important;
   height: 10px !important;
-  background: #ffffff !important;
-  border: 2px solid #0A0A0A !important;
-  box-shadow: 0 0 10px rgba(255,255,255,0.3) !important;
+  background: #e6edf3 !important;
+  border: 2px solid #0d1117 !important;
+  box-shadow: 0 0 8px rgba(124,106,247,0.4) !important;
   transition: all 0.2s ease !important;
 }
 .react-flow__handle:hover {
   transform: scale(1.4) !important;
-  box-shadow: 0 0 15px rgba(255,255,255,0.6) !important;
+  box-shadow: 0 0 14px rgba(124,106,247,0.7) !important;
 }
 .react-flow__handle-connecting {
-  background: #3b82f6 !important;
-  box-shadow: 0 0 15px rgba(59,130,246,0.6) !important;
+  background: #7c6af7 !important;
+  box-shadow: 0 0 14px rgba(124,106,247,0.7) !important;
 }
-
 .react-flow__node {
-  /* Allow BaseNode to handle internal styling */
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;

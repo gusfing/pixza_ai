@@ -5,14 +5,14 @@
 // <defs>/<linearGradient> in every edge component.
 
 const EDGE_COLORS: Record<string, string> = {
-  image: "#0d9668",
-  prompt: "#a1a1a1",
-  default: "#525252",
-  pause: "#ea580c",
-  reference: "#404040",
+  image: "#22c55e",
+  prompt: "#7c6af7",
+  default: "#4b5563",
+  pause: "#f97316",
+  reference: "#374151",
   video: "#a855f7",
-  audio: "#f97316",
-  text: "#a1a1a1",
+  audio: "#f59e0b",
+  text: "#7c6af7",
   "3d": "#06b6d4",
   easeCurve: "#f59e0b",
 };
