@@ -473,9 +473,8 @@ function CreateScreen() {
                     const token = localStorage.getItem("pixza_token");
                     if (!token) { window.location.href = "/auth/signin"; return; }
                     try {
-                      const { wpCreateCheckout } = await import("@/lib/wordpress");
-                      const { checkout_url } = await wpCreateCheckout(token, "pro");
-                      window.location.href = checkout_url;
+                      const { openRazorpayCheckout } = await import("@/lib/razorpay");
+                      await openRazorpayCheckout({ plan: "pro", onSuccess: () => {}, onError: () => {}, onDismiss: () => {} });
                     } catch { window.location.href = "/settings"; }
                   }}
                   className="mt-3 flex items-center gap-2 text-[11px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest">
@@ -638,9 +637,28 @@ function SettingsScreen() {
     if (!token) { window.location.href = "/auth/signin"; return; }
     setUpgrading(targetPlan);
     try {
-      const { wpCreateCheckout } = await import("@/lib/wordpress");
-      const { checkout_url } = await wpCreateCheckout(token, targetPlan);
-      window.location.href = checkout_url;
+      const { openRazorpayCheckout } = await import("@/lib/razorpay");
+      await openRazorpayCheckout({
+        plan: targetPlan,
+        onSuccess: (data) => {
+          setMsg({ type: "ok", text: `🎉 Upgraded to ${data.plan}! ${data.credits} credits added.` });
+          setUpgrading(null);
+          setPlan(data.plan);
+          setCredits(data.credits);
+          setCreditLimit(data.credits);
+          // Refresh from server
+          fetch("/api/credits").then(r => r.json()).then(d => {
+            setCredits(d.credits ?? null);
+            setCreditLimit(d.limit ?? null);
+            setPlan(d.plan ?? "free");
+          }).catch(() => {});
+        },
+        onError: (err) => {
+          setMsg({ type: "err", text: err });
+          setUpgrading(null);
+        },
+        onDismiss: () => setUpgrading(null),
+      });
     } catch (e) {
       setMsg({ type: "err", text: e instanceof Error ? e.message : "Checkout failed" });
       setUpgrading(null);
@@ -762,7 +780,7 @@ function SettingsScreen() {
                   </ul>
                   <button onClick={() => handleUpgrade("pro")} disabled={upgrading === "pro"}
                     className="w-full py-2.5 rounded-xl bg-violet-500 text-white text-xs font-black hover:bg-violet-400 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
-                    {upgrading === "pro" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Redirecting…</> : <><Crown className="w-3.5 h-3.5" /> Upgrade to Pro</>}
+                    {upgrading === "pro" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing…</> : <><Crown className="w-3.5 h-3.5" /> Upgrade — ₹1,999/mo</>}
                   </button>
                 </div>
 
@@ -781,7 +799,7 @@ function SettingsScreen() {
                   </ul>
                   <button onClick={() => handleUpgrade("agency")} disabled={upgrading === "agency"}
                     className="w-full py-2.5 rounded-xl bg-amber-500 text-white text-xs font-black hover:bg-amber-400 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
-                    {upgrading === "agency" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Redirecting…</> : <><Zap className="w-3.5 h-3.5" /> Upgrade to Agency</>}
+                    {upgrading === "agency" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing…</> : <><Zap className="w-3.5 h-3.5" /> Upgrade — ₹6,999/mo</>}
                   </button>
                 </div>
               </div>
@@ -971,10 +989,18 @@ export default function CreatePage() {
     const token = localStorage.getItem("pixza_token");
     if (!token) { window.location.href = "/auth/signin"; return; }
     try {
-      const { wpCreateCheckout } = await import("@/lib/wordpress");
-      const { checkout_url } = await wpCreateCheckout(token, "pro");
-      window.location.href = checkout_url;
-    } catch { window.location.href = "/settings"; }
+      const { openRazorpayCheckout } = await import("@/lib/razorpay");
+      await openRazorpayCheckout({
+        plan: "pro",
+        onSuccess: () => {
+          fetch("/api/credits").then(r => r.json()).then(d => {
+            setCredits(d.credits ?? null);
+          }).catch(() => {});
+        },
+        onError: () => {},
+        onDismiss: () => {},
+      });
+    } catch { /* silent */ }
   };
 
   return (
