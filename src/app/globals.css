@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas-bg: #f8f9fb;
+  --color-canvas-bg: #0d1117;
 }
 
 :root {
-  --background: #f8f9fb;
-  --foreground: #111111;
+  --background: #0d1117;
+  --foreground: #e6edf3;
   /* Handle colors */
   --handle-color-image: #10b981;
   --handle-color-text: #3b82f6;
@@ -31,7 +31,7 @@ body {
 
 /* ─── React Flow ─────────────────────────────────────────────── */
 .react-flow {
-  background: #f8f9fb;
+  background: #0d1117;
   overscroll-behavior-x: none;
   touch-action: none;
 }
@@ -69,8 +69,8 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  border: 2px solid #0d1117;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   z-index: 5;
 }
 
@@ -123,27 +123,27 @@ body {
 
 /* Controls */
 .react-flow__controls {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
+  background: #161b22 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
   border-radius: 8px !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
 }
 .react-flow__controls-button {
-  background: #ffffff !important;
-  border-bottom: 1px solid #e5e7eb !important;
+  background: #161b22 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
 }
-.react-flow__controls-button svg       { fill: #6b7280 !important; }
-.react-flow__controls-button svg path  { fill: #6b7280 !important; }
-.react-flow__controls-button:hover     { background: #f9fafb !important; }
+.react-flow__controls-button svg       { fill: rgba(255,255,255,0.5) !important; }
+.react-flow__controls-button svg path  { fill: rgba(255,255,255,0.5) !important; }
+.react-flow__controls-button:hover     { background: #21262d !important; }
 .react-flow__controls-button:hover svg,
-.react-flow__controls-button:hover svg path { fill: #111827 !important; }
+.react-flow__controls-button:hover svg path { fill: rgba(255,255,255,0.9) !important; }
 .react-flow__controls-button:last-child { border-bottom: none !important; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
 
 .react-flow__nodesselection-rect { pointer-events: none !important; }
 
@@ -193,16 +193,16 @@ body {
 
 /* ─── Legacy CSS variables (used by modals/ProjectSetupModal) ── */
 :root {
-  --surface-1:   #ffffff;
-  --surface-2:   #f5f5f5;
-  --surface-3:   #eeeeee;
-  --border:      rgba(0,0,0,0.08);
-  --border-md:   rgba(0,0,0,0.12);
-  --text-1:      #111111;
-  --text-2:      #444444;
-  --text-3:      #888888;
-  --accent:      #6366f1;
-  --accent-dim:  rgba(99,102,241,0.12);
+  --surface-1:   #161b22;
+  --surface-2:   #1c2128;
+  --surface-3:   #21262d;
+  --border:      rgba(255,255,255,0.07);
+  --border-md:   rgba(255,255,255,0.12);
+  --text-1:      #e6edf3;
+  --text-2:      #8b949e;
+  --text-3:      #484f58;
+  --accent:      #7c6af7;
+  --accent-dim:  rgba(124,106,247,0.12);
   --action:      #ef4444;
   --action-dim:  rgba(239,68,68,0.12);
 }

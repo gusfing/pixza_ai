@@ -1956,7 +1956,7 @@ export function WorkflowCanvas() {
   return (
     <div
       ref={reactFlowWrapper}
-      className={`flex-1 bg-[#f8f9fb] relative ${isDragOver ? "ring-2 ring-inset ring-blue-400/30" : ""}`}
+      className={`flex-1 bg-[#0d1117] relative ${isDragOver ? "ring-2 ring-inset ring-blue-400/30" : ""}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -2089,11 +2089,11 @@ export function WorkflowCanvas() {
         <SharedEdgeGradients />
         <GroupBackgroundsPortal />
         <GroupControlsOverlay />
-        <Controls className="!border-none !shadow-none !bg-transparent [&>button]:!bg-white [&>button]:!border-black/10 [&>button]:!shadow-sm [&>button:hover]:!bg-gray-50 [&>button_svg]:!fill-black/60" />
+        <Controls className="!border-none !shadow-none !bg-transparent [&>button]:!bg-[#161b22] [&>button]:!border-white/10 [&>button]:!shadow-sm [&>button:hover]:!bg-[#21262d] [&>button_svg]:!fill-white/50" />
         <MiniMap
           className="rounded-lg overflow-hidden"
-          style={{ background: "#ffffff", border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}
-          maskColor="rgba(248,249,251,0.75)"
+          style={{ background: "#161b22", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 2px 12px rgba(0,0,0,0.4)" }}
+          maskColor="rgba(13,17,23,0.75)"
           pannable
           zoomable
           nodeColor={(node) => {
