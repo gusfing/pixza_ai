@@ -183,12 +183,12 @@ body {
 .btn-minimal-secondary { background: rgba(0,0,0,0.05); color: #111111; border: 1px solid rgba(0,0,0,0.1); }
 .btn-minimal-secondary:hover { background: rgba(0,0,0,0.08); }
 
-/* Glass panel (kept for compatibility) */
+/* Glass panel — dark (used in studio floating elements) */
 .glass-panel {
-  background: rgba(255,255,255,0.9);
+  background: rgba(22,27,34,0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 /* ─── Legacy CSS variables (used by modals/ProjectSetupModal) ── */
@@ -207,11 +207,11 @@ body {
   --action-dim:  rgba(239,68,68,0.12);
 }
 
-/* Modal glass classes */
+/* Modal glass classes — always white (used in modals over dark backdrop) */
 .glass-modal {
   background: #ffffff;
   border: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
 }
 
 .glass {

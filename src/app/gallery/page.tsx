@@ -15,7 +15,7 @@ const InfiniteGallery = dynamic(
 
 function GalleryLoading() {
   return (
-    <div className="h-screen w-full bg-[#0A0A0A] flex items-center justify-center">
+    <div className="h-screen w-full bg-[#0d1117] flex items-center justify-center">
       <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin" />
     </div>
   );
@@ -36,7 +36,7 @@ class GalleryErrorBoundary extends Component<{ children: ReactNode }, { hasError
 
 function GalleryFallback() {
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#0A0A0A]">
+    <div className="w-full h-full overflow-y-auto bg-[#0d1117]">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <h2 className="text-2xl font-black text-white tracking-tighter mb-8">Gallery</h2>
         <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
@@ -92,7 +92,7 @@ export default function GalleryPage() {
   if (authLoading) return <GalleryLoading />;
 
   return (
-    <main className="min-h-screen h-full w-full bg-[#0A0A0A]">
+    <main className="min-h-screen h-full w-full bg-[#0d1117]">
       <GalleryErrorBoundary>
         <InfiniteGallery
           images={GALLERY_IMAGES}
@@ -133,3 +133,4 @@ export default function GalleryPage() {
     </main>
   );
 }
+

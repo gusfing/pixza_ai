@@ -24,7 +24,7 @@ export default function PrivacyPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] selection:bg-white selection:text-black py-32 px-6">
+    <main className="min-h-screen bg-[#0d1117] selection:bg-white selection:text-black py-32 px-6">
       <div className="max-w-4xl mx-auto">
         {/* Back Link */}
         <Link href="/landing" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors mb-20 group">
@@ -58,3 +58,4 @@ export default function PrivacyPage() {
     </main>
   );
 }
+

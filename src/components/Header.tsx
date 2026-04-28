@@ -44,7 +44,7 @@ function CommentsBtn() {
   return (
     <button
       onClick={handleClick}
-      className="relative flex items-center justify-center w-7 h-7 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-black/5 transition-colors"
+      className="relative flex items-center justify-center w-7 h-7 rounded-md text-white/30 hover:text-white/70 hover:bg-black/5 transition-colors"
       title={`${unviewed} unviewed comment${unviewed !== 1 ? "s" : ""}`}
     >
       <MessageSquare className="w-4 h-4" />
@@ -70,7 +70,7 @@ function IconBtn({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className="relative flex items-center justify-center w-7 h-7 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-black/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      className="relative flex items-center justify-center w-7 h-7 rounded-md text-white/30 hover:text-white/70 hover:bg-black/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
     >
       {children}
       {dot && (
@@ -165,14 +165,14 @@ export function Header() {
 
       {/* ── Header bar ── */}
       <header className="h-11 shrink-0 z-50 flex items-center justify-between border-b"
-        style={{ background: "#ffffff", borderColor: "rgba(0,0,0,0.08)", padding: "20px 12px" }}>
+        style={{ background: "#161b22", borderColor: "rgba(255,255,255,0.07)", padding: "20px 12px" }}>
 
         {/* ── Left: logo + workflow name ── */}
         <div className="flex items-center gap-3 min-w-0">
           {/* Back to create */}
           <Link
             href="/create"
-            className="flex items-center justify-center w-7 h-7 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-black/5 transition-colors shrink-0"
+            className="flex items-center justify-center w-7 h-7 rounded-md text-white/30 hover:text-white/70 hover:bg-white/5 transition-colors shrink-0"
             title="Back to Create"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -195,7 +195,7 @@ export function Header() {
           {/* Workflow name — click to rename */}
           <button
             onClick={() => { setProjectModalMode(configured ? "settings" : "new"); setShowProjectModal(true); }}
-            className="text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors truncate max-w-[200px]"
+            className="text-sm font-medium text-white/70 hover:text-white transition-colors truncate max-w-[200px]"
             title={configured ? "Rename project" : "Set up project"}
           >
             {configured ? workflowName : "Untitled"}
@@ -203,7 +203,7 @@ export function Header() {
 
           {/* Save status */}
           {saveLabel && (
-            <span className="text-[11px] text-neutral-400 shrink-0 hidden sm:block">
+            <span className="text-[11px] text-white/30 shrink-0 hidden sm:block">
               {saveLabel}
             </span>
           )}
@@ -247,7 +247,7 @@ export function Header() {
           {previousWorkflowSnapshot && (
             <button
               onClick={handleRevert}
-              className="flex items-center gap-1.5 px-2.5 h-7 rounded-md text-[11px] font-medium text-neutral-500 hover:text-neutral-800 hover:bg-black/5 transition-colors border border-black/8"
+              className="flex items-center gap-1.5 px-2.5 h-7 rounded-md text-[11px] font-medium text-white/40 hover:text-white/80 hover:bg-black/5 transition-colors border border-white/10"
               title="Restore workflow from before AI changes"
             >
               <RotateCcw className="w-3 h-3" />
@@ -261,7 +261,7 @@ export function Header() {
             <Keyboard className="w-3.5 h-3.5" />
           </IconBtn>
 
-          <div className="w-px h-4 bg-black/10 mx-1" />
+          <div className="w-px h-4 bg-white/10 mx-1" />
 
           <QuotaIndicator />
           <ProfileDropdown />
@@ -275,3 +275,5 @@ export function Header() {
     </>
   );
 }
+
+

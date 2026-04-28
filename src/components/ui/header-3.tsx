@@ -50,7 +50,7 @@ export function Header() {
     <header
       className={cn(
         "sticky top-0 z-50 w-full border-b border-transparent transition-all duration-300",
-        scrolled && "bg-[#0A0A0A]/95 border-white/5 backdrop-blur-xl"
+        scrolled && "bg-[#0d1117]/95 border-white/5 backdrop-blur-xl"
       )}
     >
       <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-6">
@@ -284,7 +284,7 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
   return createPortal(
     <div
       id="mobile-menu"
-      className="bg-[#0A0A0A]/98 backdrop-blur-xl fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-t border-white/5 md:hidden"
+      className="bg-[#0d1117]/98 backdrop-blur-xl fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-t border-white/5 md:hidden"
     >
       <div
         data-slot={open ? "open" : "closed"}
@@ -345,3 +345,4 @@ const companyLinks2: LinkItem[] = [
   { title: "Help Center",       href: "/contact",         icon: HelpCircle },
   { title: "API Docs",          href: "#",                icon: Zap },
 ];
+

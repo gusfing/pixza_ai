@@ -109,7 +109,7 @@ export default function AdminPage() {
   };
 
   if (authLoading) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
       <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin" />
     </div>
   );
@@ -121,9 +121,9 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans antialiased">
+    <div className="min-h-screen bg-[#0d1117] text-white font-sans antialiased">
       {/* Nav */}
-      <nav className="h-14 border-b border-white/5 flex items-center justify-between px-8 sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-50">
+      <nav className="h-14 border-b border-white/5 flex items-center justify-between px-8 sticky top-0 bg-[#0d1117]/90 backdrop-blur-xl z-50">
         <div className="flex items-center gap-3">
           <img src="/pixza-logo.png" alt="" className="w-6 h-6 invert" />
           <span className="font-black tracking-tighter">Admin</span>
@@ -303,3 +303,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

@@ -13,7 +13,7 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, heading, topRightLink }: AuthLayoutProps) {
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-white selection:text-black antialiased overflow-hidden">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#0d1117] text-white font-sans selection:bg-white selection:text-black antialiased overflow-hidden">
       {/* Grain Overlay */}
       <div 
         className="fixed inset-0 pointer-events-none z-[300] opacity-[0.03]" 
@@ -26,7 +26,7 @@ export function AuthLayout({ children, heading, topRightLink }: AuthLayoutProps)
       <div className="hidden lg:flex flex-col w-[45%] relative p-16 border-r border-white/5 overflow-hidden">
         {/* Cinematic Background Visual */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0d1117] via-[#0d1117]/80 to-transparent z-10" />
           <img 
             src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=2564" 
             alt="Abstract Architecture" 
@@ -109,3 +109,4 @@ export function AuthLayout({ children, heading, topRightLink }: AuthLayoutProps)
     </div>
   );
 }
+

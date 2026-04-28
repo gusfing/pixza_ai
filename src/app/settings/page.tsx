@@ -368,7 +368,7 @@ export default function SettingsPage() {
   }, [authLoading, user, router]);
 
   if (authLoading) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
       <div className="w-12 h-12 border-4 border-white/10 border-t-white rounded-full animate-spin" />
     </div>
   );
@@ -376,7 +376,7 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans antialiased selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-[#0d1117] text-white font-sans antialiased selection:bg-white selection:text-black">
       {/* Grain Overlay */}
       <div 
         className="fixed inset-0 pointer-events-none z-[300] opacity-[0.02]" 
@@ -386,7 +386,7 @@ export default function SettingsPage() {
       />
 
       {/* Navigation */}
-      <nav className="h-16 border-b border-white/5 flex items-center justify-between px-8 sticky top-0 bg-[#0A0A0A]/80 backdrop-blur-xl z-[100]">
+      <nav className="h-16 border-b border-white/5 flex items-center justify-between px-8 sticky top-0 bg-[#0d1117]/80 backdrop-blur-xl z-[100]">
         <Link href="/create" className="flex items-center gap-3 group">
           <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
             <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert" />
@@ -420,7 +420,7 @@ export default function SettingsPage() {
                 className={cn(
                   "flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 font-bold whitespace-nowrap",
                   tab === t.id 
-                    ? "bg-white text-[#0A0A0A] shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]" 
+                    ? "bg-white text-[#0d1117] shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]" 
                     : "text-white/30 hover:text-white hover:bg-white/5"
                 )}
               >
@@ -452,3 +452,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+
