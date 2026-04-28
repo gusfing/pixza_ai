@@ -12,8 +12,12 @@ export const metadata: Metadata = {
   title: "Pixza Studio | Create Without Limits",
   description: "Advanced AI image and video workflows for creators.",
   icons: {
-    icon: "/pixza-logo.png",
-    apple: "/pixza-logo.png",
+    icon: [
+      { url: "/pixza-logo.png", type: "image/png" },
+      { url: "/favicon.png",    type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/pixza-logo.png",
   },
 };
 
