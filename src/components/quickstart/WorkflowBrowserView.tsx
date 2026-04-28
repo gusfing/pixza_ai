@@ -21,6 +21,8 @@ interface WorkflowBrowserViewProps {
   onBack?: () => void;
   onWorkflowLoaded: (workflow: WorkflowFile, directoryPath: string) => void;
   onClose?: () => void;
+  showNewWorkflowButton?: boolean;
+  onNewWorkflow?: () => void;
 }
 
 function formatRelativeTime(timestamp: number): string {
@@ -44,6 +46,8 @@ export function WorkflowBrowserView({
   onBack,
   onWorkflowLoaded,
   onClose,
+  showNewWorkflowButton = false,
+  onNewWorkflow,
 }: WorkflowBrowserViewProps) {
   const { data: session } = useSession();
   const [viewMode, setViewMode] = useState<"local" | "cloud">("local");
@@ -216,7 +220,7 @@ export function WorkflowBrowserView({
         )}
         <div className="flex flex-col items-center gap-4 py-8">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-neutral-700/50 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
               <svg
                 className="w-5 h-5 text-neutral-400"
                 fill="none"
@@ -231,16 +235,16 @@ export function WorkflowBrowserView({
                 />
               </svg>
             </div>
-            <h2 id="workflow-browser-title" className="text-lg font-medium text-neutral-200">
+            <h2 id="workflow-browser-title" className="text-lg font-medium text-neutral-700">
               Your Workflows
             </h2>
           </div>
-          <p className="text-sm text-neutral-500 max-w-xs text-center">
+          <p className="text-sm text-neutral-400 max-w-xs text-center">
             Choose the folder that contains your workflow projects. You can change this later.
           </p>
           <button
             onClick={browseAndSetDir}
-            className="px-4 py-2 text-sm font-medium text-neutral-200 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-neutral-700 bg-gray-100 hover:bg-neutral-600 rounded-lg transition-colors"
           >
             Choose folder
           </button>
@@ -253,7 +257,7 @@ export function WorkflowBrowserView({
   return (
     <div className="flex flex-col h-full max-h-[70vh]">
       {/* Header */}
-      <div className="px-6 pt-4 pb-3 border-b border-neutral-700/50 flex-shrink-0">
+      <div className="px-6 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
         {onBack && (
           <div className="mb-2">
             <QuickstartBackButton onClick={onBack} />
@@ -261,21 +265,21 @@ export function WorkflowBrowserView({
         )}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-baseline gap-3">
-            <h2 className="text-lg font-medium text-neutral-200">
+            <h2 className="text-lg font-medium text-neutral-700">
               Your Workflows
             </h2>
           </div>
           {session && (
-            <div className="flex p-1 bg-neutral-800 rounded-lg border border-neutral-700">
+            <div className="flex p-1 bg-neutral-800 rounded-lg border border-gray-100">
               <button
                 onClick={() => setViewMode("local")}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${viewMode === "local" ? "bg-neutral-700 text-white" : "text-neutral-400 hover:text-neutral-200"}`}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${viewMode === "local" ? "bg-gray-100 text-white" : "text-neutral-400 hover:text-neutral-700"}`}
               >
                 Local
               </button>
               <button
                 onClick={() => setViewMode("cloud")}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${viewMode === "cloud" ? "bg-neutral-700 text-white" : "text-neutral-400 hover:text-neutral-200"}`}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${viewMode === "cloud" ? "bg-gray-100 text-white" : "text-neutral-400 hover:text-neutral-700"}`}
               >
                 Cloud
               </button>
@@ -284,7 +288,7 @@ export function WorkflowBrowserView({
         </div>
         {viewMode === "local" && (
           <p
-            className="text-xs text-neutral-500 truncate mt-0.5"
+            className="text-xs text-neutral-400 truncate mt-0.5"
             title={defaultDir || ""}
           >
             {defaultDir}
@@ -296,7 +300,7 @@ export function WorkflowBrowserView({
       <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-2">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="w-5 h-5 border-2 border-neutral-600 border-t-neutral-300 rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-gray-200 border-t-neutral-300 rounded-full animate-spin" />
           </div>
         ) : error && workflows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -314,7 +318,7 @@ export function WorkflowBrowserView({
               />
             </svg>
             <p className="text-sm text-neutral-400 mb-1">No workflows found</p>
-            <p className="text-xs text-neutral-600">
+            <p className="text-xs text-neutral-400">
               This folder doesn&apos;t contain any workflow projects
             </p>
           </div>
@@ -332,21 +336,21 @@ export function WorkflowBrowserView({
                       group text-left px-3 py-2.5 rounded-lg transition-all duration-100
                       disabled:opacity-50
                       ${isActive
-                        ? "bg-neutral-700/60 border border-neutral-600"
-                        : "border border-transparent hover:bg-neutral-700/30 hover:border-neutral-700/50"
+                        ? "bg-gray-100 border border-gray-200"
+                        : "border border-transparent hover:bg-gray-50 hover:border-gray-100"
                       }
                     `}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`
                         w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 transition-colors
-                        ${isActive ? "bg-blue-500/20" : "bg-neutral-700/50 group-hover:bg-neutral-700"}
+                        ${isActive ? "bg-blue-500/20" : "bg-gray-100 group-hover:bg-gray-100"}
                       `}>
                         {isActive ? (
                           <div className="w-3.5 h-3.5 border-2 border-blue-400/40 border-t-blue-400 rounded-full animate-spin" />
                         ) : (
                           <svg
-                            className="w-4 h-4 text-neutral-400 group-hover:text-neutral-300 transition-colors"
+                            className="w-4 h-4 text-neutral-400 group-hover:text-neutral-400 transition-colors"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
@@ -354,14 +358,14 @@ export function WorkflowBrowserView({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-neutral-200 group-hover:text-neutral-100 transition-colors truncate">
+                        <div className="text-sm font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors truncate">
                           {entry.name}
                         </div>
-                        <div className="text-[11px] text-neutral-600 truncate">
+                        <div className="text-[11px] text-neutral-400 truncate">
                           {entry.relativePath || dirBasename(entry.directoryPath)}
                         </div>
                       </div>
-                      <span className="text-[11px] text-neutral-600 tabular-nums flex-shrink-0">
+                      <span className="text-[11px] text-neutral-400 tabular-nums flex-shrink-0">
                         {formatRelativeTime(entry.lastModified)}
                       </span>
                     </div>
@@ -399,7 +403,7 @@ export function WorkflowBrowserView({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-neutral-200 group-hover:text-neutral-100 transition-colors truncate">
+                        <div className="text-sm font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors truncate">
                           {entry.name}
                         </div>
                         <div className="text-[11px] text-purple-400/70 truncate flex items-center gap-1">
@@ -407,7 +411,7 @@ export function WorkflowBrowserView({
                           Cloud Project
                         </div>
                       </div>
-                      <span className="text-[11px] text-neutral-600 tabular-nums flex-shrink-0">
+                      <span className="text-[11px] text-neutral-400 tabular-nums flex-shrink-0">
                         {formatRelativeTime(new Date(entry.updatedAt).getTime())}
                       </span>
                     </div>
@@ -424,25 +428,39 @@ export function WorkflowBrowserView({
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-3 border-t border-neutral-700/50 flex-shrink-0 flex items-center justify-between">
-        <button
-          onClick={handleBrowseOther}
-          disabled={loadingWorkflow !== null}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-700/50 hover:bg-neutral-700 border border-neutral-600/50 hover:border-neutral-600 rounded-md transition-colors disabled:opacity-50"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
-          </svg>
-          Open from directory
-        </button>
-        <button
-          onClick={browseAndSetDir}
-          disabled={loadingWorkflow !== null}
-          className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors disabled:opacity-50"
-        >
-          Change folder
-        </button>
+      <div className="px-4 py-3 border-t border-gray-100 shrink-0 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleBrowseOther}
+            disabled={loadingWorkflow !== null}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-400 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors disabled:opacity-50"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+            </svg>
+            Open from directory
+          </button>
+          <button
+            onClick={browseAndSetDir}
+            disabled={loadingWorkflow !== null}
+            className="text-xs text-neutral-400 hover:text-neutral-700 transition-colors disabled:opacity-50"
+          >
+            Change folder
+          </button>
+        </div>
+        {showNewWorkflowButton && onNewWorkflow && (
+          <button
+            onClick={onNewWorkflow}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-black hover:bg-neutral-800 rounded-md transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            New Workflow
+          </button>
+        )}
       </div>
     </div>
   );
 }
+

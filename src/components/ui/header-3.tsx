@@ -7,32 +7,15 @@ import { cn } from "@/lib/utils";
 import { MenuToggleIcon } from "@/components/ui/menu-toggle-icon";
 import { createPortal } from "react-dom";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
+  NavigationMenu, NavigationMenuContent, NavigationMenuItem,
+  NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { LucideIcon } from "lucide-react";
 import {
-  ImageIcon,
-  Video,
-  Music,
-  Box,
-  Sparkles,
-  Wand2,
-  LayoutGrid,
-  BookOpen,
-  Users,
-  Star,
-  FileText,
-  Shield,
-  HelpCircle,
-  Leaf,
-  Zap,
-  Globe,
+  ImageIcon, Video, Music, Box, Sparkles, Wand2, LayoutGrid,
+  BookOpen, Users, Star, FileText, Shield, HelpCircle, Leaf, Zap, Globe,
 } from "lucide-react";
+import { useWPAuth } from "@/lib/wp-auth-context";
 
 type LinkItem = {
   title: string;
@@ -154,18 +137,7 @@ export function Header() {
         </div>
 
         {/* Desktop CTA */}
-        <div className="hidden items-center gap-2 md:flex">
-          <Link href="/auth/signin">
-            <Button variant="ghost" className="text-white/60 hover:text-white hover:bg-white/5 h-8 text-sm">
-              Sign In
-            </Button>
-          </Link>
-          <Link href="/auth/signup">
-            <Button className="bg-white text-black hover:bg-white/90 h-8 text-sm font-bold px-4">
-              Get Started
-            </Button>
-          </Link>
-        </div>
+        <DesktopAuthButtons />
 
         {/* Mobile toggle */}
         <Button
@@ -216,20 +188,91 @@ export function Header() {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 pb-2">
-          <Link href="/auth/signin" onClick={() => setOpen(false)}>
-            <Button variant="outline" className="w-full bg-transparent border-white/10 text-white/60 hover:text-white hover:bg-white/5">
-              Sign In
-            </Button>
-          </Link>
-          <Link href="/auth/signup" onClick={() => setOpen(false)}>
-            <Button className="w-full bg-white text-black hover:bg-white/90 font-bold">
-              Get Started
-            </Button>
-          </Link>
-        </div>
+        <MobileAuthButtons onClose={() => setOpen(false)} />
       </MobileMenu>
     </header>
+  );
+}
+
+/* ── Auth-aware CTA buttons ──────────────────────────────────── */
+function DesktopAuthButtons() {
+  const { user, logout } = useWPAuth();
+
+  if (user) {
+    return (
+      <div className="hidden items-center gap-2 md:flex">
+        <Link href="/create">
+          <Button variant="ghost" className="text-white/60 hover:text-white hover:bg-white/5 h-8 text-sm">
+            Create
+          </Button>
+        </Link>
+        <Link href="/studio">
+          <Button className="bg-white text-black hover:bg-white/90 h-8 text-sm font-bold px-4">
+            Studio
+          </Button>
+        </Link>
+        <button
+          onClick={logout}
+          className="text-white/40 hover:text-white text-xs transition-colors ml-1"
+        >
+          Sign out
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="hidden items-center gap-2 md:flex">
+      <Link href="/auth/signin">
+        <Button variant="ghost" className="text-white/60 hover:text-white hover:bg-white/5 h-8 text-sm">
+          Sign In
+        </Button>
+      </Link>
+      <Link href="/auth/signup">
+        <Button className="bg-white text-black hover:bg-white/90 h-8 text-sm font-bold px-4">
+          Get Started
+        </Button>
+      </Link>
+    </div>
+  );
+}
+
+function MobileAuthButtons({ onClose }: { onClose: () => void }) {
+  const { user, logout } = useWPAuth();
+
+  if (user) {
+    return (
+      <div className="flex flex-col gap-2 pb-2">
+        <Link href="/create" onClick={onClose}>
+          <Button variant="outline" className="w-full bg-transparent border-white/10 text-white/60 hover:text-white hover:bg-white/5">
+            Create
+          </Button>
+        </Link>
+        <Link href="/studio" onClick={onClose}>
+          <Button className="w-full bg-white text-black hover:bg-white/90 font-bold">
+            Studio
+          </Button>
+        </Link>
+        <button onClick={() => { logout(); onClose(); }} className="text-white/40 hover:text-white text-sm text-center py-1 transition-colors">
+          Sign out
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2 pb-2">
+      <Link href="/auth/signin" onClick={onClose}>
+        <Button variant="outline" className="w-full bg-transparent border-white/10 text-white/60 hover:text-white hover:bg-white/5">
+          Sign In
+        </Button>
+      </Link>
+      <Link href="/auth/signup" onClick={onClose}>
+        <Button className="w-full bg-white text-black hover:bg-white/90 font-bold">
+          Get Started
+        </Button>
+      </Link>
+    </div>
   );
 }
 

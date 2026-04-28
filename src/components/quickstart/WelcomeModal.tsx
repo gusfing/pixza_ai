@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { WorkflowFile } from "@/store/workflowStore";
+import { WorkflowFile, useWorkflowStore } from "@/store/workflowStore";
 import { QuickstartView } from "@/types/quickstart";
 import { QuickstartInitialView } from "./QuickstartInitialView";
 import { TemplateExplorerView } from "./TemplateExplorerView";
@@ -16,7 +16,27 @@ interface WelcomeModalProps {
 }
 
 export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: WelcomeModalProps) {
-  const [currentView, setCurrentView] = useState<QuickstartView>("initial");
+  // Default to "browse" so users always see their workflow list first
+  const [currentView, setCurrentView] = useState<QuickstartView>("browse");
+  const [hasCheckedWorkflows, setHasCheckedWorkflows] = useState(false);
+
+  const loadWorkflowsFromDb = useWorkflowStore(s => s.loadWorkflowsFromDb);
+
+  // Check if user has any cloud workflows — if none, fall back to initial view
+  useEffect(() => {
+    if (hasCheckedWorkflows) return;
+    setHasCheckedWorkflows(true);
+    loadWorkflowsFromDb().then(ws => {
+      if (!ws || ws.length === 0) {
+        // No cloud workflows — check local directory too
+        // If nothing found, show initial view so user can create/load
+        setCurrentView("initial");
+      }
+      // else stay on "browse" — user has workflows to pick from
+    }).catch(() => {
+      setCurrentView("initial");
+    });
+  }, [hasCheckedWorkflows, loadWorkflowsFromDb]);
 
   const handleBack = useCallback(() => setCurrentView("initial"), []);
   const handleWorkflowSelected = useCallback((workflow: WorkflowFile) => onWorkflowGenerated(workflow), [onWorkflowGenerated]);
@@ -40,12 +60,12 @@ export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: Wel
           initial={{ opacity: 0, scale: 0.96, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 8 }}
-          transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+          transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] as [number, number, number, number] }}
           className={`w-full ${dialogWidth} mx-4 rounded-2xl overflow-hidden ${dialogHeight} flex flex-col`}
           style={{
-            background: "#161b22",
-            border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset, 0 50px 120px rgba(0,0,0,0.8)",
+            background: "#ffffff",
+            border: "1px solid rgba(0,0,0,0.1)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
           }}
           onClick={e => e.stopPropagation()}
         >
@@ -72,7 +92,13 @@ export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: Wel
             )}
             {currentView === "browse" && (
               <motion.div key="browse" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.2 }} className="flex-1 min-h-0 flex flex-col">
-                <WorkflowBrowserView onBack={handleBack} onWorkflowLoaded={(wf, dir) => onWorkflowGenerated(wf, dir)} onClose={onClose} />
+                <WorkflowBrowserView
+                  onBack={handleBack}
+                  onWorkflowLoaded={(wf, dir) => onWorkflowGenerated(wf, dir)}
+                  onClose={onClose}
+                  showNewWorkflowButton
+                  onNewWorkflow={() => setCurrentView("initial")}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -81,3 +107,4 @@ export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: Wel
     </AnimatePresence>
   );
 }
+

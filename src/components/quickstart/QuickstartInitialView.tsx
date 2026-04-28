@@ -59,7 +59,7 @@ const container = {
 };
 const item = {
   hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.19, 1, 0.22, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.19, 1, 0.22, 1] as [number, number, number, number] } },
 };
 
 export function QuickstartInitialView({
@@ -75,7 +75,7 @@ export function QuickstartInitialView({
       <motion.div
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+        transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] as [number, number, number, number] }}
         className="w-60 shrink-0 flex flex-col p-7"
         style={{
           borderRight: "1px solid rgba(255,255,255,0.06)",
@@ -182,3 +182,4 @@ export function QuickstartInitialView({
     </div>
   );
 }
+
