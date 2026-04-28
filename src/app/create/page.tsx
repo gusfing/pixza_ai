@@ -400,9 +400,9 @@ function CreateScreen() {
                       <img src={results[0]} alt="Generated"
                         className="w-full h-auto block" />
                       {selModel?.tier === "free" && (
-                        <div className="absolute bottom-3 right-3 pointer-events-none flex items-center gap-1.5 bg-black/70 backdrop-blur-sm px-2.5 py-1.5 rounded-full border border-white/10">
-                          <img src="/pixza-logo.png" alt="" className="w-3 h-3 invert opacity-50" />
-                          <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Pixza Free</span>
+                        <div className="absolute bottom-3 right-3 pointer-events-none flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-xl border border-white/10">
+                          <img src="/pixza-logo.png" alt="" className="w-5 h-5 opacity-70" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Pixza Free</span>
                         </div>
                       )}
                     </div>
@@ -421,9 +421,9 @@ function CreateScreen() {
                     <div key={i} className="group relative rounded-2xl overflow-hidden bg-black border border-white/5">
                       <img src={r} alt={`Generated ${i + 1}`} className="w-full h-auto block" />
                       {selModel?.tier === "free" && (
-                        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full">
-                          <img src="/pixza-logo.png" alt="" className="w-2.5 h-2.5 invert opacity-40" />
-                          <span className="text-[8px] font-black text-white/30">Free</span>
+                        <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-1.5 rounded-lg border border-white/10">
+                          <img src="/pixza-logo.png" alt="" className="w-4 h-4 opacity-70" />
+                          <span className="text-[9px] font-black text-white/40">Free</span>
                         </div>
                       )}
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1011,8 +1011,8 @@ export default function CreatePage() {
       {/* ── Sidebar ── */}
       <aside className="hidden lg:flex flex-col items-center py-6 w-20 shrink-0 bg-[#0d1117] border-r border-white/5 z-50 relative">
         <Link href="/landing" className="mb-10 group">
-          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
-            <img src="/pixza-logo.png" alt="" className="w-5 h-5 invert" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center transition-transform group-hover:scale-110">
+            <img src="/pixza-logo.png" alt="" className="w-10 h-10 object-cover" />
           </div>
         </Link>
 
@@ -1072,8 +1072,8 @@ export default function CreatePage() {
         {/* Mobile header */}
         <header className="lg:hidden flex items-center justify-between px-5 h-14 border-b border-white/5 shrink-0">
           <Link href="/landing" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
-              <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert" />
+            <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="/pixza-logo.png" alt="" className="w-7 h-7 object-cover" />
             </div>
             <span className="font-black tracking-tighter">Pixza</span>
           </Link>

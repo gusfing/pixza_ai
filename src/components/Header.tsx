@@ -184,8 +184,8 @@ export function Header() {
             className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
             title="Open welcome screen"
           >
-            <div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center">
-              <img src="/pixza-logo.png" alt="" className="w-3.5 h-3.5 invert" />
+            <div className="w-6 h-6 rounded-lg overflow-hidden">
+              <img src="/pixza-logo.png" alt="" className="w-6 h-6 object-cover" />
             </div>
           </button>
 

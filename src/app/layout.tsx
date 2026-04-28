@@ -11,6 +11,10 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 export const metadata: Metadata = {
   title: "Pixza Studio | Create Without Limits",
   description: "Advanced AI image and video workflows for creators.",
+  icons: {
+    icon: "/pixza-logo.png",
+    apple: "/pixza-logo.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
