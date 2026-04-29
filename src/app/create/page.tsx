@@ -47,60 +47,18 @@ const MODELS: Model[] = [
   { provider: "cloudflare", modelId: "@cf/bytedance/stable-diffusion-xl-lightning",      label: "SDXL Lightning (Free)",tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/lykon/dreamshaper-8-lcm",                      label: "DreamShaper (Free)",   tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
 
-  // ── PRO TIER — Image ───────────────────────────────────────
-  { provider: "fal",        modelId: "fal-ai/gpt-image-2",                               label: "GPT Image 2",          tabs: ["Image"], badge: "New",     tier: "pro",    creditCost: 5 },
-  { provider: "fal",        modelId: "fal-ai/gpt-image-1.5",                             label: "GPT Image 1.5",        tabs: ["Image"], badge: "OpenAI",  tier: "pro",    creditCost: 4 },
-  { provider: "fal",        modelId: "fal-ai/gpt-image-1/text-to-image",                 label: "GPT Image 1",          tabs: ["Image"],                   tier: "pro",    creditCost: 3 },
-  // Gemini / Imagen models
+  // ── FREE TIER — Gemini (requires GEMINI_API_KEY) ───────────
   { provider: "gemini",     modelId: "nano-banana",                                       label: "Gemini 2.5 Flash Image",tabs: ["Image"], badge: "Free",   tier: "free",   creditCost: 1 },
+
+  // ── PRO TIER — Gemini / Imagen ─────────────────────────────
   { provider: "gemini",     modelId: "nano-banana-pro",                                   label: "Imagen 3",             tabs: ["Image"], badge: "Google",  tier: "pro",    creditCost: 2 },
   { provider: "gemini",     modelId: "nano-banana-2",                                     label: "Imagen 4",             tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 3 },
-  { provider: "fal",        modelId: "fal-ai/flux-2-pro",                                 label: "FLUX.2 Pro",           tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 3 },
-  { provider: "fal",        modelId: "fal-ai/flux-pro",                                   label: "FLUX.1 Pro",           tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
-  { provider: "fal",        modelId: "fal-ai/flux/schnell",                               label: "FLUX Schnell",         tabs: ["Image"], badge: "Fast",    tier: "pro",    creditCost: 1 },
-  { provider: "fal",        modelId: "fal-ai/flux-realism",                               label: "FLUX Realism",         tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
-  { provider: "fal",        modelId: "fal-ai/seedream-v4-5",                              label: "Seedream V4.5",        tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
-  { provider: "fal",        modelId: "fal-ai/ideogram/v3",                                label: "Ideogram V3",          tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
-  { provider: "fal",        modelId: "fal-ai/recraft-v3",                                 label: "Recraft V3",           tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
-  { provider: "wavespeed",  modelId: "wavespeed-ai/flux-dev-ultra-fast",                  label: "FLUX Ultra Fast",      tabs: ["Image"], badge: "Fastest", tier: "pro",    creditCost: 1 },
-  { provider: "fal",        modelId: "fal-ai/flux/dev/image-to-image",                    label: "FLUX I2I",             tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
 
-  // ── PRO TIER — Video ───────────────────────────────────────
-  { provider: "fal",        modelId: "fal-ai/wan-t2v",                                    label: "Wan T2V",              tabs: ["Video"], badge: "Fast",    tier: "pro",    creditCost: 5 },
-  { provider: "fal",        modelId: "fal-ai/wan-i2v",                                    label: "Wan I2V",              tabs: ["Video"],                   tier: "pro",    creditCost: 5 },
-  { provider: "fal",        modelId: "fal-ai/minimax-video",                              label: "MiniMax Video",        tabs: ["Video"],                   tier: "pro",    creditCost: 8 },
-  { provider: "fal",        modelId: "fal-ai/kling-video/v1.6/pro/text-to-video",         label: "Kling 1.6 Pro",        tabs: ["Video"], badge: "Popular", tier: "pro",    creditCost: 8 },
-  { provider: "fal",        modelId: "fal-ai/kling-video/v1.6/pro/image-to-video",        label: "Kling 1.6 I2V",        tabs: ["Video"],                   tier: "pro",    creditCost: 8 },
-  { provider: "fal",        modelId: "fal-ai/luma-dream-machine",                         label: "Luma Dream Machine",   tabs: ["Video"],                   tier: "pro",    creditCost: 8 },
+  // ── PRO TIER — Video (Gemini Veo) ─────────────────────────
+  { provider: "gemini",     modelId: "veo-2.0-generate-001",                              label: "Veo 2",                tabs: ["Video"],                   tier: "pro",    creditCost: 15 },
 
-  // ── AGENCY TIER — Video (expensive) ───────────────────────
-  { provider: "fal",        modelId: "fal-ai/sora-2/text-to-video/pro",                   label: "Sora 2 Pro",           tabs: ["Video"], badge: "OpenAI",  tier: "agency", creditCost: 30 },
+  // ── AGENCY TIER — Video (Gemini Veo) ──────────────────────
   { provider: "gemini",     modelId: "veo-3.0-generate-preview",                          label: "Veo 3",                tabs: ["Video"], badge: "Best",    tier: "agency", creditCost: 25 },
-  { provider: "gemini",     modelId: "veo-2.0-generate-001",                              label: "Veo 2",                tabs: ["Video"],                   tier: "agency", creditCost: 15 },
-  { provider: "fal",        modelId: "fal-ai/kling-video/v3/pro/text-to-video",           label: "Kling 3.0 Pro",        tabs: ["Video"], badge: "New",     tier: "agency", creditCost: 15 },
-  { provider: "fal",        modelId: "fal-ai/kling-video/v2.6/pro/text-to-video",         label: "Kling 2.6 Pro",        tabs: ["Video"],                   tier: "agency", creditCost: 12 },
-  { provider: "fal",        modelId: "fal-ai/kling-video/v3/pro/image-to-video",          label: "Kling 3.0 I2V",        tabs: ["Video"],                   tier: "agency", creditCost: 15 },
-  { provider: "fal",        modelId: "fal-ai/kling-video/v2.6/pro/image-to-video",        label: "Kling 2.6 I2V",        tabs: ["Video"],                   tier: "agency", creditCost: 12 },
-  { provider: "fal",        modelId: "fal-ai/ltx-2/image-to-video/fast",                  label: "LTX Video 2.0",        tabs: ["Video"], badge: "4K",      tier: "agency", creditCost: 12 },
-  { provider: "fal",        modelId: "fal-ai/seedance-2-0",                               label: "Seedance 2.0",         tabs: ["Video"], badge: "New",     tier: "agency", creditCost: 15 },
-
-  // ── PRO TIER — Audio ───────────────────────────────────────
-  { provider: "fal",        modelId: "fal-ai/stable-audio",                               label: "Stable Audio",         tabs: ["Audio"],                   tier: "pro",    creditCost: 3 },
-  { provider: "fal",        modelId: "fal-ai/ace-step",                                   label: "ACE-Step",             tabs: ["Audio"], badge: "New",     tier: "pro",    creditCost: 3 },
-  { provider: "fal",        modelId: "fal-ai/mmaudio-v2",                                 label: "MMAudio V2",           tabs: ["Audio"],                   tier: "pro",    creditCost: 3 },
-  { provider: "fal",        modelId: "fal-ai/minimax-music",                              label: "MiniMax Music",        tabs: ["Audio"],                   tier: "pro",    creditCost: 4 },
-
-  // ── AGENCY TIER — Audio ────────────────────────────────────
-  { provider: "fal",        modelId: "fal-ai/minimax-music/v2",                           label: "MiniMax Music 2.0",    tabs: ["Audio"], badge: "Best",    tier: "agency", creditCost: 6 },
-  { provider: "fal",        modelId: "sonauto/v2/text-to-music",                          label: "Sonauto V2",           tabs: ["Audio"], badge: "Songs",   tier: "agency", creditCost: 6 },
-
-  // ── PRO TIER — 3D ─────────────────────────────────────────
-  { provider: "replicate",  modelId: "stability-ai/triposr",                              label: "TripoSR",              tabs: ["3D"],    badge: "Fast",    tier: "pro",    creditCost: 5 },
-  { provider: "fal",        modelId: "fal-ai/stable-zero123",                             label: "Zero123",              tabs: ["3D"],                      tier: "pro",    creditCost: 5 },
-
-  // ── AGENCY TIER — 3D ──────────────────────────────────────
-  { provider: "fal",        modelId: "fal-ai/trellis",                                    label: "Trellis",              tabs: ["3D"],    badge: "Best",    tier: "agency", creditCost: 10 },
-  { provider: "fal",        modelId: "fal-ai/hunyuan3d-v2",                               label: "Hunyuan3D V2",         tabs: ["3D"],    badge: "New",     tier: "agency", creditCost: 10 },
 ];
 
 const EXAMPLE_CARDS = [
