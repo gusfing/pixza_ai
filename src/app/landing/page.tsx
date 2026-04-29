@@ -334,7 +334,7 @@ function FAQ() {
     { q: "How does the credit system work?", a: "Each generation costs credits based on media type: 1 for images, 10 for video, 3 for audio, 5 for 3D. Free plan gets 50/month, Pro gets 2,000." },
     { q: "Can I use generated media commercially?", a: "Yes — all Pro and Agency plan generations include a full commercial license with no revenue limits." },
     { q: "Which AI models are available?", a: "50+ models including Gemini Imagen 3 & 4, FLUX Pro, Kling 1.6, Veo 2 & 3, Stable Audio, Trellis, and more." },
-    { q: "Do I need my own API keys?", a: "No — Pixza provides access to all models. You can optionally bring your own keys in Settings to use your own quotas." },
+    { q: "Do I need my own API keys?", a: "No — Pixza provides access to all models through your subscription. All API costs are covered by your plan credits." },
     { q: "Is there a free plan?", a: "Yes. The free plan includes 50 credits/month and access to Cloudflare-hosted free models with no credit card required." },
   ];
   return (

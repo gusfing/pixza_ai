@@ -882,7 +882,7 @@ export function ProjectSetupModal({
             </div>
 
             <p className="text-xs text-neutral-500 mt-2">
-              Add API keys via <code className="px-1 py-0.5 bg-gray-100 rounded">.env.local</code> for better security. Keys added here override .env and are stored in your browser.
+              API keys are managed server-side. Contact support if you need to configure custom provider access.
             </p>
           </div>
         )}

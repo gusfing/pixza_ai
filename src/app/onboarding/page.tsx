@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useWorkflowStore } from "@/store/workflowStore";
 import { useWPAuth } from "@/lib/wp-auth-context";
 import { wpUpdateUserMeta } from "@/lib/wordpress";
 
@@ -20,12 +19,6 @@ const STEPS = [
     content: "mode",
   },
   {
-    id: "providers",
-    title: "Connect your AI providers",
-    subtitle: "Bring your own API keys — we never store them on our servers",
-    content: "providers",
-  },
-  {
     id: "done",
     title: "You're all set!",
     subtitle: "Let's make something amazing",
@@ -39,33 +32,16 @@ const MODES = [
   { id: "both", icon: "◈", label: "Both", desc: "I'll use both depending on what I need.", href: "/create" },
 ];
 
-const PROVIDERS = [
-  { id: "gemini", name: "Google Gemini", desc: "Imagen 3 & 4, Veo 2 & 3 video", placeholder: "AIza...", color: "#4285f4", required: false, free: true },
-  { id: "fal", name: "fal.ai", desc: "FLUX, Kling, Wan, MiniMax and 100+ models", placeholder: "fal_...", color: "#a855f7", required: false, free: false },
-  { id: "replicate", name: "Replicate", desc: "1000s of open-source models", placeholder: "r8_...", color: "#ef4444", required: false, free: false },
-  { id: "wavespeed", name: "WaveSpeed", desc: "Ultra-fast FLUX inference", placeholder: "ws_...", color: "#f97316", required: false, free: false },
-];
-
 export default function OnboardingPage() {
   const router = useRouter();
   const { token } = useWPAuth();
-  const updateProviderApiKey = useWorkflowStore(s => s.updateProviderApiKey);
   const [step, setStep] = useState(0);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
-  const [keys, setKeys] = useState<Record<string, string>>({});
-  const [showKey, setShowKey] = useState<Record<string, boolean>>({});
 
   const current = STEPS[step];
   const progress = ((step) / (STEPS.length - 1)) * 100;
 
   const handleNext = async () => {
-    // On providers step: save keys to workflow store
-    if (current.content === "providers") {
-      Object.entries(keys).forEach(([provider, key]) => {
-        if (key.trim()) updateProviderApiKey(provider as any, key.trim());
-      });
-    }
-
     if (step < STEPS.length - 1) {
       setStep(s => s + 1);
     } else {
@@ -160,41 +136,6 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Providers */}
-        {current.content === "providers" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {PROVIDERS.map(p => (
-              <div key={p.id} style={{ padding: "16px 18px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: `${p.color}18`, border: `1px solid ${p.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: p.color }}>{p.name[0]}</div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{p.name}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{p.desc}</div>
-                    </div>
-                  </div>
-                  {p.free && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "rgba(16,185,129,0.15)", color: "#10b981", fontWeight: 600 }}>FREE TIER</span>}
-                </div>
-                <div style={{ position: "relative" }}>
-                  <input
-                    type={showKey[p.id] ? "text" : "password"}
-                    value={keys[p.id] || ""}
-                    onChange={e => setKeys(k => ({ ...k, [p.id]: e.target.value }))}
-                    placeholder={p.placeholder}
-                    style={{ width: "100%", padding: "8px 36px 8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "monospace" }}
-                  />
-                  <button onClick={() => setShowKey(s => ({ ...s, [p.id]: !s[p.id] }))} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", fontSize: 11 }}>
-                    {showKey[p.id] ? "hide" : "show"}
-                  </button>
-                </div>
-              </div>
-            ))}
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textAlign: "center", margin: "4px 0 0" }}>
-              Keys are stored locally in your browser only. You can add them later in Settings.
-            </p>
-          </div>
-        )}
-
         {/* Done */}
         {current.content === "done" && (
           <div style={{ textAlign: "center" }}>
@@ -232,7 +173,7 @@ export default function OnboardingPage() {
               transition: "all 0.15s",
             }}
           >
-            {step === STEPS.length - 1 ? "Go to Studio →" : current.content === "providers" ? "Skip for now →" : "Continue →"}
+            {step === STEPS.length - 1 ? "Go to Studio →" : "Continue →"}
           </button>
         </div>
       </div>

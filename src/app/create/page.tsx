@@ -575,10 +575,7 @@ function ExploreScreen({ onUse }: { onUse: (t: typeof TEMPLATES[0]) => void }) {
 
 /* ── Settings Screen ────────────────────────────────────────── */
 function SettingsScreen() {
-  const providerSettings = useWorkflowStore(s => s.providerSettings);
-  const updateProviderApiKey = useWorkflowStore(s => s.updateProviderApiKey);
-  const [show, setShow] = useState<Record<string, boolean>>({});
-  const [tab, setTab] = useState<"plan" | "keys" | "usage">("plan");
+  const [tab, setTab] = useState<"plan" | "usage">("plan");
 
   // Live data from WP
   const [user, setUser] = useState<any>(null);
@@ -591,13 +588,6 @@ function SettingsScreen() {
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
-
-  const PROVIDERS = [
-    { id: "gemini",    name: "Google Gemini", placeholder: "AIza..." },
-    { id: "fal",       name: "fal.ai",        placeholder: "fal_..." },
-    { id: "replicate", name: "Replicate",     placeholder: "r8_..."  },
-    { id: "wavespeed", name: "WaveSpeed",     placeholder: "ws_..."  },
-  ] as const;
 
   // Load user + credits on mount
   useEffect(() => {
@@ -689,14 +679,13 @@ function SettingsScreen() {
     <div className="flex-1 overflow-y-auto px-6 pt-8 pb-24 max-w-2xl mx-auto w-full">
       <BlurFade delay={0.1} inView>
         <h2 className="text-3xl font-black text-white tracking-tighter mb-1">Settings</h2>
-        <p className="text-white/30 text-sm mb-6">Manage your plan, credits, and API keys.</p>
+        <p className="text-white/30 text-sm mb-6">Manage your plan and credits.</p>
 
         {/* Tabs */}
         <div className="flex gap-1 bg-white/5 rounded-xl p-1 mb-8 w-fit">
           {([
             { id: "plan",  label: "Plan & Credits" },
             { id: "usage", label: "Usage History"  },
-            { id: "keys",  label: "API Keys"       },
           ] as const).map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={cn("px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
@@ -871,33 +860,6 @@ function SettingsScreen() {
           </div>
         )}
 
-        {/* ── API KEYS TAB ── */}
-        {tab === "keys" && (
-          <div className="space-y-3">
-            <p className="text-white/30 text-sm mb-4">Add your own keys. Stored locally in your browser.</p>
-            {PROVIDERS.map(p => {
-              const key = providerSettings.providers[p.id as keyof typeof providerSettings.providers]?.apiKey || "";
-              return (
-                <div key={p.id} className="p-5 rounded-2xl bg-white/5 border border-white/5">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-bold text-white text-sm">{p.name}</span>
-                    {key && <span className="text-[10px] font-black uppercase tracking-widest text-green-400 bg-green-500/10 px-2 py-1 rounded-lg">Connected</span>}
-                  </div>
-                  <div className="relative">
-                    <input type={show[p.id] ? "text" : "password"} value={key}
-                      onChange={e => updateProviderApiKey(p.id, e.target.value)}
-                      placeholder={p.placeholder}
-                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm font-mono text-white outline-none focus:border-white/20 transition-all pr-16" />
-                    <button onClick={() => setShow(s => ({ ...s, [p.id]: !s[p.id] }))}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors">
-                      {show[p.id] ? "Hide" : "Show"}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </BlurFade>
     </div>
   );
