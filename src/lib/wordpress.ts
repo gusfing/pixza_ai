@@ -87,11 +87,14 @@ export async function wpLogin(username: string, password: string): Promise<{ tok
     body: JSON.stringify({ path: "/jwt-auth/v1/token", method: "POST", body: { username, password } }),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || "Login failed");
+    const err = await res.json().catch(() => ({})) as any;
+    throw new Error(err.message || err.data?.message || "Login failed");
   }
-  const data = await res.json();
-  return { token: data.token, user: data.user_display_name };
+  const data = await res.json() as any;
+  if (!data.token) throw new Error(data.message || "No token returned");
+  // Fetch full user profile with the token
+  const user = await wpGetMe(data.token);
+  return { token: data.token, user };
 }
 
 export async function wpRegister(data: {
@@ -100,13 +103,37 @@ export async function wpRegister(data: {
   password: string;
   name?: string;
 }): Promise<WPUser> {
+  // Try Pixza plugin endpoint first, fall back to standard WP user creation
   const res = await fetch("/api/wp-proxy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path: "/pixza/v1/register", method: "POST", body: data }),
   });
+  if (res.status === 404) {
+    // Pixza plugin not installed — use standard WP REST API
+    const res2 = await fetch("/api/wp-proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        path: "/wp/v2/users",
+        method: "POST",
+        body: {
+          username: data.username,
+          email: data.email,
+          password: data.password,
+          name: data.name || data.username,
+          roles: ["subscriber"],
+        },
+      }),
+    });
+    if (!res2.ok) {
+      const err = await res2.json().catch(() => ({})) as any;
+      throw new Error(err.message || "Registration failed");
+    }
+    return res2.json();
+  }
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({})) as any;
     throw new Error(err.message || "Registration failed");
   }
   return res.json();
@@ -114,16 +141,34 @@ export async function wpRegister(data: {
 
 export async function wpGetMe(token: string): Promise<WPUser> {
   const res = await wpFetch("/wp/v2/users/me?context=edit", token);
-  return res.json();
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as any;
+    throw new Error(err?.message || `Failed to get user: ${res.status}`);
+  }
+  const user = await res.json();
+  // Ensure meta exists with defaults even if Pixza plugin isn't installed
+  if (!user.meta) user.meta = {};
+  if (user.meta.credits === undefined) user.meta.credits = 50;
+  if (user.meta.credits_limit === undefined) user.meta.credits_limit = 50;
+  if (user.meta.plan === undefined) user.meta.plan = "free";
+  if (user.meta.generations_count === undefined) user.meta.generations_count = 0;
+  return user;
 }
 
 export async function wpValidateToken(token: string): Promise<boolean> {
-  const res = await fetch("/api/wp-proxy", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ path: "/jwt-auth/v1/token/validate", method: "POST", token }),
-  });
-  return res.ok;
+  try {
+    const res = await fetch("/api/wp-proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: "/jwt-auth/v1/token/validate", method: "POST", token }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json().catch(() => ({})) as any;
+    // JWT plugin returns success:true on valid token
+    return data?.data?.status === 200 || data?.success === true || res.status === 200;
+  } catch {
+    return false;
+  }
 }
 
 // ── User meta / settings ─────────────────────────────────────
