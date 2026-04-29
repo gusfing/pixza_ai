@@ -192,6 +192,81 @@ function ModelPicker({ models, value, onChange, userPlan = "free" }: {
   );
 }
 
+/* ── History Panel ──────────────────────────────────────────── */
+function HistoryPanel({ onReuse }: { onReuse: (images: string[], prompt: string) => void }) {
+  const [history, setHistory] = useState<import("@/lib/generation-history").HistoryItem[]>([]);
+
+  useEffect(() => {
+    import("@/lib/generation-history").then(({ loadHistory }) => {
+      setHistory(loadHistory());
+    });
+  }, []);
+
+  if (history.length === 0) return null;
+
+  return (
+    <BlurFade delay={0.5} inView>
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-white/20">Your History</p>
+          <button
+            onClick={() => {
+              import("@/lib/generation-history").then(({ clearHistory }) => {
+                clearHistory();
+                setHistory([]);
+              });
+            }}
+            className="text-[10px] text-white/15 hover:text-white/40 transition-colors"
+          >
+            Clear all
+          </button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          {history.slice(0, 10).map((item) => {
+            const img = item.images[0];
+            const isTruncated = img?.includes("TRUNCATED");
+            return (
+              <div key={item.id} className="group relative rounded-2xl overflow-hidden cursor-pointer"
+                onClick={() => !isTruncated && onReuse(item.images, item.prompt)}>
+                <div className="w-full h-[160px] overflow-hidden rounded-2xl bg-white/5">
+                  {img && !isTruncated ? (
+                    <img src={img} alt={item.prompt}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="w-6 h-6 text-white/10" />
+                    </div>
+                  )}
+                </div>
+                {/* Hover overlay */}
+                {!isTruncated && (
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
+                    <span className="text-white text-[10px] font-black uppercase tracking-widest">View</span>
+                  </div>
+                )}
+                {/* Delete button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    import("@/lib/generation-history").then(({ deleteFromHistory }) => {
+                      deleteFromHistory(item.id);
+                      setHistory(h => h.filter(x => x.id !== item.id));
+                    });
+                  }}
+                  className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center text-white/40 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+                <p className="text-[10px] text-white/30 mt-1 px-0.5 truncate">{item.prompt || item.tab}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </BlurFade>
+  );
+}
+
 /* ── Persist create screen state across refreshes ──────────── */
 const CREATE_STATE_KEY = "pixza_create_state";
 
@@ -299,6 +374,25 @@ function CreateScreen() {
       setResults(outputs);
       // Refresh credit balance from server after successful generation
       refreshCredits();
+      // Save to persistent history (survives browser close)
+      import("@/lib/generation-history").then(({ saveToHistory, saveGenerationToDb }) => {
+        saveToHistory({
+          prompt: prompt.trim(),
+          model: selModel.modelId,
+          provider: selModel.provider,
+          tab,
+          aspectRatio,
+          images: outputs,
+        });
+        // Also save metadata to DB (fire-and-forget)
+        saveGenerationToDb({
+          prompt: prompt.trim(),
+          mode: tab.toLowerCase(),
+          model: selModel.modelId,
+          provider: selModel.provider,
+          outputUrl: outputs[0]?.startsWith("http") ? outputs[0] : undefined,
+        });
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -538,6 +632,9 @@ function CreateScreen() {
             </div>
           </BlurFade>
         )}
+
+        {/* Your history — shown when idle */}
+        {!loading && results.length === 0 && !error && <HistoryPanel onReuse={(imgs, prompt) => { setResults(imgs); setLastPrompt(prompt); }} />}
       </div>
     </div>
   );
