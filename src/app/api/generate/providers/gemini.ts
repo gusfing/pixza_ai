@@ -13,9 +13,9 @@ import { GenerationOutput } from "@/lib/providers/types";
  * Map model types to Gemini model IDs
  */
 export const MODEL_MAP: Record<ModelType, string> = {
-  "nano-banana": "gemini-2.5-flash-image",
-  "nano-banana-pro": "gemini-3-pro-image-preview",
-  "nano-banana-2": "gemini-3.1-flash-image-preview",
+  "nano-banana":     "gemini-2.5-flash-image",           // Gemini 2.5 Flash Image (free tier)
+  "nano-banana-pro": "imagen-3.0-generate-002",          // Imagen 3 (stable)
+  "nano-banana-2":   "imagen-4.0-generate-001",          // Imagen 4 (paid preview)
 };
 
 /**

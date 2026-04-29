@@ -51,8 +51,10 @@ const MODELS: Model[] = [
   { provider: "fal",        modelId: "fal-ai/gpt-image-2",                               label: "GPT Image 2",          tabs: ["Image"], badge: "New",     tier: "pro",    creditCost: 5 },
   { provider: "fal",        modelId: "fal-ai/gpt-image-1.5",                             label: "GPT Image 1.5",        tabs: ["Image"], badge: "OpenAI",  tier: "pro",    creditCost: 4 },
   { provider: "fal",        modelId: "fal-ai/gpt-image-1/text-to-image",                 label: "GPT Image 1",          tabs: ["Image"],                   tier: "pro",    creditCost: 3 },
-  { provider: "gemini",     modelId: "nano-banana-2",                                     label: "Imagen 4",             tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
-  { provider: "gemini",     modelId: "nano-banana-pro",                                   label: "Imagen 3",             tabs: ["Image"], badge: "Quality", tier: "pro",    creditCost: 3 },
+  // Gemini / Imagen models
+  { provider: "gemini",     modelId: "nano-banana",                                       label: "Gemini 2.5 Flash Image",tabs: ["Image"], badge: "Free",   tier: "free",   creditCost: 1 },
+  { provider: "gemini",     modelId: "nano-banana-pro",                                   label: "Imagen 3",             tabs: ["Image"], badge: "Google",  tier: "pro",    creditCost: 2 },
+  { provider: "gemini",     modelId: "nano-banana-2",                                     label: "Imagen 4",             tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 3 },
   { provider: "fal",        modelId: "fal-ai/flux-2-pro",                                 label: "FLUX.2 Pro",           tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 3 },
   { provider: "fal",        modelId: "fal-ai/flux-pro",                                   label: "FLUX.1 Pro",           tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
   { provider: "fal",        modelId: "fal-ai/flux/schnell",                               label: "FLUX Schnell",         tabs: ["Image"], badge: "Fast",    tier: "pro",    creditCost: 1 },
