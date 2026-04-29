@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Eraser, ArrowUpCircle, Palette, Upload, Download, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useOnnx } from "@/hooks/use-onnx";
@@ -12,6 +12,10 @@ const TOOLS: { id: Tool; label: string; icon: any; description: string; badge: s
   { id: "upscaler",  label: "Upscale 4×", icon: ArrowUpCircle,  description: "Enhance resolution 4× with AI super-resolution.", badge: "Free · Local" },
   { id: "colorizer", label: "Colorize",   icon: Palette,        description: "Bring black & white photos to life with AI color.", badge: "Free · Local" },
 ];
+
+const SESSION_KEY_INPUT  = "pixza_tools_input";
+const SESSION_KEY_OUTPUT = "pixza_tools_output";
+const SESSION_KEY_TOOL   = "pixza_tools_activetool";
 
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((res) => {
@@ -32,18 +36,45 @@ function loadImageEl(src: string): Promise<HTMLImageElement> {
 }
 
 export function ImageTools({ className }: { className?: string }) {
-  const [activeTool, setActiveTool] = useState<Tool>("remover");
-  const [inputImage, setInputImage] = useState<string | null>(null);
-  const [outputImage, setOutputImage] = useState<string | null>(null);
+  // Restore from sessionStorage on mount
+  const [activeTool, setActiveTool] = useState<Tool>(() => {
+    if (typeof window === "undefined") return "remover";
+    return (sessionStorage.getItem(SESSION_KEY_TOOL) as Tool) || "remover";
+  });
+  const [inputImage, setInputImage] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return sessionStorage.getItem(SESSION_KEY_INPUT) || null;
+  });
+  const [outputImage, setOutputImage] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return sessionStorage.getItem(SESSION_KEY_OUTPUT) || null;
+  });
+  const [processingError, setProcessingError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { status, progress, statusText, removeBackground, upscaleImage, colorizeImage } = useOnnx();
   const isProcessing = status === "downloading" || status === "loading" || status === "running";
+
+  // Persist to sessionStorage whenever state changes
+  useEffect(() => {
+    if (inputImage) sessionStorage.setItem(SESSION_KEY_INPUT, inputImage);
+    else sessionStorage.removeItem(SESSION_KEY_INPUT);
+  }, [inputImage]);
+
+  useEffect(() => {
+    if (outputImage) sessionStorage.setItem(SESSION_KEY_OUTPUT, outputImage);
+    else sessionStorage.removeItem(SESSION_KEY_OUTPUT);
+  }, [outputImage]);
+
+  useEffect(() => {
+    sessionStorage.setItem(SESSION_KEY_TOOL, activeTool);
+  }, [activeTool]);
 
   const handleFile = useCallback((file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       setInputImage(e.target!.result as string);
       setOutputImage(null);
+      setProcessingError(null);
     };
     reader.readAsDataURL(file);
   }, []);
@@ -57,15 +88,26 @@ export function ImageTools({ className }: { className?: string }) {
   const process = async () => {
     if (!inputImage) return;
     setOutputImage(null);
-    const imgEl = await loadImageEl(inputImage);
-    let blob: Blob;
-    if (activeTool === "remover")   blob = await removeBackground(imgEl);
-    else if (activeTool === "upscaler")  blob = await upscaleImage(imgEl);
-    else                                  blob = await colorizeImage(imgEl);
-    setOutputImage(await blobToDataUrl(blob));
+    setProcessingError(null);
+    try {
+      const imgEl = await loadImageEl(inputImage);
+      let blob: Blob;
+      if (activeTool === "remover")        blob = await removeBackground(imgEl);
+      else if (activeTool === "upscaler")  blob = await upscaleImage(imgEl);
+      else                                  blob = await colorizeImage(imgEl);
+      setOutputImage(await blobToDataUrl(blob));
+    } catch (e) {
+      setProcessingError(e instanceof Error ? e.message : "Processing failed. Try again.");
+    }
   };
 
-  const reset = () => { setInputImage(null); setOutputImage(null); };
+  const reset = () => {
+    setInputImage(null);
+    setOutputImage(null);
+    setProcessingError(null);
+    sessionStorage.removeItem(SESSION_KEY_INPUT);
+    sessionStorage.removeItem(SESSION_KEY_OUTPUT);
+  };
 
   return (
     <div className={cn("w-full space-y-6", className)}>
@@ -147,10 +189,20 @@ export function ImageTools({ className }: { className?: string }) {
                 <p className="text-xs font-bold text-white/60">{statusText}</p>
                 {progress > 0 && progress < 100 && (
                   <div className="mt-3 w-32 h-1 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-white/60 rounded-full transition-all" style={{ width: `${progress}%` }} />
+                    <div className="h-full bg-white/60 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
                   </div>
                 )}
+                {progress > 0 && (
+                  <p className="text-[10px] text-white/30 mt-1">{Math.round(progress)}%</p>
+                )}
               </div>
+            </div>
+          ) : processingError ? (
+            <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center">
+              <p className="text-xs text-red-400 font-medium">{processingError}</p>
+              <button onClick={process} className="text-xs text-white/40 hover:text-white underline transition-colors">
+                Try again
+              </button>
             </div>
           ) : outputImage ? (
             <>

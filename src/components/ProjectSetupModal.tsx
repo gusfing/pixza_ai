@@ -158,7 +158,7 @@ export function ProjectSetupModal({
   const { inlineParametersEnabled, setInlineParameters } = useInlineParameters();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState<"project" | "providers" | "nodeDefaults" | "canvas">("project");
+  const [activeTab, setActiveTab] = useState<"project" | "nodeDefaults" | "canvas">("project");
 
   // Project tab state
   const [name, setName] = useState("");
@@ -371,8 +371,6 @@ export function ProjectSetupModal({
   const handleSave = () => {
     if (activeTab === "project") {
       handleSaveProject();
-    } else if (activeTab === "providers") {
-      handleSaveProviders();
     } else if (activeTab === "canvas") {
       handleSaveCanvas();
     } else {
@@ -438,12 +436,6 @@ export function ProjectSetupModal({
             className={`px-3 py-1.5 text-sm rounded-md transition-all duration-150 ${activeTab === "project" ? "bg-indigo-50 text-neutral-900 font-medium border border-indigo-200" : "text-neutral-500 hover:text-neutral-600 hover:bg-black/4"}`}
           >
             Project
-          </button>
-          <button
-            onClick={() => setActiveTab("providers")}
-            className={`px-3 py-1.5 text-sm rounded-md transition-all duration-150 ${activeTab === "providers" ? "bg-indigo-50 text-neutral-900 font-medium border border-indigo-200" : "text-neutral-500 hover:text-neutral-600 hover:bg-black/4"}`}
-          >
-            Providers
           </button>
           <button
             onClick={() => setActiveTab("nodeDefaults")}
