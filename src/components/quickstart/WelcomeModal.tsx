@@ -16,8 +16,8 @@ interface WelcomeModalProps {
 }
 
 export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: WelcomeModalProps) {
-  // Default to "browse" so users always see their workflow list first
-  const [currentView, setCurrentView] = useState<QuickstartView>("browse");
+  // Start with null — show loading until we know which view to show
+  const [currentView, setCurrentView] = useState<QuickstartView | null>(null);
   const [hasCheckedWorkflows, setHasCheckedWorkflows] = useState(false);
 
   const loadWorkflowsFromDb = useWorkflowStore(s => s.loadWorkflowsFromDb);
@@ -28,11 +28,10 @@ export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: Wel
     setHasCheckedWorkflows(true);
     loadWorkflowsFromDb().then(ws => {
       if (!ws || ws.length === 0) {
-        // No cloud workflows — check local directory too
-        // If nothing found, show initial view so user can create/load
         setCurrentView("initial");
+      } else {
+        setCurrentView("browse");
       }
-      // else stay on "browse" — user has workflows to pick from
     }).catch(() => {
       setCurrentView("initial");
     });
@@ -69,6 +68,12 @@ export function WelcomeModal({ onWorkflowGenerated, onClose, onNewProject }: Wel
           }}
           onClick={e => e.stopPropagation()}
         >
+          {/* Loading state while checking workflows */}
+          {currentView === null && (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin" />
+            </div>
+          )}
           <AnimatePresence mode="wait">
             {currentView === "initial" && (
               <motion.div key="initial" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 min-h-0">

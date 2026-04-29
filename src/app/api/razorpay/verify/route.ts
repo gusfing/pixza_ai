@@ -9,7 +9,7 @@ import { wpGetMe } from "@/lib/wordpress";
 
 const RZP_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET ?? "";
 const WP_API_SECRET  = process.env.WP_API_SECRET        ?? "";
-const WP_URL         = process.env.WP_URL ?? process.env.NEXT_PUBLIC_WP_URL ?? "";
+const WP_URL         = (process.env.WP_URL ?? process.env.NEXT_PUBLIC_WP_URL ?? "").replace(/\/$/, "");
 
 const PLAN_CREDITS: Record<string, number> = {
   pro:    2000,
@@ -19,6 +19,11 @@ const PLAN_CREDITS: Record<string, number> = {
 export async function POST(req: NextRequest) {
   if (!RZP_KEY_SECRET) {
     return NextResponse.json({ error: "Razorpay not configured" }, { status: 500 });
+  }
+
+  if (!WP_URL) {
+    console.error("[razorpay/verify] WP_URL not configured");
+    return NextResponse.json({ error: "Payment server misconfigured. Contact support." }, { status: 500 });
   }
 
   // Auth

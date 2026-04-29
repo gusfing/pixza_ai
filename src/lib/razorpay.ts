@@ -33,6 +33,13 @@ export async function openRazorpayCheckout({
   onError,
   onDismiss,
 }: RazorpayCheckoutOptions): Promise<void> {
+  // 0. Check auth before loading SDK
+  const token = typeof window !== "undefined" ? localStorage.getItem("pixza_token") : null;
+  if (!token) {
+    window.location.href = "/auth/signin?next=/create";
+    return;
+  }
+
   // 1. Load SDK
   const loaded = await loadRazorpayScript();
   if (!loaded) {

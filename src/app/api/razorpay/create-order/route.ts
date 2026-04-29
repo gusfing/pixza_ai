@@ -9,7 +9,6 @@ import { wpGetMe } from "@/lib/wordpress";
 
 const RZP_KEY_ID     = process.env.RAZORPAY_KEY_ID     ?? "";
 const RZP_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET ?? "";
-
 // Plan prices in paise (INR × 100)
 const PLAN_PRICES: Record<string, number> = {
   pro:    1999 * 100,   // ₹1,999/month
