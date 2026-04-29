@@ -7,7 +7,7 @@ const PROTECTED = ["/create", "/studio", "/settings", "/admin", "/onboarding", "
 // Routes only for unauthenticated users
 const AUTH_ONLY = ["/auth/signin", "/auth/signup"];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const token = req.cookies.get("pixza_token")?.value;
 
