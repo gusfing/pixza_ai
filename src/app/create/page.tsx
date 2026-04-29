@@ -192,20 +192,42 @@ function ModelPicker({ models, value, onChange, userPlan = "free" }: {
   );
 }
 
+/* ── Persist create screen state across refreshes ──────────── */
+const CREATE_STATE_KEY = "pixza_create_state";
+
+function loadCreateState() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(CREATE_STATE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function saveCreateState(state: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
+  try { sessionStorage.setItem(CREATE_STATE_KEY, JSON.stringify(state)); } catch { /* quota */ }
+}
+
 /* ── Main Create Screen ─────────────────────────────────────── */
 function CreateScreen() {
-  const [tab, setTab] = useState<Tab>("Image");
-  const [modelId, setModelId] = useState(MODELS.filter(m => m.tabs.includes("Image"))[0].modelId);
-  const [refImage, setRefImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [lastPrompt, setLastPrompt] = useState<string>("");
-  const [userPlan, setUserPlan] = useState("free");
-  const [credits, setCredits] = useState<number | null>(null);
-  // Generation options
-  const [aspectRatio, setAspectRatio] = useState("1:1");
-  const [numImages, setNumImages] = useState(1);
+  const saved = loadCreateState();
+
+  const [tab, setTab]             = useState<Tab>(saved?.tab ?? "Image");
+  const [modelId, setModelId]     = useState<string>(saved?.modelId ?? MODELS.filter(m => m.tabs.includes("Image"))[0].modelId);
+  const [refImage, setRefImage]   = useState<string | null>(saved?.refImage ?? null);
+  const [loading, setLoading]     = useState(false);
+  const [results, setResults]     = useState<string[]>(saved?.results ?? []);
+  const [error, setError]         = useState<string | null>(null);
+  const [lastPrompt, setLastPrompt] = useState<string>(saved?.lastPrompt ?? "");
+  const [userPlan, setUserPlan]   = useState("free");
+  const [credits, setCredits]     = useState<number | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<string>(saved?.aspectRatio ?? "1:1");
+  const [numImages, setNumImages] = useState<number>(saved?.numImages ?? 1);
+
+  // Persist state to sessionStorage whenever it changes
+  useEffect(() => {
+    saveCreateState({ tab, modelId, refImage, results, lastPrompt, aspectRatio, numImages });
+  }, [tab, modelId, refImage, results, lastPrompt, aspectRatio, numImages]);
 
   const refreshCredits = useCallback(async () => {
     try {
@@ -439,7 +461,7 @@ function CreateScreen() {
 
               {/* Action bar */}
               <div className="flex gap-2">
-                <button onClick={() => setResults([])}
+                <button onClick={() => { setResults([]); setLastPrompt(""); sessionStorage.removeItem(CREATE_STATE_KEY); }}
                   className="px-4 py-2.5 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all">
                   New
                 </button>
@@ -919,9 +941,18 @@ function ToolsScreen() {
 
 /* ── Root Page ──────────────────────────────────────────────── */
 export default function CreatePage() {
-  const [screen, setScreen] = useState<NavScreen>("create");
+  // Persist active screen across refreshes
+  const [screen, setScreen] = useState<NavScreen>(() => {
+    if (typeof window === "undefined") return "create";
+    return (sessionStorage.getItem("pixza_nav_screen") as NavScreen) || "create";
+  });
   const [user, setUser] = useState<any>(null);
   const [credits, setCredits] = useState<number | null>(null);
+
+  // Save screen to sessionStorage on change
+  useEffect(() => {
+    sessionStorage.setItem("pixza_nav_screen", screen);
+  }, [screen]);
 
   useEffect(() => {
     const token = localStorage.getItem("pixza_token");
