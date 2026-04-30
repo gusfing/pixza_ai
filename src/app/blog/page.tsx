@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { wpGetPosts } from "@/lib/wordpress";
 import { NewsletterForm } from "@/components/ui/newsletter-form";
 
 const C = {

@@ -63,6 +63,11 @@ export default function AdminPage() {
   // Auth guard — only WP admins
   useEffect(() => {
     if (!authLoading && !user) router.push("/auth/signin");
+    if (!authLoading && user) {
+      const roles = (user as any).roles ?? [];
+      const isAdmin = roles.includes("administrator") || roles.includes("editor");
+      if (!isAdmin) router.push("/create");
+    }
   }, [authLoading, user, router]);
 
   const fetchStats = useCallback(async () => {

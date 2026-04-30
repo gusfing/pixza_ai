@@ -4,8 +4,6 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft, Send, Mail, MapPin, MessageSquare, Share2, MessageCircle, GitBranch, Loader2 } from "lucide-react";
 
-const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "";
-
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,28 +18,28 @@ export default function ContactPage() {
     setLoading(true);
     setError("");
     try {
-      // Send via WP email endpoint
-      await fetch(`${WP_URL}/wp-json/pixza/v1/email/send`, {
+      // Send via wp-proxy to avoid CORS
+      await fetch("/api/wp-proxy", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-WP-Secret": "", // public contact form — WP plugin should allow this
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          to: "hello@pixza.studio",
-          subject: `Contact: ${subjectRef.current?.value}`,
-          template: "welcome", // reuse as generic template
-          vars: {
-            name: nameRef.current?.value ?? "",
-            email: emailRef.current?.value ?? "",
-            message: messageRef.current?.value ?? "",
+          path: "/pixza/v1/email/send",
+          method: "POST",
+          body: {
+            to: "support@pixza.ai",
+            subject: `Contact: ${subjectRef.current?.value}`,
+            template: "welcome",
+            vars: {
+              name: nameRef.current?.value ?? "",
+              email: emailRef.current?.value ?? "",
+              message: messageRef.current?.value ?? "",
+            },
           },
         }),
       });
       setSubmitted(true);
     } catch {
-      // Show success anyway — don't leak server errors to users
-      setSubmitted(true);
+      setSubmitted(true); // show success anyway
     } finally {
       setLoading(false);
     }

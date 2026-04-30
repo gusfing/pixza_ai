@@ -91,11 +91,11 @@ export default function SignUpPage() {
             autoComplete="new-password"
           />
           <AuthInput 
-            label="Promo Code"
+            label="Promo Code (optional)"
             type="text"
             value={coupon}
             onChange={(e) => setCoupon(e.target.value)}
-            placeholder="OPTIONAL"
+            placeholder="LAUNCH50"
           />
         </div>
 
