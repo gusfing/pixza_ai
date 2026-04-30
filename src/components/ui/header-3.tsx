@@ -60,7 +60,6 @@ export function Header() {
             <div className="w-7 h-7 rounded-lg overflow-hidden transition-transform group-hover:scale-110">
               <img src="/pixza-logo.png" alt="Pixza" className="w-7 h-7 object-cover" />
             </div>
-            <span className="font-black tracking-tighter text-white text-base">Pixza</span>
           </Link>
 
           {/* Desktop Nav */}
