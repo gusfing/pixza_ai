@@ -57,8 +57,8 @@ export function Header() {
         {/* Logo */}
         <div className="flex items-center gap-6">
           <Link href="/landing" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-lg overflow-hidden transition-transform group-hover:scale-110">
-              <img src="/pixza-logo.png" alt="Pixza" className="w-7 h-7 object-cover" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden transition-transform group-hover:scale-110">
+              <img src="/pixza-logo.png" alt="Pixza" className="w-10 h-10 object-cover" />
             </div>
           </Link>
 
