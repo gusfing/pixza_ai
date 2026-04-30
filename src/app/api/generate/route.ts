@@ -263,32 +263,25 @@ export async function POST(request: NextRequest) {
       "@cf/runwayml/stable-diffusion-v1-5-img2img",
     ];
 
-    const PREMIUM_PROVIDERS = ["replicate", "fal", "kie", "wavespeed"];
+    // WaveSpeed is a premium provider but these specific models are allowed on Pro
+    const PREMIUM_PROVIDERS = ["replicate", "fal", "kie"];
+    // wavespeed is allowed for Pro+ — remove from premium providers, add specific models to premium list
     const PREMIUM_MODELS = [
+      // Gemini premium
       "nano-banana-pro",
       "nano-banana-2",
+      "veo-2.0-generate-001",
       "veo-3.0-generate-preview",
       "veo-3.1/text-to-video",
       "veo-3.1/image-to-video",
-      "fal-ai/gpt-image-1.5",
-      "fal-ai/gpt-image-1/text-to-image",
-      "fal-ai/gpt-image-1-mini",
-      "fal-ai/gpt-image-1/edit-image",
-      "fal-ai/gpt-image-2",
-      "fal-ai/gpt-image-2/edit",
-      "fal-ai/sora-2/text-to-video/pro",
-      "fal-ai/sora-2/image-to-video/pro",
-      "fal-ai/flux-2-pro",
-      "fal-ai/kling-video/v3/pro/text-to-video",
-      "fal-ai/kling-video/v3/pro/image-to-video",
-      "fal-ai/kling-video/v2.6/pro/text-to-video",
-      "fal-ai/kling-video/v2.6/pro/image-to-video",
-      "fal-ai/seedance-v1-pro",
-      "fal-ai/seedance-2-0",
-      "fal-ai/ltx-2/image-to-video/fast",
-      "fal-ai/minimax-music/v2",
-      "sonauto/v2/text-to-music",
-      "fal-ai/hunyuan3d-v2",
+      // WaveSpeed premium (Pro+)
+      "wavespeed-ai/flux-dev-ultra-fast",
+      "wavespeed-ai/flux-dev/fp8",
+      "wavespeed-ai/wan-2.1-t2v-480p",
+      "wavespeed-ai/seedance-1.5-lite-t2v-480p",
+      "wavespeed-ai/seedance-1.5-pro-t2v-720p",
+      // Agency only
+      "wavespeed-ai/seedance-2.0-t2v-720p",
     ];
 
     const isFreeModel = FREE_MODELS.includes(resolvedModelId);

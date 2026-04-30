@@ -34,31 +34,44 @@ interface Model {
 
 /* ── Plan Config ─────────────────────────────────────────────── */
 const PLAN_LIMITS = {
-  free:   { credits: 50,    label: "Free",   color: "text-white/40" },
-  pro:    { credits: 2000,  label: "Pro",    color: "text-violet-400" },
-  agency: { credits: 10000, label: "Agency", color: "text-amber-400" },
+  free:   { credits: 100,   label: "Free",   color: "text-white/40" },
+  pro:    { credits: 3000,  label: "Pro",    color: "text-violet-400" },
+  agency: { credits: 8000,  label: "Agency", color: "text-amber-400" },
 };
 
 /* ── Model Registry ─────────────────────────────────────────── */
 const MODELS: Model[] = [
   // ── FREE TIER — Cloudflare AI (zero cost) ──────────────────
-  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-1-schnell",              label: "FLUX Schnell (Free)",  tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
-  { provider: "cloudflare", modelId: "@cf/stabilityai/stable-diffusion-xl-base-1.0",     label: "SDXL (Free)",          tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
-  { provider: "cloudflare", modelId: "@cf/bytedance/stable-diffusion-xl-lightning",      label: "SDXL Lightning (Free)",tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
-  { provider: "cloudflare", modelId: "@cf/lykon/dreamshaper-8-lcm",                      label: "DreamShaper (Free)",   tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-1-schnell",              label: "FLUX Schnell",         tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/stabilityai/stable-diffusion-xl-base-1.0",     label: "SDXL",                 tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/bytedance/stable-diffusion-xl-lightning",      label: "SDXL Lightning",       tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/lykon/dreamshaper-8-lcm",                      label: "DreamShaper",          tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
 
-  // ── FREE TIER — Gemini (requires GEMINI_API_KEY) ───────────
-  { provider: "gemini",     modelId: "nano-banana",                                       label: "Gemini 2.5 Flash Image",tabs: ["Image"], badge: "Free",   tier: "free",   creditCost: 1 },
+  // ── FREE TIER — Gemini Flash (free quota) ──────────────────
+  { provider: "gemini",     modelId: "nano-banana",                                       label: "Gemini Flash Image",   tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
 
-  // ── PRO TIER — Gemini / Imagen ─────────────────────────────
-  { provider: "gemini",     modelId: "nano-banana-pro",                                   label: "Imagen 3",             tabs: ["Image"], badge: "Google",  tier: "pro",    creditCost: 2 },
-  { provider: "gemini",     modelId: "nano-banana-2",                                     label: "Imagen 4",             tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 3 },
+  // ── PRO TIER — Image ───────────────────────────────────────
+  // WaveSpeed FLUX — ~₹1.7/image, very fast
+  { provider: "wavespeed",  modelId: "wavespeed-ai/flux-dev-ultra-fast",                  label: "FLUX Dev Ultra Fast",  tabs: ["Image"], badge: "Fast",    tier: "pro",    creditCost: 2 },
+  { provider: "wavespeed",  modelId: "wavespeed-ai/flux-dev/fp8",                         label: "FLUX Dev",             tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  // Gemini Imagen — ~₹3.3–3.4/image
+  { provider: "gemini",     modelId: "nano-banana-pro",                                   label: "Imagen 3",             tabs: ["Image"], badge: "Google",  tier: "pro",    creditCost: 4 },
+  { provider: "gemini",     modelId: "nano-banana-2",                                     label: "Imagen 4",             tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 5 },
 
-  // ── PRO TIER — Video (Gemini Veo) ─────────────────────────
-  { provider: "gemini",     modelId: "veo-2.0-generate-001",                              label: "Veo 2",                tabs: ["Video"],                   tier: "pro",    creditCost: 15 },
+  // ── PRO TIER — Video (cheap) ───────────────────────────────
+  // Wan 2.6 — ~₹6/10s video (cheapest quality video)
+  { provider: "wavespeed",  modelId: "wavespeed-ai/wan-2.1-t2v-480p",                     label: "Wan 2.1 (Fast)",       tabs: ["Video"], badge: "Fast",    tier: "pro",    creditCost: 8 },
+  // Seedance 1.5 — ~₹22/5s video
+  { provider: "wavespeed",  modelId: "wavespeed-ai/seedance-1.5-lite-t2v-480p",           label: "Seedance 1.5 Lite",    tabs: ["Video"],                   tier: "pro",    creditCost: 15 },
+  { provider: "wavespeed",  modelId: "wavespeed-ai/seedance-1.5-pro-t2v-720p",            label: "Seedance 1.5 Pro",     tabs: ["Video"], badge: "Popular", tier: "pro",    creditCost: 20 },
 
-  // ── AGENCY TIER — Video (Gemini Veo) ──────────────────────
-  { provider: "gemini",     modelId: "veo-3.0-generate-preview",                          label: "Veo 3",                tabs: ["Video"], badge: "Best",    tier: "agency", creditCost: 25 },
+  // ── AGENCY TIER — Video (premium) ─────────────────────────
+  // Seedance 2.0 — ~₹22/5s 720p
+  { provider: "wavespeed",  modelId: "wavespeed-ai/seedance-2.0-t2v-720p",                label: "Seedance 2.0",         tabs: ["Video"], badge: "New",     tier: "agency", creditCost: 25 },
+  // Veo 2 — ~₹85–170/video
+  { provider: "gemini",     modelId: "veo-2.0-generate-001",                              label: "Veo 2",                tabs: ["Video"], badge: "Google",  tier: "agency", creditCost: 60 },
+  // Veo 3 — ~₹340/video
+  { provider: "gemini",     modelId: "veo-3.0-generate-preview",                          label: "Veo 3",                tabs: ["Video"], badge: "Best",    tier: "agency", creditCost: 150 },
 ];
 
 const EXAMPLE_CARDS = [
@@ -840,7 +853,7 @@ function SettingsScreen() {
                     <span className="text-lg font-black text-white">$19<span className="text-xs text-white/30">/mo</span></span>
                   </div>
                   <ul className="space-y-1.5 mb-4">
-                    {["2,000 credits/month", "All premium models", "Priority generation", "No watermarks"].map(f => (
+                    {["3,000 credits/month", "FLUX + Imagen 3 & 4", "Seedance video", "No watermarks", "Priority generation"].map(f => (
                       <li key={f} className="flex items-center gap-2 text-xs text-white/60">
                         <Check className="w-3 h-3 text-violet-400 shrink-0" /> {f}
                       </li>
@@ -848,7 +861,7 @@ function SettingsScreen() {
                   </ul>
                   <button onClick={() => handleUpgrade("pro")} disabled={upgrading === "pro"}
                     className="w-full py-2.5 rounded-xl bg-violet-500 text-white text-xs font-black hover:bg-violet-400 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
-                    {upgrading === "pro" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing…</> : <><Crown className="w-3.5 h-3.5" /> Upgrade — ₹1,999/mo</>}
+                    {upgrading === "pro" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing…</> : <><Crown className="w-3.5 h-3.5" /> Upgrade — ₹999/mo</>}
                   </button>
                 </div>
 
@@ -859,7 +872,7 @@ function SettingsScreen() {
                     <span className="text-lg font-black text-white">$79<span className="text-xs text-white/30">/mo</span></span>
                   </div>
                   <ul className="space-y-1.5 mb-4">
-                    {["10,000 credits/month", "Everything in Pro", "Team seats (coming soon)", "Priority support"].map(f => (
+                    {["8,000 credits/month", "Everything in Pro", "Veo 2 & 3 video", "Team seats (coming soon)", "Priority support"].map(f => (
                       <li key={f} className="flex items-center gap-2 text-xs text-white/60">
                         <Check className="w-3 h-3 text-amber-400 shrink-0" /> {f}
                       </li>
@@ -867,7 +880,7 @@ function SettingsScreen() {
                   </ul>
                   <button onClick={() => handleUpgrade("agency")} disabled={upgrading === "agency"}
                     className="w-full py-2.5 rounded-xl bg-amber-500 text-white text-xs font-black hover:bg-amber-400 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
-                    {upgrading === "agency" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing…</> : <><Zap className="w-3.5 h-3.5" /> Upgrade — ₹6,999/mo</>}
+                    {upgrading === "agency" ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing…</> : <><Zap className="w-3.5 h-3.5" /> Upgrade — ₹2,999/mo</>}
                   </button>
                 </div>
               </div>

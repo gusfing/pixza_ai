@@ -235,8 +235,8 @@ function BillingTab() {
       {plan === "free" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
-            { id: "pro" as const, name: "Pro", price: "₹1,999", credits: "2,000", color: "violet", features: ["2,000 credits/month", "All premium models", "Priority generation", "No watermarks", "Commercial license"] },
-            { id: "agency" as const, name: "Agency", price: "₹6,999", credits: "10,000", color: "amber", features: ["10,000 credits/month", "Everything in Pro", "API access", "Team seats (soon)", "Priority support"] },
+            { id: "pro" as const, name: "Pro", price: "₹999", credits: "3,000", color: "violet", features: ["3,000 credits/month", "FLUX + Imagen 3 & 4", "Seedance video", "No watermarks", "Commercial license"] },
+            { id: "agency" as const, name: "Agency", price: "₹2,999", credits: "8,000", color: "amber", features: ["8,000 credits/month", "Everything in Pro", "Veo 2 & 3 video", "Team seats (soon)", "Priority support"] },
           ].map(p => (
             <div key={p.id} className={cn("p-5 rounded-2xl border", p.color === "violet" ? "border-violet-500/20 bg-violet-500/5" : "border-amber-500/20 bg-amber-500/5")}>
               <div className="flex items-center justify-between mb-3">

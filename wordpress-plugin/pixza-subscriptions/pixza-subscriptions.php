@@ -37,9 +37,9 @@ function pixza_activate() {
 
     // Default plan credit limits stored as option
     add_option( 'pixza_plan_credits', json_encode([
-        'free'   => 50,
-        'pro'    => 2000,
-        'agency' => 10000,
+        'free'   => 100,
+        'pro'    => 3000,
+        'agency' => 8000,
     ]));
     add_option( 'pixza_api_secret', wp_generate_password(32, false) );
 }

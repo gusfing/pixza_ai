@@ -12,8 +12,8 @@ const WP_API_SECRET  = process.env.WP_API_SECRET        ?? "";
 const WP_URL         = (process.env.WP_URL ?? process.env.NEXT_PUBLIC_WP_URL ?? "").replace(/\/$/, "");
 
 const PLAN_CREDITS: Record<string, number> = {
-  pro:    2000,
-  agency: 10000,
+  pro:    3000,
+  agency: 8000,
 };
 
 export async function POST(req: NextRequest) {

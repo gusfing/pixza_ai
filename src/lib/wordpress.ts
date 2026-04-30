@@ -73,9 +73,9 @@ export const CREDIT_COSTS: Record<string, number> = {
 
 // Default credit limits per plan
 export const PLAN_CREDIT_LIMITS: Record<string, number> = {
-  free: 50,
-  pro: 2000,
-  agency: 10000,
+  free: 100,
+  pro: 3000,
+  agency: 8000,
 };
 
 // ── Auth ─────────────────────────────────────────────────────

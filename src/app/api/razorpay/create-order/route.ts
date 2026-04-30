@@ -11,8 +11,8 @@ const RZP_KEY_ID     = process.env.RAZORPAY_KEY_ID     ?? "";
 const RZP_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET ?? "";
 // Plan prices in paise (INR × 100)
 const PLAN_PRICES: Record<string, number> = {
-  pro:    1999 * 100,   // ₹1,999/month
-  agency: 6999 * 100,   // ₹6,999/month
+  pro:    999 * 100,    // ₹999/month
+  agency: 2999 * 100,  // ₹2,999/month
 };
 
 const PLAN_NAMES: Record<string, string> = {

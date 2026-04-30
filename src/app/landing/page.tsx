@@ -180,22 +180,22 @@ function Pricing() {
   const plans = [
     {
       name: "Free",
-      price: "$0",
+      price: "₹0",
       desc: "Get started with no commitment.",
-      features: ["50 credits/month", "Cloudflare free models", "Community access", "Web export"],
+      features: ["100 credits/month", "Cloudflare free models", "Gemini Flash Image", "Web export"],
     },
     {
       name: "Pro",
-      price: "$29",
-      desc: "For serious creators and teams.",
-      features: ["2,000 credits/month", "All 50+ models", "Priority queue", "4K export", "Commercial license"],
+      price: "₹999",
+      desc: "For creators and small teams.",
+      features: ["3,000 credits/month", "FLUX + Imagen 3 & 4", "Seedance video", "No watermarks", "Commercial license"],
       popular: true,
     },
     {
       name: "Agency",
-      price: "Custom",
-      desc: "For studios and enterprises.",
-      features: ["10,000+ credits", "API access", "SSO / SAML", "Dedicated support", "Custom SLA"],
+      price: "₹2,999",
+      desc: "For studios and power users.",
+      features: ["8,000 credits/month", "Veo 2 & 3 video", "Everything in Pro", "Priority support", "Team seats (soon)"],
     },
   ];
 
@@ -331,11 +331,11 @@ function Testimonials() {
 function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
   const faqs = [
-    { q: "How does the credit system work?", a: "Each generation costs credits based on media type: 1 for images, 10 for video, 3 for audio, 5 for 3D. Free plan gets 50/month, Pro gets 2,000." },
+    { q: "How does the credit system work?", a: "Each generation costs credits: 1 for free images, 2–5 for premium images, 8–25 for video. Free plan gets 100/month, Pro gets 3,000, Agency gets 8,000." },
     { q: "Can I use generated media commercially?", a: "Yes — all Pro and Agency plan generations include a full commercial license with no revenue limits." },
-    { q: "Which AI models are available?", a: "50+ models including Gemini Imagen 3 & 4, FLUX Pro, Kling 1.6, Veo 2 & 3, Stable Audio, Trellis, and more." },
+    { q: "Which AI models are available?", a: "Gemini Flash Image, Imagen 3 & 4, FLUX Dev (WaveSpeed), Seedance 1.5 & 2.0 video, Veo 2 & 3, and Cloudflare free models." },
     { q: "Do I need my own API keys?", a: "No — Pixza provides access to all models through your subscription. All API costs are covered by your plan credits." },
-    { q: "Is there a free plan?", a: "Yes. The free plan includes 50 credits/month and access to Cloudflare-hosted free models with no credit card required." },
+    { q: "Is there a free plan?", a: "Yes. The free plan includes 100 credits/month and access to Cloudflare + Gemini Flash free models with no credit card required." },
   ];
   return (
     <section id="faq" className="py-24 px-6 border-t border-white/5">
