@@ -50,106 +50,50 @@ export function Header() {
     <header
       className={cn(
         "sticky top-0 z-50 w-full border-b border-transparent transition-all duration-300",
-        scrolled && "bg-[#0d1117]/95 border-white/5 backdrop-blur-xl"
+        scrolled && "bg-[#0d1117]/98 border-white/5 backdrop-blur-xl"
       )}
     >
-      <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-6">
-        {/* Logo */}
-        <div className="flex items-center gap-6">
-          <Link href="/landing" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl overflow-hidden transition-transform group-hover:scale-110">
-              <img src="/pixza-logo.png" alt="Pixza" className="w-10 h-10 object-cover" />
-            </div>
-          </Link>
+      <nav className="mx-auto flex h-12 w-full max-w-7xl items-center justify-between px-6">
+        {/* Logo — left */}
+        <Link href="/landing" className="flex items-center gap-2.5 group shrink-0">
+          <div className="w-8 h-8 rounded-lg overflow-hidden transition-transform group-hover:scale-105">
+            <img src="/pixza-logo.png" alt="Pixza" className="w-8 h-8 object-cover" />
+          </div>
+          <span className="text-sm font-bold text-white/80 group-hover:text-white transition-colors hidden sm:block">Pixza</span>
+        </Link>
 
-          {/* Desktop Nav */}
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/60 hover:text-white hover:bg-white/5 data-[state=open]:bg-white/5 text-sm h-8">
-                  Create
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-[#0e0e10] border border-white/10 rounded-2xl p-1">
-                  <ul className="grid w-[480px] grid-cols-2 gap-1 p-2">
-                    {createLinks.map((item, i) => (
-                      <li key={i}><ListItem {...item} /></li>
-                    ))}
-                  </ul>
-                  <div className="px-3 pb-3 pt-1">
-                    <p className="text-white/30 text-xs">
-                      New to Pixza?{" "}
-                      <Link href="/onboarding" className="text-white/70 font-medium hover:text-white transition-colors">
-                        Start the tour →
-                      </Link>
-                    </p>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/60 hover:text-white hover:bg-white/5 data-[state=open]:bg-white/5 text-sm h-8">
-                  Company
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-[#0e0e10] border border-white/10 rounded-2xl p-1">
-                  <div className="grid w-[420px] grid-cols-2 gap-2 p-2">
-                    <ul className="space-y-1">
-                      {companyLinks.map((item, i) => (
-                        <li key={i}><ListItem {...item} /></li>
-                      ))}
-                    </ul>
-                    <ul className="space-y-1 p-1">
-                      {companyLinks2.map((item, i) => (
-                        <li key={i}>
-                          <NavigationMenuLink asChild>
-                            <Link
-                              href={item.href}
-                              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors group"
-                            >
-                              <item.icon className="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors" />
-                              <span className="text-sm text-white/60 group-hover:text-white transition-colors font-medium">{item.title}</span>
-                            </Link>
-                          </NavigationMenuLink>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link href="/landing#pricing" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">
-                    Pricing
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link href="/blog" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">
-                    Blog
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+        {/* Nav links — center/right (desktop) */}
+        <div className="hidden md:flex items-center gap-1">
+          {[
+            { label: "Product",    href: "/create" },
+            { label: "Pricing",    href: "/landing#pricing" },
+            { label: "Studio",     href: "/studio" },
+            { label: "Blog",       href: "/blog" },
+            { label: "Join Us",    href: "/auth/signup" },
+          ].map(l => (
+            <Link key={l.label} href={l.href}
+              className="px-3 py-1.5 text-[13px] font-semibold text-white/50 hover:text-white transition-colors tracking-wide uppercase">
+              {l.label}
+            </Link>
+          ))}
         </div>
 
-        {/* Desktop CTA */}
-        <DesktopAuthButtons />
-
-        {/* Mobile toggle */}
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => setOpen(!open)}
-          className="md:hidden text-white/60 hover:text-white hover:bg-white/5 h-9 w-9"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label="Toggle menu"
-        >
-          <MenuToggleIcon open={open} className="size-5" duration={300} />
-        </Button>
+        {/* CTA — far right */}
+        <div className="flex items-center gap-2 shrink-0">
+          <DesktopAuthButtons />
+          {/* Mobile toggle */}
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => setOpen(!open)}
+            className="md:hidden text-white/60 hover:text-white hover:bg-white/5 h-9 w-9"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label="Toggle menu"
+          >
+            <MenuToggleIcon open={open} className="size-5" duration={300} />
+          </Button>
+        </div>
       </nav>
 
       {/* Mobile menu */}
@@ -199,21 +143,13 @@ function DesktopAuthButtons() {
 
   if (user) {
     return (
-      <div className="hidden items-center gap-2 md:flex">
+      <div className="hidden md:flex items-center gap-2">
         <Link href="/create">
-          <Button variant="ghost" className="text-white/60 hover:text-white hover:bg-white/5 h-8 text-sm">
-            Create
+          <Button className="bg-white/10 text-white hover:bg-white/20 h-8 text-sm font-semibold px-4 rounded-full border-0">
+            Dashboard
           </Button>
         </Link>
-        <Link href="/studio">
-          <Button className="bg-white text-black hover:bg-white/90 h-8 text-sm font-bold px-4">
-            Studio
-          </Button>
-        </Link>
-        <button
-          onClick={logout}
-          className="text-white/40 hover:text-white text-xs transition-colors ml-1"
-        >
+        <button onClick={logout} className="text-white/30 hover:text-white text-xs transition-colors">
           Sign out
         </button>
       </div>
@@ -221,15 +157,10 @@ function DesktopAuthButtons() {
   }
 
   return (
-    <div className="hidden items-center gap-2 md:flex">
+    <div className="hidden md:flex items-center">
       <Link href="/auth/signin">
-        <Button variant="ghost" className="text-white/60 hover:text-white hover:bg-white/5 h-8 text-sm">
+        <Button className="bg-white text-black hover:bg-white/90 h-8 text-sm font-semibold px-5 rounded-full border-0">
           Sign In
-        </Button>
-      </Link>
-      <Link href="/auth/signup">
-        <Button className="bg-white text-black hover:bg-white/90 h-8 text-sm font-bold px-4">
-          Get Started
         </Button>
       </Link>
     </div>
