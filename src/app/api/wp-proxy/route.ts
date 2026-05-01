@@ -48,22 +48,21 @@ export async function POST(req: NextRequest) {
         data?.message || data?.data?.message || data?.error || "";
 
       // Map known WP error codes to clean user-facing messages
-      const code: string = data?.code || data?.data?.code || "";
+      // JWT plugin prefixes codes with [jwt_auth], strip it for matching
+      const code: string = (data?.code || data?.data?.code || "").replace(/^\[jwt_auth\]\s*/, "");
       const cleanMsg =
         code === "incorrect_password" || rawMsg.toLowerCase().includes("password")
           ? "Incorrect password. Please try again."
-          : code === "invalid_username" || rawMsg.toLowerCase().includes("username") || rawMsg.toLowerCase().includes("email")
+          : code === "invalid_username" || code === "invalid_email" || rawMsg.toLowerCase().includes("not registered") || rawMsg.toLowerCase().includes("no account")
           ? "No account found with that email or username."
-          : code === "invalid_email"
-          ? "Please enter a valid email address."
           : code === "empty_username"
           ? "Please enter your email or username."
           : code === "empty_password"
           ? "Please enter your password."
           : code === "existing_user_email"
           ? "An account with this email already exists."
-          : code === "existing_user_login"
-          ? "That username is already taken."
+          : code === "existing_user_login" || code === "user_exists"
+          ? "An account with this email already exists."
           : rawMsg
           ? sanitize(rawMsg)
           : "Something went wrong. Please try again.";

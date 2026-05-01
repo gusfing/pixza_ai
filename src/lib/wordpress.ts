@@ -86,17 +86,14 @@ export async function wpLogin(username: string, password: string): Promise<{ tok
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path: "/jwt-auth/v1/token", method: "POST", body: { username, password } }),
   });
+  const data = await res.json().catch(() => ({})) as any;
   if (!res.ok) {
-    const err = await res.json().catch(() => ({})) as any;
-    // Strip any residual HTML tags just in case
-    const raw: string = err.message || err.data?.message || "Login failed";
-    const clean = raw.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, " ").replace(/\s+/g, " ").trim();
-    throw new Error(clean || "Login failed");
+    // Proxy already sanitizes the message — just use it directly
+    const msg: string = data?.message || data?.error || "Login failed";
+    throw new Error(msg.replace(/<[^>]*>/g, "").trim());
   }
-  const data = await res.json() as any;
   if (!data.token) {
-    const raw: string = data.message || "Authentication failed";
-    throw new Error(raw.replace(/<[^>]*>/g, "").trim());
+    throw new Error((data.message || "Authentication failed").replace(/<[^>]*>/g, "").trim());
   }
   const user = await wpGetMe(data.token);
   return { token: data.token, user };
@@ -134,17 +131,13 @@ export async function wpRegister(data: {
         },
       }),
     });
-    if (!res2.ok) {
-      const err = await res2.json().catch(() => ({})) as any;
-      throw new Error(stripHtml(err.message || "Registration failed"));
-    }
-    return res2.json();
+    const d2 = await res2.json().catch(() => ({})) as any;
+    if (!res2.ok) throw new Error(stripHtml(d2.message || "Registration failed"));
+    return d2;
   }
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({})) as any;
-    throw new Error(stripHtml(err.message || "Registration failed"));
-  }
-  return res.json();
+  const d = await res.json().catch(() => ({})) as any;
+  if (!res.ok) throw new Error(stripHtml(d.message || "Registration failed"));
+  return d;
 }
 
 export async function wpGetMe(token: string): Promise<WPUser> {
