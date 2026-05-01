@@ -40,6 +40,35 @@ export async function POST(req: NextRequest) {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       console.error(`[wp-proxy] ${method ?? "GET"} ${url} → ${res.status}`, data);
+      // Strip HTML tags from WP error messages before sending to client
+      const sanitize = (s: string) =>
+        s.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, " ").replace(/\s+/g, " ").trim();
+
+      const rawMsg: string =
+        data?.message || data?.data?.message || data?.error || "";
+
+      // Map known WP error codes to clean user-facing messages
+      const code: string = data?.code || data?.data?.code || "";
+      const cleanMsg =
+        code === "incorrect_password" || rawMsg.toLowerCase().includes("password")
+          ? "Incorrect password. Please try again."
+          : code === "invalid_username" || rawMsg.toLowerCase().includes("username") || rawMsg.toLowerCase().includes("email")
+          ? "No account found with that email or username."
+          : code === "invalid_email"
+          ? "Please enter a valid email address."
+          : code === "empty_username"
+          ? "Please enter your email or username."
+          : code === "empty_password"
+          ? "Please enter your password."
+          : code === "existing_user_email"
+          ? "An account with this email already exists."
+          : code === "existing_user_login"
+          ? "That username is already taken."
+          : rawMsg
+          ? sanitize(rawMsg)
+          : "Something went wrong. Please try again.";
+
+      return NextResponse.json({ ...data, message: cleanMsg }, { status: res.status });
     }
     return NextResponse.json(data, { status: res.status });
   } catch (err) {

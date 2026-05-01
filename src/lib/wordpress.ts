@@ -88,11 +88,16 @@ export async function wpLogin(username: string, password: string): Promise<{ tok
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({})) as any;
-    throw new Error(err.message || err.data?.message || "Login failed");
+    // Strip any residual HTML tags just in case
+    const raw: string = err.message || err.data?.message || "Login failed";
+    const clean = raw.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, " ").replace(/\s+/g, " ").trim();
+    throw new Error(clean || "Login failed");
   }
   const data = await res.json() as any;
-  if (!data.token) throw new Error(data.message || "No token returned");
-  // Fetch full user profile with the token
+  if (!data.token) {
+    const raw: string = data.message || "Authentication failed";
+    throw new Error(raw.replace(/<[^>]*>/g, "").trim());
+  }
   const user = await wpGetMe(data.token);
   return { token: data.token, user };
 }
@@ -103,6 +108,9 @@ export async function wpRegister(data: {
   password: string;
   name?: string;
 }): Promise<WPUser> {
+  const stripHtml = (s: string) =>
+    s.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, " ").replace(/\s+/g, " ").trim();
+
   // Try Pixza plugin endpoint first, fall back to standard WP user creation
   const res = await fetch("/api/wp-proxy", {
     method: "POST",
@@ -128,13 +136,13 @@ export async function wpRegister(data: {
     });
     if (!res2.ok) {
       const err = await res2.json().catch(() => ({})) as any;
-      throw new Error(err.message || "Registration failed");
+      throw new Error(stripHtml(err.message || "Registration failed"));
     }
     return res2.json();
   }
   if (!res.ok) {
     const err = await res.json().catch(() => ({})) as any;
-    throw new Error(err.message || "Registration failed");
+    throw new Error(stripHtml(err.message || "Registration failed"));
   }
   return res.json();
 }
