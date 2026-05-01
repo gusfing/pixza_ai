@@ -167,11 +167,39 @@ function BillingTab() {
   const { user, token } = useWPAuth();
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoicesLoading, setInvoicesLoading] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [showInvoices, setShowInvoices] = useState(false);
 
   const plan = user?.meta?.plan ?? "free";
   const credits = user?.meta?.credits ?? 0;
-  const creditsLimit = user?.meta?.credits_limit ?? 50;
+  const creditsLimit = user?.meta?.credits_limit ?? 100;
   const creditsPct = creditsLimit > 0 ? Math.min(100, Math.round((credits / creditsLimit) * 100)) : 0;
+
+  const loadInvoices = async () => {
+    setInvoicesLoading(true); setShowInvoices(true);
+    try {
+      const res = await fetch("/api/razorpay/invoices");
+      if (res.ok) { const d = await res.json(); setInvoices(d.payments ?? []); }
+    } catch { /* silent */ }
+    finally { setInvoicesLoading(false); }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm("Cancel subscription? You'll keep access until the end of the billing period.")) return;
+    setCancelling(true);
+    try {
+      const subId = (user as any)?.meta?.razorpay_subscription_id;
+      const res = await fetch("/api/razorpay/cancel", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscription_id: subId }),
+      });
+      const d = await res.json();
+      setMsg(res.ok ? { type: "ok", text: d.message } : { type: "err", text: d.error });
+    } catch { setMsg({ type: "err", text: "Failed to cancel. Contact support." }); }
+    finally { setCancelling(false); }
+  };
 
   const handleUpgrade = async (targetPlan: "pro" | "agency") => {
     if (!token) { window.location.href = "/auth/signin"; return; }
@@ -229,6 +257,54 @@ function BillingTab() {
           />
         </div>
         <p className="text-[10px] text-white/20 mt-2">{creditsPct}% remaining this period</p>
+        {creditsPct < 20 && (
+          <p className="text-[10px] text-amber-400 font-bold mt-1">⚠ Running low — consider upgrading</p>
+        )}
+      </div>
+
+      {/* Cancel subscription */}
+      {plan !== "free" && (
+        <div className="p-4 rounded-2xl border border-white/5 bg-white/[0.02] flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-white">Manage Subscription</p>
+            <p className="text-xs text-white/30 mt-0.5">Cancel anytime — access continues until period end</p>
+          </div>
+          <button onClick={handleCancel} disabled={cancelling}
+            className="px-4 py-2 rounded-xl border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-all disabled:opacity-50">
+            {cancelling ? "Cancelling…" : "Cancel Plan"}
+          </button>
+        </div>
+      )}
+
+      {/* Invoice history */}
+      <div className="p-4 rounded-2xl border border-white/5 bg-white/[0.02]">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Payment History</p>
+          <button onClick={loadInvoices} disabled={invoicesLoading}
+            className="text-xs text-white/30 hover:text-white transition-colors">
+            {invoicesLoading ? "Loading…" : showInvoices ? "Refresh" : "Load history"}
+          </button>
+        </div>
+        {showInvoices && (
+          invoices.length === 0 ? (
+            <p className="text-xs text-white/20 py-2">No payments found</p>
+          ) : (
+            <div className="space-y-1">
+              {invoices.map((inv: any) => (
+                <div key={inv.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                  <div>
+                    <p className="text-xs font-bold text-white">₹{inv.amount.toLocaleString()}</p>
+                    <p className="text-[10px] text-white/30">{new Date(inv.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
+                  </div>
+                  <span className={cn("text-[9px] font-black uppercase px-2 py-0.5 rounded-full",
+                    inv.status === "captured" ? "bg-green-500/10 text-green-400" : "bg-white/5 text-white/30")}>
+                    {inv.status === "captured" ? "Paid" : inv.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )
+        )}
       </div>
 
       {/* Upgrade cards */}

@@ -10,16 +10,10 @@ export function NewsletterForm() {
     if (!email.trim()) return;
     setStatus("loading");
     try {
-      const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "";
-      await fetch(`${WP_URL}/wp-json/pixza/v1/email/send`, {
+      await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: email.trim(),
-          subject: "Welcome to the Pixza Journal",
-          template: "welcome",
-          vars: { name: email.split("@")[0] },
-        }),
+        body: JSON.stringify({ email: email.trim() }),
       });
     } catch { /* non-fatal */ }
     setStatus("done");

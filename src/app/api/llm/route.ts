@@ -292,6 +292,13 @@ async function generateWithAnthropic(
 export async function POST(request: NextRequest) {
   const requestId = generateRequestId();
 
+  // Require authentication — prevent free API key abuse
+  const wpToken = request.cookies.get("pixza_token")?.value;
+  const authHeader = request.headers.get("Authorization");
+  if (!wpToken && !authHeader) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     // Get user-provided API keys from headers (override env variables)
     const geminiApiKey = request.headers.get("X-Gemini-API-Key");

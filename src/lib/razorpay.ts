@@ -62,37 +62,28 @@ export async function openRazorpayCheckout({
     return;
   }
 
-  // 3. Open Razorpay modal
-  const rzp = new window.Razorpay({
+  // 3. Open Razorpay modal — handles both subscription and one-time order
+  const rzpConfig: any = {
     key:         orderData.key_id,
-    amount:      orderData.amount,
-    currency:    orderData.currency,
     name:        "Pixza Studio",
     description: `${orderData.plan_name} — Monthly Subscription`,
     image:       "/pixza-logo.png",
-    order_id:    orderData.order_id,
     prefill: {
       name:  orderData.user_name,
       email: orderData.user_email,
     },
     theme: { color: "#7c6af7" },
-    modal: {
-      ondismiss: () => onDismiss?.(),
-    },
-    handler: async (response: {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
-    }) => {
-      // 4. Verify payment server-side
+    modal: { ondismiss: () => onDismiss?.() },
+    handler: async (response: any) => {
       try {
         const verifyRes = await fetch("/api/razorpay/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            razorpay_order_id:   response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature:  response.razorpay_signature,
+            razorpay_order_id:        response.razorpay_order_id,
+            razorpay_payment_id:      response.razorpay_payment_id,
+            razorpay_signature:       response.razorpay_signature,
+            razorpay_subscription_id: response.razorpay_subscription_id,
             plan,
           }),
         });
@@ -103,7 +94,17 @@ export async function openRazorpayCheckout({
         onError?.(e instanceof Error ? e.message : "Payment verification failed");
       }
     },
-  });
+  };
 
+  // Set order_id or subscription_id depending on type
+  if (orderData.type === "subscription") {
+    rzpConfig.subscription_id = orderData.subscription_id;
+  } else {
+    rzpConfig.order_id = orderData.order_id;
+    rzpConfig.amount   = orderData.amount;
+    rzpConfig.currency = orderData.currency;
+  }
+
+  const rzp = new window.Razorpay(rzpConfig);
   rzp.open();
 }
