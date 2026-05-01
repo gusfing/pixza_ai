@@ -370,7 +370,7 @@ function FAQ() {
 /* ── Footer ────────────────────────────────────────────────── */
 function Footer() {
   const cols = [
-    { title: "Product", links: [{ l: "Studio", h: "/studio" }, { l: "Simple Mode", h: "/create" }, { l: "Pricing", h: "#pricing" }, { l: "Examples", h: "/examples" }] },
+    { title: "Product", links: [{ l: "Studio", h: "/studio" }, { l: "Simple Mode", h: "/create" }, { l: "Tools", h: "/tools" }, { l: "Batch Editor", h: "/batch" }, { l: "Pricing", h: "#pricing" }, { l: "Examples", h: "/examples" }] },
     { title: "Company", links: [{ l: "Blog", h: "/blog" }, { l: "Contact", h: "/contact" }, { l: "About", h: "/landing" }] },
     { title: "Legal", links: [{ l: "Privacy", h: "/privacy" }, { l: "Terms", h: "/terms" }] },
   ];

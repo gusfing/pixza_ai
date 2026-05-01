@@ -66,6 +66,7 @@ export function Header() {
         <div className="hidden md:flex items-center gap-1">
           {[
             { label: "Product",    href: "/create" },
+            { label: "Tools",      href: "/tools" },
             { label: "Pricing",    href: "/landing#pricing" },
             { label: "Studio",     href: "/studio" },
             { label: "Blog",       href: "/blog" },
