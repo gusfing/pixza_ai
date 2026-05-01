@@ -53,7 +53,7 @@ export function Header() {
         scrolled && "bg-[#0d1117]/98 border-white/5 backdrop-blur-xl"
       )}
     >
-      <nav className="mx-auto flex h-12 w-full max-w-7xl items-center justify-between px-6">
+      <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6">
         {/* Logo — left */}
         <Link href="/landing" className="flex items-center gap-2.5 group shrink-0">
           <div className="w-8 h-8 rounded-lg overflow-hidden transition-transform group-hover:scale-105">
@@ -215,7 +215,7 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
   return createPortal(
     <div
       id="mobile-menu"
-      className="bg-[#0d1117]/98 backdrop-blur-xl fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-t border-white/5 md:hidden"
+      className="bg-[#0d1117]/98 backdrop-blur-xl fixed top-16 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-t border-white/5 md:hidden"
     >
       <div
         data-slot={open ? "open" : "closed"}
