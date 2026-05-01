@@ -78,7 +78,7 @@ export function AuthLayout({ children, heading, topRightLink }: AuthLayoutProps)
       </div>
 
       {/* Right Pane - Form Area */}
-      <div className="flex-1 flex flex-col relative bg-[#040406] overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col relative bg-[#0d1117] overflow-y-auto custom-scrollbar">
         {/* Top Right Navigation */}
         <div className="absolute top-12 right-12 z-20">
           <Link 

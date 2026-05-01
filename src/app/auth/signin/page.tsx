@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useWPAuth } from "@/lib/wp-auth-context";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { AuthInput } from "@/components/auth/AuthInput";
-import { CircularAuthButton } from "@/components/auth/CircularAuthButton";
 import { signIn } from "next-auth/react";
 
 function GoogleButton({ loading, onClick }: { loading: boolean; onClick: () => void }) {
@@ -81,13 +80,13 @@ function SignInForm() {
 
       <Divider />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+      <div className="grid grid-cols-1 gap-5">
         <AuthInput
           label="Email or Username"
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="mark.johnson@gmail.com"
+          placeholder="your@email.com"
           required
           autoComplete="username"
         />
@@ -127,12 +126,17 @@ function SignInForm() {
       </div>
 
       {error && (
-        <p className="mt-8 text-xs text-red-500 font-medium tracking-wide">{error}</p>
+        <p className="mt-4 text-xs text-red-500 font-medium tracking-wide">{error}</p>
       )}
 
-      <div className="mt-16 md:absolute md:-bottom-24 md:right-0">
-        <CircularAuthButton type="submit" label="Sign In" loading={loading} />
-      </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="mt-8 w-full py-3.5 rounded-xl bg-white text-black text-sm font-black hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {loading && <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />}
+        {loading ? "Signing in…" : "Sign In"}
+      </button>
     </form>
   );
 }

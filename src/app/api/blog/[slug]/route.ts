@@ -13,10 +13,11 @@ function readTime(content: string) {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params;
   const res = await fetch(
-    `${WP_URL}/wp-json/wp/v2/posts?slug=${params.slug}&_embed=1`,
+    `${WP_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed=1`,
     { next: { revalidate: 60 } }
   );
 

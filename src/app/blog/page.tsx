@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { NewsletterForm } from "@/components/ui/newsletter-form";
-
-const C = {
-  bg: "#040406", surface: "#0e0e10", surface2: "#161618",
-  border: "rgba(255,255,255,0.07)", text: "#fff",
-  text2: "rgba(255,255,255,0.5)", text3: "rgba(255,255,255,0.25)",
-  accent: "#92dce5", action: "#d64933",
-};
+import { cn } from "@/lib/utils";
 
 interface Post {
   id: number; slug: string; title: string; excerpt: string;
@@ -18,42 +13,38 @@ interface Post {
 }
 
 function PostCard({ post, featured = false }: { post: Post; featured?: boolean }) {
-  const [hov, setHov] = useState(false);
   const date = new Date(post.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   if (featured) {
     return (
-      <Link href={`/blog/${post.slug}`} style={{ textDecoration: "none", display: "block" }}
-        onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
-        <div style={{
-          borderRadius: 20, overflow: "hidden", border: `1px solid ${hov ? "rgba(255,255,255,0.12)" : C.border}`,
-          background: C.surface, transition: "all 0.2s", display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-        }}>
+      <Link href={`/blog/${post.slug}`} className="block group">
+        <div className="rounded-2xl overflow-hidden border border-white/7 bg-[#161b22] transition-all duration-200 hover:border-white/12 grid grid-cols-1 md:grid-cols-2">
           {/* Thumbnail */}
-          <div style={{ aspectRatio: "16/9", background: "linear-gradient(135deg,#0a1628,#0d2040)", position: "relative", overflow: "hidden" }}>
+          <div className="aspect-video bg-gradient-to-br from-[#0a1628] to-[#0d2040] relative overflow-hidden">
             {post.thumbnail
-              ? <img src={post.thumbnail} alt={post.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s", transform: hov ? "scale(1.04)" : "scale(1)" }} />
-              : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 64, opacity: 0.15 }}>✦</div>
+              ? <img src={post.thumbnail} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+              : <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-15">✦</div>
             }
           </div>
           {/* Content */}
-          <div style={{ padding: "40px 36px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+          <div className="p-8 md:p-10 flex flex-col justify-center">
+            <div className="flex gap-2 mb-4 flex-wrap">
               {post.categories.slice(0, 2).map(c => (
-                <span key={c} style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 99, background: "rgba(146,220,229,0.1)", color: C.accent, border: "1px solid rgba(146,220,229,0.2)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c}</span>
+                <span key={c} className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                  {c}
+                </span>
               ))}
-              <span style={{ fontSize: 10, color: C.text3, padding: "3px 0" }}>{post.read_time}</span>
+              <span className="text-[10px] text-white/30 self-center">{post.read_time}</span>
             </div>
-            <h2 style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 700, color: C.text, margin: "0 0 14px", lineHeight: 1.25, letterSpacing: "-0.02em" }}>{post.title}</h2>
-            <p style={{ fontSize: 15, color: C.text2, lineHeight: 1.65, margin: "0 0 24px" }}>{post.excerpt}</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#92dce5,#d64933)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#080808" }}>
+            <h2 className="text-2xl md:text-3xl font-black text-white tracking-tighter leading-tight mb-3">{post.title}</h2>
+            <p className="text-sm text-white/60 leading-relaxed mb-6 line-clamp-3">{post.excerpt}</p>
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-[11px] font-black text-white shrink-0">
                 {post.author[0]?.toUpperCase()}
               </div>
-              <span style={{ fontSize: 13, color: C.text2 }}>{post.author}</span>
-              <span style={{ color: C.text3 }}>·</span>
-              <span style={{ fontSize: 13, color: C.text3 }}>{date}</span>
+              <span className="text-sm text-white/60">{post.author}</span>
+              <span className="text-white/20">·</span>
+              <span className="text-sm text-white/30">{date}</span>
             </div>
           </div>
         </div>
@@ -62,38 +53,34 @@ function PostCard({ post, featured = false }: { post: Post; featured?: boolean }
   }
 
   return (
-    <Link href={`/blog/${post.slug}`} style={{ textDecoration: "none", display: "block" }}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
-      <div style={{
-        borderRadius: 16, overflow: "hidden", border: `1px solid ${hov ? "rgba(255,255,255,0.12)" : C.border}`,
-        background: C.surface, transition: "all 0.2s", height: "100%", display: "flex", flexDirection: "column",
-        transform: hov ? "translateY(-3px)" : "none",
-        boxShadow: hov ? "0 16px 48px rgba(0,0,0,0.4)" : "none",
-      }}>
+    <Link href={`/blog/${post.slug}`} className="block group h-full">
+      <div className="rounded-2xl overflow-hidden border border-white/7 bg-[#161b22] transition-all duration-200 hover:border-white/12 hover:-translate-y-1 hover:shadow-2xl h-full flex flex-col">
         {/* Thumbnail */}
-        <div style={{ aspectRatio: "16/9", background: "linear-gradient(135deg,#0a1628,#0d2040)", overflow: "hidden", position: "relative" }}>
+        <div className="aspect-video bg-gradient-to-br from-[#0a1628] to-[#0d2040] overflow-hidden relative">
           {post.thumbnail
-            ? <img src={post.thumbnail} alt={post.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s", transform: hov ? "scale(1.05)" : "scale(1)" }} />
-            : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, opacity: 0.15 }}>✦</div>
+            ? <img src={post.thumbnail} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" />
+            : <div className="absolute inset-0 flex items-center justify-center text-5xl opacity-15">✦</div>
           }
         </div>
         {/* Content */}
-        <div style={{ padding: "20px 22px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+        <div className="p-5 flex-1 flex flex-col">
+          <div className="flex gap-1.5 mb-3 flex-wrap">
             {post.categories.slice(0, 1).map(c => (
-              <span key={c} style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "rgba(146,220,229,0.1)", color: C.accent, border: "1px solid rgba(146,220,229,0.15)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c}</span>
+              <span key={c} className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/15">
+                {c}
+              </span>
             ))}
-            <span style={{ fontSize: 10, color: C.text3 }}>{post.read_time}</span>
+            <span className="text-[10px] text-white/30 self-center">{post.read_time}</span>
           </div>
-          <h3 style={{ fontSize: 17, fontWeight: 700, color: C.text, margin: "0 0 10px", lineHeight: 1.3, letterSpacing: "-0.01em" }}>{post.title}</h3>
-          <p style={{ fontSize: 13, color: C.text2, lineHeight: 1.6, margin: "0 0 16px", flex: 1, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>{post.excerpt}</p>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: "auto" }}>
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#92dce5,#d64933)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700, color: "#080808" }}>
+          <h3 className="text-base font-black text-white tracking-tight leading-snug mb-2">{post.title}</h3>
+          <p className="text-xs text-white/60 leading-relaxed mb-4 flex-1 line-clamp-3">{post.excerpt}</p>
+          <div className="flex items-center gap-2 mt-auto">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-[9px] font-black text-white shrink-0">
               {post.author[0]?.toUpperCase()}
             </div>
-            <span style={{ fontSize: 12, color: C.text2 }}>{post.author}</span>
-            <span style={{ color: C.text3, fontSize: 12 }}>·</span>
-            <span style={{ fontSize: 12, color: C.text3 }}>{date}</span>
+            <span className="text-xs text-white/60">{post.author}</span>
+            <span className="text-white/20 text-xs">·</span>
+            <span className="text-xs text-white/30">{date}</span>
           </div>
         </div>
       </div>
@@ -130,63 +117,58 @@ export default function BlogPage() {
   const rest = posts.slice(1);
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-[#0d1117] text-white font-sans antialiased">
       {/* Header */}
-      <header style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, zIndex: 50, background: "rgba(4,4,6,0.92)", backdropFilter: "blur(20px)" }}>
-        <Link href="/landing" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <img src="/pixza-logo.png" alt="" style={{ width: 26, height: 26, borderRadius: 7, objectFit: "contain" }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: C.text }}>Pixza Studio</span>
+      <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 sticky top-0 bg-[#0d1117]/90 backdrop-blur-xl z-50">
+        <Link href="/landing" className="flex items-center gap-2 no-underline">
+          <img src="/pixza-logo.png" alt="" className="w-6 h-6 rounded-lg object-contain" />
+          <span className="text-sm font-bold text-white">Pixza Studio</span>
         </Link>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+        <div className="flex gap-5 items-center">
           {[{ label: "Create", href: "/create" }, { label: "Examples", href: "/examples" }, { label: "Studio", href: "/studio" }].map(l => (
-            <Link key={l.label} href={l.href} style={{ fontSize: 13, color: C.text2, textDecoration: "none" }}
-              onMouseEnter={e => (e.currentTarget.style.color = C.text)}
-              onMouseLeave={e => (e.currentTarget.style.color = C.text2)}
-            >{l.label}</Link>
+            <Link key={l.label} href={l.href} className="text-sm text-white/50 hover:text-white transition-colors">
+              {l.label}
+            </Link>
           ))}
         </div>
       </header>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "56px 24px 80px" }}>
+      <div className="max-w-5xl mx-auto px-6 py-14 pb-20">
         {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.accent, marginBottom: 14 }}>Blog</p>
-          <h1 style={{ fontSize: "clamp(32px,5vw,56px)", fontWeight: 700, letterSpacing: "-0.04em", color: C.text, margin: "0 0 16px", lineHeight: 1.05 }}>
+        <div className="text-center mb-14">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-violet-400 mb-3">Blog</p>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-4 leading-none">
             Ideas, tutorials &<br />AI creative insights
           </h1>
-          <p style={{ fontSize: 17, color: C.text2, maxWidth: 480, margin: "0 auto 32px" }}>
+          <p className="text-base text-white/50 max-w-md mx-auto mb-8">
             Guides, model comparisons, workflow tutorials and product updates from the Pixza Studio team.
           </p>
           {/* Search */}
-          <div style={{ position: "relative", maxWidth: 400, margin: "0 auto" }}>
-            <svg style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} width="14" height="14" fill="none" viewBox="0 0 24 24" stroke={C.text3} strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
+          <div className="relative max-w-sm mx-auto">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20 pointer-events-none" />
             <input
-              value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+              value={search}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search articles…"
-              style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, background: C.surface2, border: `1px solid ${C.border}`, color: C.text, fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
-              onFocus={e => (e.target.style.borderColor = C.accent)}
-              onBlur={e => (e.target.style.borderColor = C.border)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/8 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-all"
             />
           </div>
         </div>
 
         {loading ? (
-          <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid rgba(146,220,229,0.2)", borderTopColor: C.accent, animation: "spin 0.8s linear infinite" }} />
-            <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-violet-500 animate-spin" />
           </div>
         ) : posts.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "80px 0", color: C.text3 }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>✦</div>
-            <p style={{ fontSize: 16 }}>No articles found{search ? ` for "${search}"` : ""}.</p>
+          <div className="text-center py-20 text-white/30">
+            <div className="text-5xl mb-4">✦</div>
+            <p className="text-base">No articles found{search ? ` for "${search}"` : ""}.</p>
           </div>
         ) : (
           <>
             {/* Featured post */}
             {featured && !debouncedSearch && page === 1 && (
-              <div style={{ marginBottom: 48 }}>
+              <div className="mb-12">
                 <PostCard post={featured} featured />
               </div>
             )}
@@ -195,11 +177,11 @@ export default function BlogPage() {
             {rest.length > 0 && (
               <>
                 {!debouncedSearch && page === 1 && (
-                  <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: C.text3, marginBottom: 20 }}>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-5">
                     Latest articles
                   </p>
                 )}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20, marginBottom: 48 }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
                   {(debouncedSearch ? posts : rest).map(p => (
                     <PostCard key={p.id} post={p} />
                   ))}
@@ -209,12 +191,35 @@ export default function BlogPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: "8px 18px", borderRadius: 9, border: `1px solid ${C.border}`, background: "transparent", color: page === 1 ? C.text3 : C.text2, cursor: page === 1 ? "not-allowed" : "pointer", fontSize: 13 }}>← Prev</button>
+              <div className="flex justify-center gap-2">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 rounded-xl border border-white/8 text-sm text-white/40 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  ← Prev
+                </button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                  <button key={n} onClick={() => setPage(n)} style={{ width: 36, height: 36, borderRadius: 9, border: `1px solid ${n === page ? C.accent : C.border}`, background: n === page ? "rgba(146,220,229,0.1)" : "transparent", color: n === page ? C.accent : C.text2, cursor: "pointer", fontSize: 13, fontWeight: n === page ? 700 : 400 }}>{n}</button>
+                  <button
+                    key={n}
+                    onClick={() => setPage(n)}
+                    className={cn(
+                      "w-9 h-9 rounded-xl border text-sm font-bold transition-all",
+                      n === page
+                        ? "border-violet-500/40 bg-violet-500/10 text-violet-400"
+                        : "border-white/8 text-white/40 hover:text-white"
+                    )}
+                  >
+                    {n}
+                  </button>
                 ))}
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ padding: "8px 18px", borderRadius: 9, border: `1px solid ${C.border}`, background: "transparent", color: page === totalPages ? C.text3 : C.text2, cursor: page === totalPages ? "not-allowed" : "pointer", fontSize: 13 }}>Next →</button>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="px-4 py-2 rounded-xl border border-white/8 text-sm text-white/40 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  Next →
+                </button>
               </div>
             )}
           </>
@@ -222,10 +227,10 @@ export default function BlogPage() {
       </div>
 
       {/* Newsletter */}
-      <div style={{ borderTop: `1px solid ${C.border}`, padding: "64px 24px" }}>
-        <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
-          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.text, margin: "0 0 12px", letterSpacing: "-0.02em" }}>Stay in the loop</h2>
-          <p style={{ fontSize: 15, color: C.text2, margin: "0 0 28px" }}>Get new articles, model releases, and workflow tips delivered to your inbox.</p>
+      <div className="border-t border-white/5 py-16 px-6">
+        <div className="max-w-md mx-auto text-center">
+          <h2 className="text-2xl font-black text-white tracking-tighter mb-3">Stay in the loop</h2>
+          <p className="text-sm text-white/50 mb-7">Get new articles, model releases, and workflow tips delivered to your inbox.</p>
           <NewsletterForm />
         </div>
       </div>

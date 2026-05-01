@@ -6,7 +6,6 @@ import { useWPAuth } from "@/lib/wp-auth-context";
 import { wpRegister } from "@/lib/wordpress";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { AuthInput } from "@/components/auth/AuthInput";
-import { CircularAuthButton } from "@/components/auth/CircularAuthButton";
 import { signIn } from "next-auth/react";
 
 export default function SignUpPage() {
@@ -61,66 +60,60 @@ export default function SignUpPage() {
         <div className="flex-1 h-px bg-white/10" />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col relative pb-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
-          <AuthInput 
-            label="Full Name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Jane Smith"
-            required
-            autoComplete="name"
-          />
-          <AuthInput 
-            label="Email Address"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="jane@example.com"
-            required
-            autoComplete="email"
-          />
-          <AuthInput 
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Min 8 characters"
-            required
-            autoComplete="new-password"
-          />
-          <AuthInput 
-            label="Promo Code (optional)"
-            type="text"
-            value={coupon}
-            onChange={(e) => setCoupon(e.target.value)}
-            placeholder="LAUNCH50"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AuthInput 
+          label="Full Name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Jane Smith"
+          required
+          autoComplete="name"
+        />
+        <AuthInput 
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="jane@example.com"
+          required
+          autoComplete="email"
+        />
+        <AuthInput 
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Min 8 characters"
+          required
+          autoComplete="new-password"
+        />
+        <AuthInput 
+          label="Promo Code (optional)"
+          type="text"
+          value={coupon}
+          onChange={(e) => setCoupon(e.target.value)}
+          placeholder="LAUNCH50"
+        />
 
-        <div className="flex flex-col gap-4 mt-8">
-          <p className="text-[10px] text-white/30 uppercase tracking-widest font-medium leading-relaxed max-w-sm">
-            By creating an account you agree to our{" "}
-            <Link href="/terms" className="text-white/60 hover:text-white underline underline-offset-4">Terms</Link> &{" "}
-            <Link href="/privacy" className="text-white/60 hover:text-white underline underline-offset-4">Privacy Policy</Link>.
-          </p>
-        </div>
+        <p className="text-[10px] text-white/30 uppercase tracking-widest font-medium leading-relaxed mt-2">
+          By creating an account you agree to our{" "}
+          <Link href="/terms" className="text-white/60 hover:text-white underline underline-offset-4">Terms</Link> &{" "}
+          <Link href="/privacy" className="text-white/60 hover:text-white underline underline-offset-4">Privacy Policy</Link>.
+        </p>
 
         {error && (
-          <p className="mt-8 text-xs text-red-500 font-medium tracking-wide">
-            {error}
-          </p>
+          <p className="text-xs text-red-500 font-medium tracking-wide">{error}</p>
         )}
 
-        {/* Circular Sign Up Button - Bottom Right */}
-        <div className="mt-16 md:absolute md:-bottom-24 md:right-0">
-          <CircularAuthButton 
-            type="submit" 
-            label="Sign Up" 
-            loading={loading}
-          />
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-2 w-full py-3.5 rounded-xl bg-white text-black text-sm font-black hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {loading && <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />}
+          {loading ? "Creating account…" : "Create Account"}
+        </button>
       </form>
     </AuthLayout>
   );

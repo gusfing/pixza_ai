@@ -37,13 +37,13 @@ export default function BlogPostPage() {
   }, [slug]);
 
   if (loading) return (
-    <div className="min-h-screen bg-[#040406] flex items-center justify-center">
+    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
     </div>
   );
 
   if (notFound || !post) return (
-    <div className="min-h-screen bg-[#040406] flex flex-col items-center justify-center text-center p-8">
+    <div className="min-h-screen bg-[#0d1117] flex flex-col items-center justify-center text-center p-8">
       <p className="text-6xl mb-6">✦</p>
       <h1 className="text-2xl font-black text-white tracking-tighter mb-3">Article not found</h1>
       <p className="text-white/40 text-sm mb-8">This post may have been moved or deleted.</p>
@@ -54,9 +54,9 @@ export default function BlogPostPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#040406] text-white font-sans">
+    <div className="min-h-screen bg-[#0d1117] text-white font-sans">
       {/* Header */}
-      <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 sticky top-0 bg-[#040406]/90 backdrop-blur-xl z-50">
+      <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 sticky top-0 bg-[#0d1117]/90 backdrop-blur-xl z-50">
         <Link href="/blog" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           <span className="text-sm font-bold">Blog</span>
