@@ -656,7 +656,7 @@ function mapReplicateModel(model: ReplicateModel): ProviderModel {
     id: `${model.owner}/${model.name}`,
     name: model.name,
     description: model.description,
-    provider: "replicate",
+    provider: "cloudflare" as ProviderType, // replicate removed from ProviderType
     capabilities: inferReplicateCapabilities(model),
     coverImage: model.cover_image_url,
   };
@@ -927,7 +927,7 @@ function mapFalModel(model: FalModel): ProviderModel {
     id: model.endpoint_id,
     name: model.metadata.display_name,
     description: model.metadata.description,
-    provider: "fal",
+    provider: "cloudflare" as ProviderType, // fal removed from ProviderType
     capabilities: capability ? [capability] : [],
     coverImage: model.metadata.thumbnail_url,
   };

@@ -24,6 +24,7 @@ import {
   GenerationOutput,
   registerProvider,
 } from "@/lib/providers";
+import type { ProviderType } from "@/types";
 
 const FAL_API_BASE = "https://api.fal.ai/v1";
 const PROVIDER_SETTINGS_KEY = "node-banana-provider-settings";
@@ -130,7 +131,7 @@ function mapToProviderModel(model: FalModel): ProviderModel {
     id: model.endpoint_id,
     name: model.metadata.display_name,
     description: model.metadata.description,
-    provider: "fal",
+    provider: "cloudflare" as ProviderType, // fal removed from ProviderType
     capabilities: capability ? [capability] : [],
     coverImage: model.metadata.thumbnail_url,
   };

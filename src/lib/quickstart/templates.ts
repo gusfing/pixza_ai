@@ -846,9 +846,9 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: {
             ...createNanoBananaData(),
             selectedModel: {
-              provider: "fal",
-              modelId: "fal-ai/image-apps-v2/product-photography",
-              displayName: "Product Photography"
+              provider: "wavespeed" as const,
+              modelId: "wavespeed-ai/flux-dev-ultra-fast",
+              displayName: "FLUX Dev Ultra Fast"
             }
           },
           style: NODE_DIMENSIONS.nanoBanana,
