@@ -392,6 +392,42 @@ const GEMINI_IMAGE_MODELS: ProviderModel[] = [
 // Cloudflare Workers AI models
 const CLOUDFLARE_MODELS: ProviderModel[] = [
   {
+    id: "@cf/black-forest-labs/flux-1-schnell",
+    name: "FLUX.1 Schnell",
+    description: "High-performance text-to-image by Black Forest Labs. Excellent prompt adherence, 4-step generation.",
+    provider: "cloudflare",
+    capabilities: ["text-to-image"],
+    isFree: true,
+    coverImage: undefined,
+  },
+  {
+    id: "@cf/black-forest-labs/flux-2-klein-4b",
+    name: "FLUX.2 Klein 4B",
+    description: "Ultra-fast distilled image model by Black Forest Labs. Unifies text-to-image and editing in a single model. Fixed 4-step inference.",
+    provider: "cloudflare",
+    capabilities: ["text-to-image", "image-to-image"],
+    isFree: true,
+    coverImage: undefined,
+  },
+  {
+    id: "@cf/black-forest-labs/flux-2-klein-9b",
+    name: "FLUX.2 Klein 9B",
+    description: "Enhanced quality distilled image model by Black Forest Labs. Better than 4B variant with same fast 4-step inference.",
+    provider: "cloudflare",
+    capabilities: ["text-to-image", "image-to-image"],
+    isFree: true,
+    coverImage: undefined,
+  },
+  {
+    id: "@cf/black-forest-labs/flux-2-dev",
+    name: "FLUX.2 Dev",
+    description: "High-fidelity image model with multi-reference support (up to 4 images). Supports image-to-image, character consistency, JSON prompting, and hex color control. Output up to 4MP.",
+    provider: "cloudflare",
+    capabilities: ["text-to-image", "image-to-image"],
+    isFree: true,
+    coverImage: undefined,
+  },
+  {
     id: "@cf/stabilityai/stable-diffusion-xl-base-1.0",
     name: "SDXL Base",
     description: "Stable Diffusion XL Base 1.0 by Stability AI. High-quality image generation via Cloudflare.",
@@ -419,23 +455,23 @@ const CLOUDFLARE_MODELS: ProviderModel[] = [
     coverImage: undefined,
   },
   {
-    id: "@cf/black-forest-labs/flux-1-schnell",
-    name: "FLUX.1 Schnell",
-    description: "High-performance text-to-image model by Black Forest Labs via Cloudflare. Excellent prompt adherence.",
-    provider: "cloudflare",
-    capabilities: ["text-to-image"],
-    isFree: true,
-    coverImage: undefined,
-  },
-  {
     id: "@cf/runwayml/stable-diffusion-v1-5-img2img",
     name: "SD 1.5 Img2Img",
-    description: "Image-to-image transformations using Stable Diffusion v1.5 via Cloudflare.",
+    description: "Image-to-image transformations using Stable Diffusion v1.5 via Cloudflare. Control style transfer with strength parameter.",
     provider: "cloudflare",
     capabilities: ["image-to-image"],
     isFree: true,
     coverImage: undefined,
-  }
+  },
+  {
+    id: "@cf/runwayml/stable-diffusion-v1-5-inpainting",
+    name: "SD 1.5 Inpainting",
+    description: "Object removal and inpainting using Stable Diffusion v1.5 via Cloudflare. Fill masked areas with AI-generated content.",
+    provider: "cloudflare",
+    capabilities: ["image-to-image"],
+    isFree: true,
+    coverImage: undefined,
+  },
 ];
 
 // Gemini video models (native Veo via Gemini API)
