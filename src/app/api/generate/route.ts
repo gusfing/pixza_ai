@@ -296,12 +296,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Route to appropriate provider
-    if (provider === "replicate" || provider === "fal") {
-      return NextResponse.json<GenerateResponse>(
-        { success: false, error: `Provider "${provider}" is not available on this platform.` },
-        { status: 400 }
-      );
-    }
+    // Note: replicate and fal are disabled — their blocks below use `if (false && ...)` guards
 
     if (false && provider === "replicate") {
       if (!selectedModel?.modelId || !selectedModel?.displayName) {
