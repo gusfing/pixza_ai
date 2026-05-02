@@ -296,7 +296,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Route to appropriate provider
-    if (provider === "replicate" || provider === "fal" || provider === "kie") {
+    if (provider === "replicate" || provider === "fal") {
       return NextResponse.json<GenerateResponse>(
         { success: false, error: `Provider "${provider}" is not available on this platform.` },
         { status: 400 }

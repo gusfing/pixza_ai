@@ -52,7 +52,7 @@ export const defaultProviderSettings: ProviderSettings = {
     cloudflare: { id: "cloudflare", name: "Cloudflare",    enabled: true,  apiKey: null, apiKeyEnvVar: "CLOUDFLARE_API_KEY" },
     // Hidden providers — kept in type for legacy data compatibility but disabled
     fal:        { id: "fal",        name: "fal.ai",        enabled: false, apiKey: null, apiKeyEnvVar: "FAL_API_KEY" },
-    kie:        { id: "kie",        name: "Kie.ai",        enabled: false, apiKey: null, apiKeyEnvVar: "KIE_API_KEY" },
+    kie:        { id: "kie",        name: "Kie.ai",        enabled: true,  apiKey: null, apiKeyEnvVar: "KIE_API_KEY" },
   }
 };
 

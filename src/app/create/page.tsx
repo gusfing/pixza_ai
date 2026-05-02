@@ -68,6 +68,8 @@ const MODELS: Model[] = [
   // ── AGENCY TIER — Video (premium) ─────────────────────────
   // Seedance 2.0 — ~₹22/5s 720p
   { provider: "wavespeed",  modelId: "wavespeed-ai/seedance-2.0-t2v-720p",                label: "Seedance 2.0",         tabs: ["Video"], badge: "New",     tier: "agency", creditCost: 25 },
+  // Veo 3 Fast via KIE — ₹34/8s (vs ₹504 on fal) — 15x cheaper
+  { provider: "kie",        modelId: "veo3-fast/text-to-video",                            label: "Veo 3 Fast",           tabs: ["Video"], badge: "Best",    tier: "agency", creditCost: 40 },
   // Veo 2 — ~₹85–170/video
   { provider: "gemini",     modelId: "veo-2.0-generate-001",                              label: "Veo 2",                tabs: ["Video"], badge: "Google",  tier: "agency", creditCost: 60 },
   // Veo 3 — ~₹340/video
