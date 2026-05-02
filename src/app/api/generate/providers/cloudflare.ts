@@ -1,22 +1,35 @@
 /**
  * Cloudflare Workers AI Provider for Generate API Route
  *
- * Two API formats depending on model generation:
- * - Legacy models (FLUX Schnell, SDXL, SD img2img): JSON with image as Uint8Array number[]
+ * Three API formats:
  * - FLUX.2 models (klein-4b, klein-9b, flux-2-dev): multipart/form-data
+ *   - flux-2-dev supports image-to-image via input_image_0..3 fields
+ * - Legacy img2img (SD v1.5 img2img, inpainting): JSON + Uint8Array image field
+ * - Legacy text-to-image (FLUX Schnell, SDXL, etc.): JSON
  */
 import { GenerationInput, GenerationOutput } from "@/lib/providers/types";
 
-// FLUX.2 models require multipart/form-data
+// FLUX.2 models — use multipart/form-data
 const FLUX2_MODELS = new Set([
   "@cf/black-forest-labs/flux-2-klein-4b",
   "@cf/black-forest-labs/flux-2-klein-9b",
   "@cf/black-forest-labs/flux-2-dev",
 ]);
 
+// Legacy img2img models — JSON with Uint8Array image field
+const LEGACY_IMG2IMG_MODELS = new Set([
+  "@cf/runwayml/stable-diffusion-v1-5-img2img",
+  "@cf/runwayml/stable-diffusion-v1-5-inpainting",
+]);
+
 function base64ToUint8Array(base64: string): number[] {
   const clean = base64.includes(",") ? base64.split(",")[1] : base64;
   return Array.from(new Uint8Array(Buffer.from(clean, "base64")));
+}
+
+function base64ToBuffer(base64: string): Buffer {
+  const clean = base64.includes(",") ? base64.split(",")[1] : base64;
+  return Buffer.from(clean, "base64");
 }
 
 export async function generateWithCloudflare(
@@ -28,6 +41,7 @@ export async function generateWithCloudflare(
   const modelId = input.model.id;
   const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${modelId}`;
   const isFlux2 = FLUX2_MODELS.has(modelId);
+  const isLegacyImg2Img = LEGACY_IMG2IMG_MODELS.has(modelId);
   const hasImage = !!(input.images && input.images.length > 0);
 
   try {
@@ -37,25 +51,49 @@ export async function generateWithCloudflare(
     };
 
     if (isFlux2) {
-      // FLUX.2 models: multipart/form-data
+      // ── FLUX.2 models: multipart/form-data ──────────────────
       const form = new FormData();
       form.append("prompt", input.prompt || "");
-      if (input.parameters?.num_steps !== undefined) form.append("num_steps", String(Number(input.parameters.num_steps)));
-      if (input.parameters?.seed !== undefined && input.parameters.seed !== "") form.append("seed", String(Number(input.parameters.seed)));
-      // width/height defaults
       form.append("width", "1024");
       form.append("height", "1024");
+
+      if (input.parameters) {
+        if (input.parameters.num_steps !== undefined) form.append("steps", String(Number(input.parameters.num_steps)));
+        if (input.parameters.seed !== undefined && input.parameters.seed !== "") form.append("seed", String(Number(input.parameters.seed)));
+      }
+
       if (hasImage) {
-        const base64Raw = input.images![0];
-        const base64Data = base64Raw.includes(",") ? base64Raw.split(",")[1] : base64Raw;
-        const imgBuffer = Buffer.from(base64Data, "base64");
-        form.append("image", new Blob([imgBuffer], { type: "image/png" }), "image.png");
+        // FLUX.2 Dev supports up to 4 reference images: input_image_0..3
+        const images = input.images!.slice(0, 4);
+        images.forEach((img, i) => {
+          const buf = base64ToBuffer(img);
+          form.append(`input_image_${i}`, new Blob([buf], { type: "image/png" }), `image_${i}.png`);
+        });
         if (input.parameters?.strength !== undefined) form.append("strength", String(Number(input.parameters.strength)));
       }
+
       fetchBody = form;
       // Do NOT set Content-Type — let fetch set it with boundary
+
+    } else if (isLegacyImg2Img && hasImage) {
+      // ── Legacy img2img: JSON with Uint8Array ─────────────────
+      const body: Record<string, unknown> = {
+        prompt: input.prompt || "",
+        image: base64ToUint8Array(input.images![0]),
+        num_steps: 20,
+        strength: 0.75,
+      };
+      if (input.parameters) {
+        if (input.parameters.num_steps !== undefined) body.num_steps = Number(input.parameters.num_steps);
+        if (input.parameters.strength !== undefined) body.strength = Number(input.parameters.strength);
+        if (input.parameters.guidance !== undefined) body.guidance = Number(input.parameters.guidance);
+        if (input.parameters.seed !== undefined && input.parameters.seed !== "") body.seed = Number(input.parameters.seed);
+      }
+      headers["Content-Type"] = "application/json";
+      fetchBody = JSON.stringify(body);
+
     } else {
-      // Legacy models: JSON with image as Uint8Array number[]
+      // ── Text-to-image: JSON (no image input) ─────────────────
       const body: Record<string, unknown> = {
         prompt: input.prompt || "",
         num_steps: 4,
@@ -64,10 +102,6 @@ export async function generateWithCloudflare(
         if (input.parameters.num_steps !== undefined) body.num_steps = Number(input.parameters.num_steps);
         if (input.parameters.guidance !== undefined) body.guidance = Number(input.parameters.guidance);
         if (input.parameters.seed !== undefined && input.parameters.seed !== "") body.seed = Number(input.parameters.seed);
-      }
-      if (hasImage) {
-        body.image = base64ToUint8Array(input.images![0]);
-        if (input.parameters?.strength !== undefined) body.strength = Number(input.parameters.strength);
       }
       headers["Content-Type"] = "application/json";
       fetchBody = JSON.stringify(body);
@@ -89,6 +123,7 @@ export async function generateWithCloudflare(
     const contentTypeResponse = response.headers.get("content-type") || "";
 
     if (contentTypeResponse.includes("image/")) {
+      // Binary image response
       const arrayBuffer = await response.arrayBuffer();
       const base64String = Buffer.from(arrayBuffer).toString("base64");
       return {
@@ -97,6 +132,7 @@ export async function generateWithCloudflare(
       };
     }
 
+    // JSON response
     const result = await response.json();
 
     if (!result.success) {
@@ -104,6 +140,7 @@ export async function generateWithCloudflare(
       return { success: false, error: `Cloudflare AI Error: ${cfMsg}` };
     }
 
+    // FLUX.2 returns base64 in result.image
     const imageBase64 = result.result?.image;
     if (!imageBase64) {
       return { success: false, error: "No image data in Cloudflare response" };

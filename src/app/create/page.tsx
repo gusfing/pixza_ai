@@ -45,10 +45,11 @@ const MODELS: Model[] = [
   { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-1-schnell",              label: "FLUX Schnell",         tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-2-klein-4b",             label: "FLUX.2 Klein 4B",      tabs: ["Image"], badge: "Fast",    tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-2-klein-9b",             label: "FLUX.2 Klein 9B",      tabs: ["Image"], badge: "New",     tier: "free",   creditCost: 1 },
-  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-2-dev",                  label: "FLUX.2 Dev",           tabs: ["Image"],                   tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-2-dev",                  label: "FLUX.2 Dev",           tabs: ["Image"], badge: "i2i",     tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/stabilityai/stable-diffusion-xl-base-1.0",     label: "SDXL",                 tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/bytedance/stable-diffusion-xl-lightning",      label: "SDXL Lightning",       tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/lykon/dreamshaper-8-lcm",                      label: "DreamShaper",          tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/runwayml/stable-diffusion-v1-5-img2img",       label: "SD 1.5 Img2Img",       tabs: ["Image"], badge: "i2i",     tier: "free",   creditCost: 1 },
 
   // ── FREE TIER — Gemini Flash (free quota) ──────────────────
   { provider: "gemini",     modelId: "nano-banana",                                       label: "Gemini Flash Image",   tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
