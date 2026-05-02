@@ -1055,10 +1055,6 @@ export async function GET(
           { status: 400 }
         );
       }
-    } else if (providerFilter === "replicate" && replicateKey) {
-      providersToFetch.push("replicate");
-    } else if (providerFilter === "fal" && falKey) {
-      providersToFetch.push("fal");
     } else if (providerFilter === "cloudflare") {
       if (cloudflareKey && cloudflareAccountId) {
         includeCloudflare = true;
@@ -1072,6 +1068,7 @@ export async function GET(
         );
       }
     }
+    // Note: replicate and fal are disabled — requests for them are blocked earlier in the handler
   } else {
     // Include all providers that have keys configured
     includeGemini = true; // Gemini always available
@@ -1080,12 +1077,7 @@ export async function GET(
     if (wavespeedKey) {
       providersToFetch.push("wavespeed"); // WaveSpeed if key is configured
     }
-    if (replicateKey) {
-      providersToFetch.push("replicate");
-    }
-    if (falKey) {
-      providersToFetch.push("fal");
-    }
+    // Note: replicate and fal keys are nulled out, so they're never added to providersToFetch
   }
 
   // Gemini and Kie are always available (with key for Kie), so we don't fail if no external providers
@@ -1153,14 +1145,9 @@ export async function GET(
     anyFromCache = true;
   }
 
-  // Fetch from each provider (replicate, fal, wavespeed)
+  // Fetch from each provider (wavespeed only — replicate and fal are disabled)
   for (const provider of providersToFetch) {
-    // For Replicate and WaveSpeed, always use base cache key since we filter client-side
-    // For fal.ai, include search in cache key since their API supports search
-    const cacheKey =
-      provider === "replicate" || provider === "wavespeed"
-        ? getCacheKey(provider)
-        : getCacheKey(provider, searchQuery);
+    const cacheKey = getCacheKey(provider, provider === "wavespeed" ? undefined : searchQuery);
     let models: ProviderModel[] | null = null;
     let fromCache = false;
 
@@ -1172,8 +1159,8 @@ export async function GET(
         fromCache = true;
         anyFromCache = true;
 
-        // For Replicate and WaveSpeed, apply client-side search filtering on cached models
-        if ((provider === "replicate" || provider === "wavespeed") && searchQuery) {
+        // WaveSpeed: apply client-side search filtering on cached models
+        if (provider === "wavespeed" && searchQuery) {
           models = filterModelsBySearch(models, searchQuery);
         }
       }
@@ -1183,25 +1170,12 @@ export async function GET(
     if (!models) {
       allFromCache = false;
       try {
-        if (provider === "replicate") {
-          // Fetch all models (no search param - we filter client-side)
-          const allReplicateModels = await fetchReplicateModels(replicateKey!);
-          // Cache the full list
-          setCachedModels(cacheKey, allReplicateModels);
-          // Apply search filter if needed
-          models = searchQuery
-            ? filterModelsBySearch(allReplicateModels, searchQuery)
-            : allReplicateModels;
-        } else if (provider === "fal") {
-          models = await fetchFalModels(falKey, searchQuery);
-          // Cache the results (fal.ai handles search server-side)
-          setCachedModels(cacheKey, models);
-        } else if (provider === "wavespeed") {
+        if (provider === "wavespeed") {
           // Fetch all models from WaveSpeed API
           const allWaveSpeedModels = await fetchWaveSpeedModels(wavespeedKey!);
           // Cache the full list
           setCachedModels(cacheKey, allWaveSpeedModels);
-          // Apply search filter if needed (client-side filtering like Replicate)
+          // Apply search filter if needed
           models = searchQuery
             ? filterModelsBySearch(allWaveSpeedModels, searchQuery)
             : allWaveSpeedModels;
