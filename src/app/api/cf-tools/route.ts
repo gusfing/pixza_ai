@@ -4,32 +4,16 @@ const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN ?? "";
 
 async function cfAI(model: string, body: any) {
-  // For models that need image input, use multipart form (Cloudflare REST API requires binary)
-  // For text-only models, use JSON
-  const hasImage = body.image !== undefined;
-
-  let fetchBody: BodyInit;
-  let headers: Record<string, string> = {
-    Authorization: `Bearer ${CF_API_TOKEN}`,
-  };
-
-  if (hasImage) {
-    const form = new FormData();
-    const imgBuf = Buffer.from(body.image);
-    form.append("image", new Blob([imgBuf], { type: "image/png" }), "image.png");
-    // Add other fields as strings
-    for (const [k, v] of Object.entries(body)) {
-      if (k !== "image") form.append(k, String(v));
-    }
-    fetchBody = form;
-  } else {
-    headers["Content-Type"] = "application/json";
-    fetchBody = JSON.stringify(body);
-  }
-
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${model}`,
-    { method: "POST", headers, body: fetchBody }
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${CF_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }
   );
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

@@ -1,10 +1,16 @@
 /**
  * Cloudflare Workers AI Provider for Generate API Route
  *
- * NOTE: Cloudflare REST API requires multipart/form-data for image inputs.
- * JSON byte arrays and image_b64 are NOT reliably supported across all models.
+ * REST API image format: JSON with image as number array (Uint8Array spread)
+ * This is different from Workers bindings which accept ArrayBuffer directly.
  */
 import { GenerationInput, GenerationOutput } from "@/lib/providers/types";
+
+function base64ToUint8Array(base64: string): number[] {
+  const clean = base64.includes(",") ? base64.split(",")[1] : base64;
+  const buf = Buffer.from(clean, "base64");
+  return Array.from(new Uint8Array(buf));
+}
 
 export async function generateWithCloudflare(
   requestId: string,
@@ -18,53 +24,37 @@ export async function generateWithCloudflare(
   try {
     const hasImage = input.images && input.images.length > 0;
 
-    let fetchBody: BodyInit;
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${apiToken}`,
+    // Build JSON body — Cloudflare REST API always expects JSON
+    const body: Record<string, unknown> = {
+      prompt: input.prompt || "",
     };
 
+    // Add optional parameters
+    if (input.parameters) {
+      if (input.parameters.num_steps !== undefined) body.num_steps = Number(input.parameters.num_steps);
+      if (input.parameters.guidance !== undefined) body.guidance = Number(input.parameters.guidance);
+      if (input.parameters.seed !== undefined && input.parameters.seed !== "") body.seed = Number(input.parameters.seed);
+    }
+
     if (hasImage) {
-      // Cloudflare REST API requires multipart/form-data for image inputs
-      const form = new FormData();
-      form.append("prompt", input.prompt || "");
-
-      // Convert base64 data URL to binary buffer
-      const base64Raw = input.images![0];
-      const base64Data = base64Raw.includes(",") ? base64Raw.split(",")[1] : base64Raw;
-      const imgBuffer = Buffer.from(base64Data, "base64");
-      form.append("image", new Blob([imgBuffer], { type: "image/png" }), "image.png");
-
-      // Add optional parameters
-      if (input.parameters) {
-        if (input.parameters.num_steps !== undefined) form.append("num_steps", String(Number(input.parameters.num_steps)));
-        if (input.parameters.guidance !== undefined) form.append("guidance", String(Number(input.parameters.guidance)));
-        if (input.parameters.seed !== undefined && input.parameters.seed !== "") form.append("seed", String(Number(input.parameters.seed)));
-        if (input.parameters.strength !== undefined) form.append("strength", String(Number(input.parameters.strength)));
+      // REST API expects image as a number array (Uint8Array spread)
+      body.image = base64ToUint8Array(input.images![0]);
+      // Only include strength for img2img models
+      if (input.parameters?.strength !== undefined) {
+        body.strength = Number(input.parameters.strength);
       }
-
-      fetchBody = form;
-      // Do NOT set Content-Type — browser/Node sets it automatically with boundary for FormData
     } else {
-      // Text-to-image: use JSON (no image input)
-      const body: Record<string, unknown> = {
-        prompt: input.prompt,
-        num_steps: 4, // default for FLUX Schnell
-      };
-
-      if (input.parameters) {
-        if (input.parameters.num_steps !== undefined) body.num_steps = Number(input.parameters.num_steps);
-        if (input.parameters.guidance !== undefined) body.guidance = Number(input.parameters.guidance);
-        if (input.parameters.seed !== undefined && input.parameters.seed !== "") body.seed = Number(input.parameters.seed);
-      }
-
-      headers["Content-Type"] = "application/json";
-      fetchBody = JSON.stringify(body);
+      // Text-to-image default steps
+      if (body.num_steps === undefined) body.num_steps = 4;
     }
 
     const response = await fetch(url, {
       method: "POST",
-      headers,
-      body: fetchBody,
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -74,11 +64,10 @@ export async function generateWithCloudflare(
         const errJson = JSON.parse(errorText);
         const cfMsg = errJson?.errors?.[0]?.message;
         if (cfMsg) errorMsg = `Cloudflare: ${cfMsg}`;
-      } catch { /* use raw text */ }
+      } catch { /* use raw */ }
       return { success: false, error: errorMsg };
     }
 
-    // Check content-type — binary image or JSON wrapper
     const contentTypeResponse = response.headers.get("content-type") || "";
 
     if (contentTypeResponse.includes("image/")) {
@@ -90,7 +79,6 @@ export async function generateWithCloudflare(
       };
     }
 
-    // JSON response
     const result = await response.json();
 
     if (!result.success) {

@@ -1,25 +1,17 @@
-/**
- * Image Upscaler API
- * Uses Cloudflare SD img2img with low strength to enhance/sharpen
- */
 import { NextRequest, NextResponse } from "next/server";
 
-const CF_ACCOUNT_ID = process.env.CLOUDFLARE_API_TOKEN ? process.env.CLOUDFLARE_ACCOUNT_ID ?? "" : "";
+const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
 
-function base64ToBuffer(base64: string): Buffer {
-  const clean = base64.replace(/^data:[^;]+;base64,/, "");
-  return Buffer.from(clean, "base64");
+function toUint8Array(base64: string): number[] {
+  const clean = base64.includes(",") ? base64.split(",")[1] : base64;
+  return Array.from(new Uint8Array(Buffer.from(clean, "base64")));
 }
 
 export async function POST(req: NextRequest) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
-  const apiToken  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
-
-  if (!accountId || !apiToken) {
+  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
     return NextResponse.json({ error: "Cloudflare not configured" }, { status: 500 });
   }
-
   let imageBase64: string;
   try {
     const body = await req.json();
@@ -28,39 +20,28 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
   }
-
   try {
-    const imgBuf = base64ToBuffer(imageBase64);
-
-    // Use multipart form for img2img
-    const form = new FormData();
-    form.append("prompt", "high resolution, sharp details, 4k, professional quality, enhanced clarity");
-    form.append("image", new Blob([imgBuf], { type: "image/png" }), "image.png");
-    form.append("strength", "0.15");
-    form.append("num_steps", "20");
-
     const res = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`,
+      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`,
       {
         method: "POST",
-        headers: { Authorization: `Bearer ${apiToken}` },
-        body: form,
+        headers: { Authorization: `Bearer ${CF_API_TOKEN}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: "high resolution, sharp details, 4k, professional quality, enhanced clarity",
+          image: toUint8Array(imageBase64),
+          strength: 0.15,
+          num_steps: 20,
+        }),
       }
     );
-
     if (!res.ok) {
       const err = await res.json().catch(() => ({})) as any;
       throw new Error(err?.errors?.[0]?.message || `CF error ${res.status}`);
     }
-
     const buf = await res.arrayBuffer();
-    const result = `data:image/png;base64,${Buffer.from(buf).toString("base64")}`;
-    return NextResponse.json({ result });
+    return NextResponse.json({ result: `data:image/png;base64,${Buffer.from(buf).toString("base64")}` });
   } catch (err) {
     console.error("[upscaler]", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Upscaling failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Failed" }, { status: 500 });
   }
 }

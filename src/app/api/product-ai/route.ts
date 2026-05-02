@@ -18,30 +18,16 @@ const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
 
 // ── Cloudflare AI helper ─────────────────────────────────────
 async function cfAI(model: string, body: unknown): Promise<Response> {
-  const b = body as Record<string, unknown>;
-  const hasImage = b.image !== undefined;
-
-  let fetchBody: BodyInit;
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${CF_API_TOKEN}`,
-  };
-
-  if (hasImage) {
-    const form = new FormData();
-    const imgBuf = Buffer.from(b.image as number[]);
-    form.append("image", new Blob([imgBuf], { type: "image/png" }), "image.png");
-    for (const [k, v] of Object.entries(b)) {
-      if (k !== "image") form.append(k, String(v));
-    }
-    fetchBody = form;
-  } else {
-    headers["Content-Type"] = "application/json";
-    fetchBody = JSON.stringify(body);
-  }
-
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${model}`,
-    { method: "POST", headers, body: fetchBody }
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${CF_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }
   );
   if (!res.ok) {
     const err = await res.json().catch(() => ({})) as any;
