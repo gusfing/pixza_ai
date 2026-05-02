@@ -7,9 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
 
-function toByteArray(base64: string): number[] {
+function base64ToBuffer(base64: string): Buffer {
   const clean = base64.replace(/^data:[^;]+;base64,/, "");
-  return Array.from(Buffer.from(clean, "base64"));
+  return Buffer.from(clean, "base64");
 }
 
 export async function POST(req: NextRequest) {
@@ -29,29 +29,27 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // Use SD inpainting — fill masked area with background
     const inpaintPrompt = prompt || "clean background, empty space, seamless fill, professional photo";
+    const imgBuf = base64ToBuffer(imageBase64);
 
-    const reqBody: any = {
-      prompt: inpaintPrompt,
-      image: toByteArray(imageBase64),
-      strength: 0.99,
-      num_steps: 20,
-    };
+    // Use multipart form for image input
+    const form = new FormData();
+    form.append("prompt", inpaintPrompt);
+    form.append("image", new Blob([imgBuf], { type: "image/png" }), "image.png");
+    form.append("strength", "0.99");
+    form.append("num_steps", "20");
 
     if (maskBase64) {
-      reqBody.mask = toByteArray(maskBase64);
+      const maskBuf = base64ToBuffer(maskBase64);
+      form.append("mask", new Blob([maskBuf], { type: "image/png" }), "mask.png");
     }
 
     const res = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-inpainting`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${CF_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reqBody),
+        headers: { Authorization: `Bearer ${CF_API_TOKEN}` },
+        body: form,
       }
     );
 
