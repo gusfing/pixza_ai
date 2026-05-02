@@ -1,5 +1,8 @@
 /**
  * Cloudflare Workers AI Provider for Generate API Route
+ *
+ * NOTE: Cloudflare REST API requires multipart/form-data for image inputs.
+ * JSON byte arrays and image_b64 are NOT reliably supported across all models.
  */
 import { GenerationInput, GenerationOutput } from "@/lib/providers/types";
 
@@ -13,97 +16,96 @@ export async function generateWithCloudflare(
   const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${modelId}`;
 
   try {
-    // Build request body
-    const body: Record<string, any> = {
-      prompt: input.prompt,
-    };
-
-    // Add optional parameters if they exist
-    // Add optional parameters if they exist
-    if (input.parameters) {
-      if (input.parameters.num_steps !== undefined) body.num_steps = Number(input.parameters.num_steps);
-      if (input.parameters.guidance !== undefined) body.guidance = Number(input.parameters.guidance);
-      if (input.parameters.seed !== undefined && input.parameters.seed !== "") body.seed = Number(input.parameters.seed);
-    }
-
     const hasImage = input.images && input.images.length > 0;
 
-    // Only include strength if we actually have an image (otherwise Cloudflare throws AiError 3043)
-    if (hasImage && input.parameters?.strength !== undefined) {
-      body.strength = Number(input.parameters.strength);
-    }
+    let fetchBody: BodyInit;
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${apiToken}`,
+    };
 
-    // Handle image input for img2img if present
     if (hasImage) {
-      // Cloudflare REST API (which uses Pydantic backend) expects base64 strings for 'bytes' fields
-      const base64Data = input.images![0].split(",").pop() || input.images![0];
-      // The REST API expects 'image_b64' parameter for base64 encoded strings
-      // rather than the 'image' parameter which expects raw arrays in bindings
-      body.image_b64 = base64Data;
+      // Cloudflare REST API requires multipart/form-data for image inputs
+      const form = new FormData();
+      form.append("prompt", input.prompt || "");
+
+      // Convert base64 data URL to binary buffer
+      const base64Raw = input.images![0];
+      const base64Data = base64Raw.includes(",") ? base64Raw.split(",")[1] : base64Raw;
+      const imgBuffer = Buffer.from(base64Data, "base64");
+      form.append("image", new Blob([imgBuffer], { type: "image/png" }), "image.png");
+
+      // Add optional parameters
+      if (input.parameters) {
+        if (input.parameters.num_steps !== undefined) form.append("num_steps", String(Number(input.parameters.num_steps)));
+        if (input.parameters.guidance !== undefined) form.append("guidance", String(Number(input.parameters.guidance)));
+        if (input.parameters.seed !== undefined && input.parameters.seed !== "") form.append("seed", String(Number(input.parameters.seed)));
+        if (input.parameters.strength !== undefined) form.append("strength", String(Number(input.parameters.strength)));
+      }
+
+      fetchBody = form;
+      // Do NOT set Content-Type — browser/Node sets it automatically with boundary for FormData
+    } else {
+      // Text-to-image: use JSON (no image input)
+      const body: Record<string, unknown> = {
+        prompt: input.prompt,
+        num_steps: 4, // default for FLUX Schnell
+      };
+
+      if (input.parameters) {
+        if (input.parameters.num_steps !== undefined) body.num_steps = Number(input.parameters.num_steps);
+        if (input.parameters.guidance !== undefined) body.guidance = Number(input.parameters.guidance);
+        if (input.parameters.seed !== undefined && input.parameters.seed !== "") body.seed = Number(input.parameters.seed);
+      }
+
+      headers["Content-Type"] = "application/json";
+      fetchBody = JSON.stringify(body);
     }
 
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
+      headers,
+      body: fetchBody,
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      return {
-        success: false,
-        error: `Cloudflare API error: ${response.status} - ${errorText}`,
-      };
+      let errorMsg = `Cloudflare API error: ${response.status}`;
+      try {
+        const errJson = JSON.parse(errorText);
+        const cfMsg = errJson?.errors?.[0]?.message;
+        if (cfMsg) errorMsg = `Cloudflare: ${cfMsg}`;
+      } catch { /* use raw text */ }
+      return { success: false, error: errorMsg };
     }
 
-    // Check the response content-type to see if it's a binary image or a JSON object
+    // Check content-type — binary image or JSON wrapper
     const contentTypeResponse = response.headers.get("content-type") || "";
 
     if (contentTypeResponse.includes("image/")) {
-      // Success! Cloudflare returned a raw binary image blob
       const arrayBuffer = await response.arrayBuffer();
       const base64String = Buffer.from(arrayBuffer).toString("base64");
       return {
         success: true,
-        outputs: [
-          {
-            type: "image",
-            data: `data:${contentTypeResponse};base64,${base64String}`,
-          },
-        ],
+        outputs: [{ type: "image", data: `data:${contentTypeResponse};base64,${base64String}` }],
       };
     }
 
-    // Otherwise, expect a JSON response (like an error or a wrapped base64 string)
+    // JSON response
     const result = await response.json();
 
     if (!result.success) {
-      return {
-        success: false,
-        error: `Cloudflare AI Error: ${JSON.stringify(result.errors)}`,
-      };
+      const cfMsg = result.errors?.[0]?.message || JSON.stringify(result.errors);
+      return { success: false, error: `Cloudflare AI Error: ${cfMsg}` };
     }
 
-    // Some models do return the image wrapped inside JSON
     const imageBase64 = result.result?.image;
-
     if (!imageBase64) {
-      return {
-        success: false,
-        error: "No image data in Cloudflare JSON response",
-      };
+      return { success: false, error: "No image data in Cloudflare response" };
     }
+
     return {
       success: true,
-      outputs: [
-        {
-          type: "image",
-          data: `data:image/png;base64,${imageBase64}`,
-        },
-      ],
+      outputs: [{ type: "image", data: `data:image/png;base64,${imageBase64}` }],
     };
   } catch (error) {
     return {
@@ -112,4 +114,3 @@ export async function generateWithCloudflare(
     };
   }
 }
-
