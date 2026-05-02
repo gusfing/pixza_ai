@@ -31,8 +31,9 @@ function ProviderIcon({ provider }: { provider: ProviderType }) {
 
   const tier =
     provider === "cloudflare" ? "standard" :
-    provider === "fal" ? "premium" :
-    provider === "gemini" ? "assistant" : "experimental";
+    provider === "gemini"     ? "assistant" :
+    provider === "wavespeed"  ? "premium" :
+    provider === "kie"        ? "premium" : "experimental";
 
   const color = colors[tier] || colors.standard;
 
@@ -48,12 +49,11 @@ function ProviderIcon({ provider }: { provider: ProviderType }) {
  */
 function getTierDisplayName(provider: ProviderType): string {
   switch (provider) {
-    case "gemini": return "Assistant Engine";
-    case "fal": return "Premium Engine";
+    case "gemini":     return "Assistant Engine";
     case "cloudflare": return "Standard Engine";
-    case "replicate": return "Experimental Pipeline";
-    case "wavespeed": return "Hyper-Speed Engine";
-    default: return "Advanced Engine";
+    case "wavespeed":  return "Hyper-Speed Engine";
+    case "kie":        return "KIE Engine";
+    default:           return "Advanced Engine";
   }
 }
 
@@ -61,18 +61,11 @@ function getTierDisplayName(provider: ProviderType): string {
  * Get model page URL for external providers
  */
 function getModelUrl(provider: ProviderType, modelId: string): string | null {
-  if (provider === "replicate") {
-    // modelId format: "owner/model" or "owner/model:version"
-    const baseModelId = modelId.split(":")[0];
-    return `https://replicate.com/${baseModelId}`;
-  }
-  if (provider === "fal") {
-    // modelId format: "fal-ai/flux/dev" or similar
-    return `https://fal.ai/models/${modelId}`;
-  }
   if (provider === "wavespeed") {
-    // modelId format: "wavespeed-ai/model-name"
     return `https://wavespeed.ai`;
+  }
+  if (provider === "kie") {
+    return `https://kie.ai`;
   }
   return null;
 }

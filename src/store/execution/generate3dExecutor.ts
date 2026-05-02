@@ -69,7 +69,7 @@ export async function executeGenerate3D(
     error: null,
   });
 
-  const provider = nodeData.selectedModel?.provider || "fal";
+  const provider = nodeData.selectedModel?.provider || "cloudflare";
   const headers = buildGenerateHeaders(provider, providerSettings);
 
   const requestPayload = {

@@ -54,7 +54,7 @@ export interface ModelInput {
   isArray?: boolean;
 }
 
-export const PREMIUM_PROVIDERS = ["replicate", "fal", "kie", "wavespeed"];
+export const PREMIUM_PROVIDERS = ["kie", "wavespeed", "gemini"];
 export const PREMIUM_MODELS = [
   "nano-banana-pro",
   "nano-banana-2",
