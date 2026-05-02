@@ -1235,7 +1235,7 @@ export async function GET(
     );
   }
 
-  if (!provider || (provider !== "replicate" && provider !== "fal" && provider !== "kie" && provider !== "wavespeed" && provider !== "gemini" && provider !== "cloudflare")) {
+  if (!provider || (provider !== "wavespeed" && provider !== "gemini" && provider !== "cloudflare")) {
     return NextResponse.json<SchemaErrorResponse>(
       {
         success: false,
@@ -1283,22 +1283,6 @@ export async function GET(
         // Gemini image models don't use schema endpoint (params are built-in)
         result = { parameters: [], inputs: [] };
       }
-    } else if (provider === "replicate") {
-      // User-provided key takes precedence over env variable
-      const apiKey = request.headers.get("X-Replicate-Key") || process.env.REPLICATE_API_KEY;
-      if (!apiKey) {
-        return NextResponse.json<SchemaErrorResponse>(
-          {
-            success: false,
-            error: "Replicate API key required. Add REPLICATE_API_KEY to .env.local or configure in Settings.",
-          },
-          { status: 401 }
-        );
-      }
-      result = await fetchReplicateSchema(decodedModelId, apiKey);
-    } else if (provider === "kie") {
-      // Kie.ai uses hardcoded schemas (no schema discovery API)
-      result = getKieSchema(decodedModelId);
     } else if (provider === "wavespeed") {
       // WaveSpeed uses dynamic schemas from API, with static fallback
       const apiKey = request.headers.get("X-WaveSpeed-Key") || process.env.WAVESPEED_API_KEY || null;

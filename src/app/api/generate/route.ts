@@ -296,7 +296,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Route to appropriate provider
-    if (provider === "replicate") {
+    if (provider === "replicate" || provider === "fal" || provider === "kie") {
+      return NextResponse.json<GenerateResponse>(
+        { success: false, error: `Provider "${provider}" is not available on this platform.` },
+        { status: 400 }
+      );
+    }
+
+    if (false && provider === "replicate") {
       if (!selectedModel?.modelId || !selectedModel?.displayName) {
         return NextResponse.json<GenerateResponse>(
           { success: false, error: "selectedModel with modelId and displayName is required for Replicate" },
@@ -375,7 +382,7 @@ export async function POST(request: NextRequest) {
       return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
     }
 
-    if (provider === "fal") {
+    if (false && provider === "fal") {
       if (!selectedModel?.modelId || !selectedModel?.displayName) {
         return NextResponse.json<GenerateResponse>(
           { success: false, error: "selectedModel with modelId and displayName is required for fal.ai" },
