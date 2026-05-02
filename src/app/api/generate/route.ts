@@ -14,8 +14,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { GenerateRequest, GenerateResponse, ModelType, SelectedModel, ProviderType } from "@/types";
 import { GenerationInput, ModelCapability } from "@/lib/providers/types";
 import { generateWithGemini, generateWithGeminiVideo } from "./providers/gemini";
-import { generateWithReplicate } from "./providers/replicate";
-import { clearFalInputMappingCache as _clearFalInputMappingCache, generateWithFalQueue } from "./providers/fal";
 import { generateWithKie } from "./providers/kie";
 import { generateWithWaveSpeed } from "./providers/wavespeed";
 import { generateWithCloudflare } from "./providers/cloudflare";
@@ -24,9 +22,6 @@ import { db } from "@/lib/db";
 import { freeLimiter, proLimiter, checkRateLimit } from "@/lib/ratelimit";
 import { uploadToStorage, contentTypeForOutput } from "@/lib/storage";
 import { wpGetMe, wpDeductCredits, CREDIT_COSTS } from "@/lib/wordpress";
-// Re-export for backward compatibility (test file imports from route)
-export const clearFalInputMappingCache = _clearFalInputMappingCache;
-
 export const maxDuration = 300; // 5 minute timeout (Vercel hobby plan limit)
 export const dynamic = 'force-dynamic'; // Ensure this route is always dynamic
 
@@ -296,159 +291,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Route to appropriate provider
-    // Note: replicate and fal are disabled — their blocks below use `if (false && ...)` guards
-
-    if (false && provider === "replicate") {
-      if (!selectedModel?.modelId || !selectedModel?.displayName) {
-        return NextResponse.json<GenerateResponse>(
-          { success: false, error: "selectedModel with modelId and displayName is required for Replicate" },
-          { status: 400 }
-        );
-      }
-
-      const replicateApiKey = process.env.REPLICATE_API_KEY;
-      if (!replicateApiKey) {
-        return NextResponse.json<GenerateResponse>(
-          {
-            success: false,
-            error: "Replicate API key not configured. Platform administrator must configure REPLICATE_API_KEY.",
-          },
-          { status: 500 }
-        );
-      }
-
-      // Keep Data URIs as-is since localhost URLs won't work (provider can't reach them)
-      const processedImages: string[] = images ? [...images] : [];
-
-      // Process dynamicInputs: filter empty values, keep Data URIs
-      let processedDynamicInputs: Record<string, string | string[]> | undefined = undefined;
-
-      if (dynamicInputs) {
-        processedDynamicInputs = {};
-        for (const key of Object.keys(dynamicInputs)) {
-          const value = dynamicInputs[key];
-
-          // Skip empty/null/undefined values (arrays pass through)
-          if (value === null || value === undefined || value === '') {
-            continue;
-          }
-
-          // Keep the value as-is (Data URIs work with Replicate)
-          processedDynamicInputs[key] = value;
-        }
-      }
-
-      // Build generation input
-      const genInput: GenerationInput = {
-        model: {
-          id: selectedModel.modelId,
-          name: selectedModel.displayName,
-          provider: "replicate",
-          capabilities: capabilitiesForMediaType(mediaType),
-          description: null,
-        },
-        prompt: prompt || "",
-        images: processedImages,
-        parameters,
-        dynamicInputs: processedDynamicInputs,
-      };
-
-      const result = await generateWithReplicate(requestId, replicateApiKey, genInput);
-
-      if (!result.success) {
-        return NextResponse.json<GenerateResponse>(
-          {
-            success: false,
-            error: result.error || "Generation failed",
-          },
-          { status: 500 }
-        );
-      }
-
-      // Return first output
-      const output = result.outputs?.[0];
-      if (!output?.data && !output?.url) {
-        return NextResponse.json<GenerateResponse>(
-          { success: false, error: "No output in generation result" },
-          { status: 500 }
-        );
-      }
-
-      return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
-    }
-
-    if (false && provider === "fal") {
-      if (!selectedModel?.modelId || !selectedModel?.displayName) {
-        return NextResponse.json<GenerateResponse>(
-          { success: false, error: "selectedModel with modelId and displayName is required for fal.ai" },
-          { status: 400 }
-        );
-      }
-
-      const falApiKey = process.env.FAL_API_KEY || null;
-
-      if (!falApiKey) {
-      }
-
-      // Pass images as-is; generateWithFalQueue uploads base64 to CDN internally
-      const processedImages: string[] = images ? [...images] : [];
-
-      // Process dynamicInputs: filter empty values
-      let processedDynamicInputs: Record<string, string | string[]> | undefined = undefined;
-
-      if (dynamicInputs) {
-        processedDynamicInputs = {};
-        for (const key of Object.keys(dynamicInputs)) {
-          const value = dynamicInputs[key];
-
-          // Skip empty/null/undefined values (arrays pass through)
-          if (value === null || value === undefined || value === '') {
-            continue;
-          }
-
-          // Keep the value as-is; CDN upload happens in generateWithFalQueue
-          processedDynamicInputs[key] = value;
-        }
-      }
-
-      // Build generation input
-      const genInput: GenerationInput = {
-        model: {
-          id: selectedModel.modelId,
-          name: selectedModel.displayName,
-          provider: "fal",
-          capabilities: capabilitiesForMediaType(mediaType),
-          description: null,
-        },
-        prompt: prompt || "",
-        images: processedImages,
-        parameters,
-        dynamicInputs: processedDynamicInputs,
-      };
-
-      const result = await generateWithFalQueue(requestId, falApiKey, genInput);
-
-      if (!result.success) {
-        return NextResponse.json<GenerateResponse>(
-          {
-            success: false,
-            error: result.error || "Generation failed",
-          },
-          { status: 500 }
-        );
-      }
-
-      // Return first output
-      const output = result.outputs?.[0];
-      if (!output?.data && !output?.url) {
-        return NextResponse.json<GenerateResponse>(
-          { success: false, error: "No output in generation result" },
-          { status: 500 }
-        );
-      }
-
-      return buildMediaResponseWithStorage(output, generationId, userId, wpUserId, CREDIT_COSTS[mediaType ?? "image"] ?? 1, mediaType, resolvedModelId, provider);
-    }
 
     if (provider === "kie") {
       if (!selectedModel?.modelId || !selectedModel?.displayName) {
