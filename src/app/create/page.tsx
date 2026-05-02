@@ -43,6 +43,9 @@ const PLAN_LIMITS = {
 const MODELS: Model[] = [
   // ── FREE TIER — Cloudflare AI (zero cost) ──────────────────
   { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-1-schnell",              label: "FLUX Schnell",         tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-2-klein-4b",             label: "FLUX.2 Klein 4B",      tabs: ["Image"], badge: "Fast",    tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-2-klein-9b",             label: "FLUX.2 Klein 9B",      tabs: ["Image"], badge: "New",     tier: "free",   creditCost: 1 },
+  { provider: "cloudflare", modelId: "@cf/black-forest-labs/flux-2-dev",                  label: "FLUX.2 Dev",           tabs: ["Image"],                   tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/stabilityai/stable-diffusion-xl-base-1.0",     label: "SDXL",                 tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/bytedance/stable-diffusion-xl-lightning",      label: "SDXL Lightning",       tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
   { provider: "cloudflare", modelId: "@cf/lykon/dreamshaper-8-lcm",                      label: "DreamShaper",          tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
