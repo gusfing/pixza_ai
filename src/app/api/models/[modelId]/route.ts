@@ -1226,11 +1226,20 @@ export async function GET(
   const decodedModelId = decodeURIComponent(modelId);
   const provider = request.nextUrl.searchParams.get("provider") as ProviderType | null;
 
+  // Block hidden providers
+  const HIDDEN_PROVIDERS = ["fal", "replicate", "kie"];
+  if (provider && HIDDEN_PROVIDERS.includes(provider)) {
+    return NextResponse.json<SchemaErrorResponse>(
+      { success: false, error: `Provider "${provider}" is not available on this platform.` },
+      { status: 400 }
+    );
+  }
+
   if (!provider || (provider !== "replicate" && provider !== "fal" && provider !== "kie" && provider !== "wavespeed" && provider !== "gemini" && provider !== "cloudflare")) {
     return NextResponse.json<SchemaErrorResponse>(
       {
         success: false,
-        error: "Invalid or missing provider. Use ?provider=replicate, ?provider=fal, ?provider=kie, ?provider=wavespeed, ?provider=gemini, or ?provider=cloudflare",
+        error: "Invalid or missing provider. Use ?provider=wavespeed, ?provider=gemini, or ?provider=cloudflare",
       },
       { status: 400 }
     );

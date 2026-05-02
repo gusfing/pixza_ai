@@ -1,47 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { wpGetMe } from "@/lib/wordpress";
-import { freeLimiter, proLimiter, getRateLimitRemaining } from "@/lib/ratelimit";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    let userId = session?.user?.id ?? null;
-    let plan = (session?.user as { plan?: string })?.plan ?? "FREE";
+    // Get user plan from WP token cookie
+    let plan = "FREE";
+    let credits = 0;
+    let creditsLimit = 100;
 
-    if (!userId) {
-      const wpToken = request.cookies.get("pixza_token")?.value;
-      if (wpToken) {
-        try {
-          const me = await wpGetMe(wpToken);
-          if (me) {
-            userId = me.id.toString();
-            plan = me.meta?.plan?.toUpperCase() || "FREE";
-            if (plan === "AGENCY") plan = "PRO";
-          }
-        } catch (e) {
-          // Token expired or invalid
-        }
+    const wpToken = request.cookies.get("pixza_token")?.value;
+    if (wpToken) {
+      try {
+        const me = await wpGetMe(wpToken);
+        plan = (me.meta?.plan ?? "free").toUpperCase();
+        credits = me.meta?.credits ?? 0;
+        creditsLimit = me.meta?.credits_limit ?? 100;
+      } catch {
+        // Token expired or invalid — return defaults
       }
     }
 
-    const identifier = userId ?? (request.headers.get("x-forwarded-for") ?? "anon");
-    const limiter = plan === "PRO" || plan === "AGENCY" ? proLimiter : freeLimiter;
-    const { limit, remaining, reset } = await getRateLimitRemaining(limiter, `gen:${identifier}`);
+    // Map plan to limits
+    const limitMap: Record<string, number> = {
+      FREE: 100,
+      PRO: 3000,
+      AGENCY: 8000,
+    };
+    const limit = limitMap[plan] ?? creditsLimit;
+    const remaining = credits;
 
     return NextResponse.json({
       success: true,
       plan,
       limit,
       remaining,
-      reset,
+      reset: 0,
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: "Failed to fetch quota" },
-      { status: 500 }
-    );
+    // Never crash — return safe defaults
+    return NextResponse.json({
+      success: true,
+      plan: "FREE",
+      limit: 100,
+      remaining: 100,
+      reset: 0,
+    });
   }
 }

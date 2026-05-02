@@ -995,19 +995,26 @@ export async function GET(
     ? (capabilitiesParam.split(",") as ModelCapability[])
     : null;
 
+  // ── Hidden providers — fal, replicate, kie are disabled ──────
+  const HIDDEN_PROVIDERS = ["fal", "replicate", "kie"];
+  if (providerFilter && HIDDEN_PROVIDERS.includes(providerFilter)) {
+    return NextResponse.json<ModelsErrorResponse>(
+      { success: false, error: `Provider "${providerFilter}" is not available on this platform.` },
+      { status: 400 }
+    );
+  }
+
   // Get API keys from env variables ONLY
-  const replicateKey = process.env.REPLICATE_API_KEY || null;
-  const falKey = process.env.FAL_API_KEY || null;
-  const kieKey = process.env.KIE_API_KEY || null;
+  const replicateKey = null; // disabled
+  const falKey = null;       // disabled
+  const kieKey = null;       // disabled
   const wavespeedKey = process.env.WAVESPEED_API_KEY || null;
   const cloudflareKey = process.env.CLOUDFLARE_API_TOKEN || null;
   const cloudflareAccountId = process.env.CLOUDFLARE_ACCOUNT_ID || null;
 
   // Build list of all available providers (have keys from env)
   const availableProviders: string[] = ["gemini"]; // Gemini always available
-  if (falKey) availableProviders.push("fal");
-  if (replicateKey) availableProviders.push("replicate");
-  if (kieKey) availableProviders.push("kie");
+  // fal, replicate, kie are hidden/disabled
   if (wavespeedKey) availableProviders.push("wavespeed");
   if (cloudflareKey && cloudflareAccountId) availableProviders.push("cloudflare");
 
