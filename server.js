@@ -7,7 +7,11 @@ const next = require('next');
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
-const port = process.env.PORT || 3000;
+
+// Support --port CLI flag, PORT env var, or default 3000
+const portArgIndex = process.argv.indexOf('--port');
+const portArg = portArgIndex !== -1 ? parseInt(process.argv[portArgIndex + 1], 10) : null;
+const port = portArg || parseInt(process.env.PORT, 10) || 3000;
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();

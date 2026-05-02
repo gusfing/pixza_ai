@@ -1,35 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, ArrowRight } from "lucide-react";
 import { useWPAuth } from "@/lib/wp-auth-context";
 import { wpUpdateUserMeta } from "@/lib/wordpress";
+import { cn } from "@/lib/utils";
 
 const STEPS = [
-  {
-    id: "welcome",
-    title: "Welcome to Pixza Studio",
-    subtitle: "The AI creative studio for everyone",
-    content: "welcome",
-  },
-  {
-    id: "mode",
-    title: "How do you want to create?",
-    subtitle: "You can always switch later",
-    content: "mode",
-  },
-  {
-    id: "done",
-    title: "You're all set!",
-    subtitle: "Let's make something amazing",
-    content: "done",
-  },
+  { id: "welcome", title: "Welcome to Pixza", subtitle: "The AI creative studio for everyone", content: "welcome" },
+  { id: "mode",    title: "How do you want to create?", subtitle: "You can always switch later", content: "mode" },
+  { id: "done",    title: "You're all set!", subtitle: "Let's make something amazing", content: "done" },
 ];
 
 const MODES = [
-  { id: "simple", icon: "✦", label: "Simple Mode", desc: "One prompt, one output. Perfect for getting started fast.", href: "/create" },
-  { id: "studio", icon: "⬡", label: "Node Studio", desc: "Build complex multi-step AI pipelines visually.", href: "/studio" },
-  { id: "both", icon: "◈", label: "Both", desc: "I'll use both depending on what I need.", href: "/create" },
+  { id: "simple", icon: "✦", label: "Simple Mode",  desc: "One prompt, one output. Perfect for getting started fast." },
+  { id: "studio", icon: "⬡", label: "Node Studio",  desc: "Build complex multi-step AI pipelines visually." },
+  { id: "both",   icon: "◈", label: "Both",          desc: "I'll use both depending on what I need." },
+];
+
+const FEATURES = [
+  { icon: "✦", label: "Gemini + FLUX models",   desc: "Imagen 4, FLUX Dev, Seedance video and more" },
+  { icon: "⬡", label: "Visual node editor",     desc: "Build complex pipelines without code" },
+  { icon: "◈", label: "Simple create mode",     desc: "One prompt, instant results" },
+  { icon: "◉", label: "Community templates",    desc: "Start from proven workflows" },
 ];
 
 export default function OnboardingPage() {
@@ -39,125 +35,131 @@ export default function OnboardingPage() {
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
 
   const current = STEPS[step];
-  const progress = ((step) / (STEPS.length - 1)) * 100;
+  const progress = Math.round((step / (STEPS.length - 1)) * 100);
 
   const handleNext = async () => {
     if (step < STEPS.length - 1) {
       setStep(s => s + 1);
     } else {
-      // Mark onboarding done in WordPress
       if (token) {
-        try {
-          await wpUpdateUserMeta(token, { onboarding_done: true } as any);
-        } catch { /* non-fatal */ }
+        try { await wpUpdateUserMeta(token, { onboarding_done: true } as any); } catch { /* non-fatal */ }
       }
-      const dest = selectedMode === "studio" ? "/studio" : "/create";
-      router.push(dest);
+      router.push(selectedMode === "studio" ? "/studio" : "/create");
     }
   };
 
   const canNext = current.content === "mode" ? !!selectedMode : true;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#040406", color: "#fff", fontFamily: "'Inter', system-ui, sans-serif", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 20px 40px" }}>
-
+    <div className="min-h-screen bg-[#0d1117] text-white font-sans antialiased flex flex-col items-center justify-center px-5 py-20">
       {/* Progress bar */}
-      <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 2, background: "rgba(255,255,255,0.06)" }}>
-        <div style={{ height: "100%", background: "#92dce5", width: `${progress}%`, transition: "width 0.4s ease" }} />
+      <div className="fixed top-0 left-0 right-0 h-0.5 bg-white/5">
+        <div className="h-full bg-violet-500 transition-all duration-500" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Logo */}
-      <div style={{ position: "fixed", top: 20, left: 24, display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg, #92dce5, #d64933)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <img src="/pixza-logo.png" alt="" style={{ width: 14, height: 14 }} />
+      <div className="fixed top-5 left-6 flex items-center gap-2">
+        <div className="w-7 h-7 rounded-lg overflow-hidden">
+          <img src="/pixza-logo.png" alt="" className="w-7 h-7 object-cover" />
         </div>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>Pixza Studio</span>
+        <span className="text-sm font-bold text-white/70">Pixza Studio</span>
       </div>
 
-      {/* Step indicator */}
-      <div style={{ position: "fixed", top: 24, right: 24, fontSize: 12, color: "rgba(255,255,255,0.3)" }}>
+      {/* Step counter */}
+      <div className="fixed top-6 right-6 text-xs text-white/30 font-bold tabular-nums">
         {step + 1} / {STEPS.length}
       </div>
 
       {/* Card */}
-      <div style={{ width: "100%", maxWidth: 560, animation: "fadeIn 0.3s ease" }}>
-        <div style={{ marginBottom: 40, textAlign: "center" }}>
-          <h1 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 10px" }}>{current.title}</h1>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", margin: 0 }}>{current.subtitle}</p>
-        </div>
+      <div className="w-full max-w-md">
+        <AnimatePresence mode="wait">
+          <motion.div key={step}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] as [number,number,number,number] }}
+          >
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-black tracking-tighter text-white mb-2">{current.title}</h1>
+              <p className="text-sm text-white/40">{current.subtitle}</p>
+            </div>
 
-        {/* Welcome */}
-        {current.content === "welcome" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {[
-              { icon: "✦", label: "50+ AI models", desc: "Gemini, FLUX, Kling, Veo and more" },
-              { icon: "⬡", label: "Visual node editor", desc: "Build complex pipelines without code" },
-              { icon: "◈", label: "Simple create mode", desc: "One prompt, instant results" },
-              { icon: "◉", label: "Community templates", desc: "Start from proven workflows" },
-            ].map((f, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(146,220,229,0.1)", border: "1px solid rgba(146,220,229,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#92dce5", flexShrink: 0 }}>{f.icon}</div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{f.label}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{f.desc}</div>
+            {/* Welcome */}
+            {current.content === "welcome" && (
+              <div className="flex flex-col gap-3">
+                {FEATURES.map((f, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/8">
+                    <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 text-base shrink-0">
+                      {f.icon}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">{f.label}</p>
+                      <p className="text-xs text-white/40 mt-0.5">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Mode selection */}
+            {current.content === "mode" && (
+              <div className="flex flex-col gap-3">
+                {MODES.map(m => (
+                  <button key={m.id} onClick={() => setSelectedMode(m.id)}
+                    className={cn(
+                      "flex items-center gap-4 p-4 rounded-2xl border text-left transition-all",
+                      selectedMode === m.id
+                        ? "bg-violet-500/10 border-violet-500/30"
+                        : "bg-white/[0.03] border-white/8 hover:border-white/15"
+                    )}>
+                    <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 transition-all",
+                      selectedMode === m.id ? "bg-violet-500/20 text-violet-400" : "bg-white/5 text-white/40")}>
+                      {m.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={cn("text-sm font-bold transition-colors", selectedMode === m.id ? "text-white" : "text-white/80")}>{m.label}</p>
+                      <p className="text-xs text-white/40 mt-0.5">{m.desc}</p>
+                    </div>
+                    {selectedMode === m.id && (
+                      <div className="w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Done */}
+            {current.content === "done" && (
+              <div className="text-center">
+                <div className="text-6xl mb-6">🎉</div>
+                <p className="text-sm text-white/50 leading-relaxed max-w-xs mx-auto mb-8">
+                  Your workspace is ready. Start with a simple prompt or explore the node canvas.
+                </p>
+                <div className="flex gap-3 justify-center flex-wrap">
+                  {[
+                    { label: "Simple Mode", href: "/create" },
+                    { label: "Node Studio", href: "/studio" },
+                    { label: "Examples",    href: "/examples" },
+                  ].map(l => (
+                    <Link key={l.label} href={l.href}
+                      className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm hover:text-white hover:border-white/20 transition-all">
+                      {l.label}
+                    </Link>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Mode selection */}
-        {current.content === "mode" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {MODES.map(m => (
-              <button
-                key={m.id}
-                onClick={() => setSelectedMode(m.id)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 16,
-                  padding: "18px 20px", borderRadius: 14, border: "none", cursor: "pointer", textAlign: "left",
-                  background: selectedMode === m.id ? "rgba(146,220,229,0.08)" : "rgba(255,255,255,0.03)",
-                  outline: selectedMode === m.id ? "2px solid rgba(146,220,229,0.4)" : "1px solid rgba(255,255,255,0.07)",
-                  transition: "all 0.15s",
-                }}
-              >
-                <div style={{ width: 44, height: 44, borderRadius: 11, background: selectedMode === m.id ? "rgba(146,220,229,0.15)" : "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: selectedMode === m.id ? "#92dce5" : "rgba(255,255,255,0.4)", flexShrink: 0, transition: "all 0.15s" }}>{m.icon}</div>
-                <div>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: selectedMode === m.id ? "#fff" : "rgba(255,255,255,0.8)", marginBottom: 3 }}>{m.label}</div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>{m.desc}</div>
-                </div>
-                {selectedMode === m.id && (
-                  <div style={{ marginLeft: "auto", width: 20, height: 20, borderRadius: "50%", background: "#92dce5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#080808" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Done */}
-        {current.content === "done" && (
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 72, marginBottom: 24 }}>🎉</div>
-            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 400, margin: "0 auto 32px" }}>
-              Your workspace is ready. Start with a simple prompt or explore the node canvas — the choice is yours.
-            </p>
-            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="/create" style={{ padding: "10px 22px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", fontSize: 14, textDecoration: "none" }}>Simple Mode</a>
-              <a href="/studio" style={{ padding: "10px 22px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", fontSize: 14, textDecoration: "none" }}>Node Studio</a>
-              <a href="/examples" style={{ padding: "10px 22px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", fontSize: 14, textDecoration: "none" }}>Browse Examples</a>
-            </div>
-          </div>
-        )}
+            )}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Navigation */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 32 }}>
+        <div className="flex items-center justify-between mt-8">
           <button
             onClick={() => step > 0 ? setStep(s => s - 1) : router.push("/landing")}
-            style={{ padding: "10px 20px", borderRadius: 10, background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)", fontSize: 14, cursor: "pointer", transition: "all 0.15s" }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#fff"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.2)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.4)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)"; }}
+            className="px-4 py-2.5 rounded-xl border border-white/10 text-white/40 text-sm font-bold hover:text-white hover:border-white/20 transition-all"
           >
             {step === 0 ? "← Back" : "← Previous"}
           </button>
@@ -165,20 +167,16 @@ export default function OnboardingPage() {
           <button
             onClick={handleNext}
             disabled={!canNext}
-            style={{
-              padding: "10px 28px", borderRadius: 10, border: "none",
-              background: canNext ? "#92dce5" : "rgba(255,255,255,0.08)",
-              color: canNext ? "#080808" : "rgba(255,255,255,0.2)",
-              fontSize: 14, fontWeight: 600, cursor: canNext ? "pointer" : "not-allowed",
-              transition: "all 0.15s",
-            }}
+            className={cn(
+              "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all",
+              canNext ? "bg-white text-black hover:bg-white/90" : "bg-white/8 text-white/20 cursor-not-allowed"
+            )}
           >
-            {step === STEPS.length - 1 ? "Go to Studio →" : "Continue →"}
+            {step === STEPS.length - 1 ? "Go to Studio" : "Continue"}
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
-
-      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
     </div>
   );
 }

@@ -11,13 +11,12 @@ import { ProviderType, ProviderSettings, LLMProvider } from "@/types";
  * Header name mapping for each provider
  */
 const PROVIDER_HEADER_MAP: Record<ProviderType, string> = {
-  gemini: "X-Gemini-API-Key",
-  replicate: "X-Replicate-API-Key",
-  fal: "X-Fal-API-Key",
-  kie: "X-Kie-Key",
-  wavespeed: "X-WaveSpeed-Key",
-  openai: "X-OpenAI-API-Key",
-  anthropic: "X-Anthropic-API-Key",
+  gemini:     "X-Gemini-API-Key",
+  fal:        "X-Fal-API-Key",
+  kie:        "X-Kie-Key",
+  wavespeed:  "X-WaveSpeed-Key",
+  openai:     "X-OpenAI-API-Key",
+  anthropic:  "X-Anthropic-API-Key",
   cloudflare: "X-Cloudflare-Key",
 };
 
