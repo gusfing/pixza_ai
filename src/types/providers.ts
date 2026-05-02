@@ -36,7 +36,7 @@ export interface ProviderSettings {
 }
 
 // LLM Provider Options
-export type LLMProvider = "google" | "openai" | "anthropic";
+export type LLMProvider = "google" | "openai" | "anthropic" | "cloudflare";
 
 // LLM Model Options
 export type LLMModelType =
@@ -48,7 +48,16 @@ export type LLMModelType =
   | "gpt-4.1-nano"
   | "claude-opus-4.6"
   | "claude-sonnet-4.5"
-  | "claude-haiku-4.5";
+  | "claude-haiku-4.5"
+  // Cloudflare free LLMs
+  | "llama-3.3-70b-fast"
+  | "llama-3.1-8b"
+  | "qwq-32b"
+  | "kimi-k2.6"
+  | "gemma-4-26b"
+  | "llama-4-scout"
+  | "mistral-small-3.1"
+  | "deepseek-r1-32b";
 
 // Recently used models tracking
 export interface RecentModel {

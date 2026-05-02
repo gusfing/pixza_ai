@@ -29,6 +29,18 @@ const ANTHROPIC_MODEL_MAP: Record<string, string> = {
   "claude-opus-4.6": "claude-opus-4-6",
 };
 
+// Cloudflare Workers AI — free LLM models
+const CLOUDFLARE_MODEL_MAP: Record<string, string> = {
+  "llama-3.3-70b-fast":    "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "llama-3.1-8b":          "@cf/meta/llama-3.1-8b-instruct",
+  "qwq-32b":               "@cf/qwen/qwq-32b",
+  "kimi-k2.6":             "@cf/moonshot-ai/kimi-k2.6",
+  "gemma-4-26b":           "@cf/google/gemma-4-26b-a4b-it",
+  "llama-4-scout":         "@cf/meta/llama-4-scout-17b-16e-instruct",
+  "mistral-small-3.1":     "@cf/mistralai/mistral-small-3.1-24b-instruct",
+  "deepseek-r1-32b":       "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+};
+
 async function generateWithGoogle(
   prompt: string,
   model: LLMModelType,
@@ -289,6 +301,46 @@ async function generateWithAnthropic(
   return text;
 }
 
+async function generateWithCloudflare(
+  prompt: string,
+  model: string,
+  temperature: number,
+  maxTokens: number,
+  requestId?: string,
+): Promise<string> {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const apiToken  = process.env.CLOUDFLARE_API_TOKEN;
+  if (!accountId || !apiToken) {
+    throw new Error("Cloudflare credentials not configured (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN).");
+  }
+
+  const modelId = CLOUDFLARE_MODEL_MAP[model] || model;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${modelId}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      messages: [{ role: "user", content: prompt }],
+      temperature,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({})) as any;
+    throw new Error(err?.errors?.[0]?.message || `Cloudflare LLM error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.result?.response || data.result?.content || "";
+  if (!text) throw new Error("No text in Cloudflare LLM response");
+  return text;
+}
+
 export async function POST(request: NextRequest) {
   const requestId = generateRequestId();
 
@@ -342,6 +394,8 @@ export async function POST(request: NextRequest) {
       text = await generateWithOpenAI(prompt, model, temperature, maxTokens, images, requestId, openaiApiKey);
     } else if (provider === "anthropic") {
       text = await generateWithAnthropic(prompt, model, temperature, maxTokens, images, requestId, anthropicApiKey);
+    } else if (provider === "cloudflare") {
+      text = await generateWithCloudflare(prompt, model, temperature, maxTokens, requestId);
     } else {
       logger.warn('api.llm', 'Unknown provider requested', { requestId, provider });
       return NextResponse.json<LLMGenerateResponse>(
