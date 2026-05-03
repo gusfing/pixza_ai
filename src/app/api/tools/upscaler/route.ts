@@ -1,11 +1,15 @@
+/**
+ * Image Upscaler / Enhancer API
+ * Uses FLUX.2 Dev to enhance and sharpen images
+ */
 import { NextRequest, NextResponse } from "next/server";
 
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
 
-function toUint8Array(base64: string): number[] {
+function base64ToBuffer(base64: string): Buffer {
   const clean = base64.includes(",") ? base64.split(",")[1] : base64;
-  return Array.from(new Uint8Array(Buffer.from(clean, "base64")));
+  return Buffer.from(clean, "base64");
 }
 
 export async function POST(req: NextRequest) {
@@ -21,25 +25,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
   }
   try {
+    const imgBuf = base64ToBuffer(imageBase64);
+    const form = new FormData();
+    form.append("prompt", "enhance this image: increase sharpness, improve clarity, boost detail, professional quality, 4k resolution, maintain original composition and colors");
+    form.append("input_image_0", new Blob([imgBuf], { type: "image/png" }), "image.png");
+    form.append("width", "1024");
+    form.append("height", "1024");
+    form.append("steps", "20");
+
     const res = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`,
+      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-2-dev`,
       {
         method: "POST",
-        headers: { Authorization: `Bearer ${CF_API_TOKEN}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: "high resolution, sharp details, 4k, professional quality, enhanced clarity",
-          image: toUint8Array(imageBase64),
-          strength: 0.15,
-          num_steps: 20,
-        }),
+        headers: { Authorization: `Bearer ${CF_API_TOKEN}` },
+        body: form,
       }
     );
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({})) as any;
       throw new Error(err?.errors?.[0]?.message || `CF error ${res.status}`);
     }
-    const buf = await res.arrayBuffer();
-    return NextResponse.json({ result: `data:image/png;base64,${Buffer.from(buf).toString("base64")}` });
+
+    const data = await res.json();
+    const imageB64 = data?.result?.image;
+    if (!imageB64) throw new Error("No image in response");
+
+    return NextResponse.json({ result: `data:image/png;base64,${imageB64}` });
   } catch (err) {
     console.error("[upscaler]", err);
     return NextResponse.json({ error: err instanceof Error ? err.message : "Failed" }, { status: 500 });

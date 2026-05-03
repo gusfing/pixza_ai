@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toast } from "@/components/Toast";
 import { SessionProvider } from "@/components/SessionProvider";
 import { WPAuthProvider } from "@/lib/wp-auth-context";
+import { PromoPopup } from "@/components/ui/promo-popup";
+import { LowCreditsPopup } from "@/components/ui/low-credits-popup";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -37,6 +39,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SessionProvider>
             {children}
             <Toast />
+            <PromoPopup />
+            <LowCreditsPopup />
           </SessionProvider>
         </WPAuthProvider>
       </body>
