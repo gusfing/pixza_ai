@@ -27,9 +27,9 @@ function base64ToUint8Array(base64: string): number[] {
   return Array.from(new Uint8Array(Buffer.from(clean, "base64")));
 }
 
-function base64ToBuffer(base64: string): Buffer {
+function base64ToBytes(base64: string): Uint8Array {
   const clean = base64.includes(",") ? base64.split(",")[1] : base64;
-  return Buffer.from(clean, "base64");
+  return new Uint8Array(Buffer.from(clean, "base64"));
 }
 
 export async function generateWithCloudflare(
@@ -66,8 +66,8 @@ export async function generateWithCloudflare(
         // FLUX.2 Dev supports up to 4 reference images: input_image_0..3
         const images = input.images!.slice(0, 4);
         images.forEach((img, i) => {
-          const buf = base64ToBuffer(img);
-          form.append(`input_image_${i}`, new Blob([buf], { type: "image/png" }), `image_${i}.png`);
+          const bytes = base64ToBytes(img);
+          form.append(`input_image_${i}`, new Blob([bytes], { type: "image/png" }), `image_${i}.png`);
         });
         if (input.parameters?.strength !== undefined) form.append("strength", String(Number(input.parameters.strength)));
       }

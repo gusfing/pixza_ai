@@ -7,12 +7,12 @@ import { NextRequest, NextResponse } from "next/server";
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
 
-function base64ToBuffer(base64: string): Buffer {
+function base64ToBytes(base64: string): Uint8Array {
   const clean = base64.includes(",") ? base64.split(",")[1] : base64;
-  return Buffer.from(clean, "base64");
+  return new Uint8Array(Buffer.from(clean, "base64"));
 }
 
-async function flux2Dev(imageBuffer: Buffer, prompt: string): Promise<string> {
+async function flux2Dev(imageBuffer: Uint8Array, prompt: string): Promise<string> {
   const form = new FormData();
   form.append("prompt", prompt);
   form.append("input_image_0", new Blob([imageBuffer], { type: "image/png" }), "image.png");
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
   }
   try {
-    const imgBuf = base64ToBuffer(imageBase64);
+    const imgBuf = base64ToBytes(imageBase64);
 
     if (mode === "remove-only") {
       // White background removal
