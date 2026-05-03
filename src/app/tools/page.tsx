@@ -6,6 +6,16 @@ import { cn } from "@/lib/utils";
 
 const TOOLS = [
   {
+    href: "/tools/magic-eraser",
+    icon: Eraser,
+    title: "Magic Eraser",
+    desc: "Paint over anything to remove it. AI fills the area seamlessly.",
+    badge: "Free",
+    badgeColor: "text-green-400 bg-green-500/10 border-green-500/20",
+    accent: "from-rose-500/10 to-transparent",
+    popular: false,
+  },
+  {
     href: "/tools/background-remover",
     icon: Scissors,
     title: "Background Remover",

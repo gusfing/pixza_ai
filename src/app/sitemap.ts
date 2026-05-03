@@ -70,6 +70,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.85,
     },
+    {
+      url: `${base}/tools/magic-eraser`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
 
     // ── Batch ──────────────────────────────────────────────────
     {
