@@ -1,9 +1,17 @@
+/**
+ * Image Upscaler / Enhancer
+ * Uses SD img2img with low strength to enhance sharpness
+ */
 import { NextRequest, NextResponse } from "next/server";
-import { base64ToNodeBuffer, cfFlux2 } from "@/lib/cf-multipart";
+import { cfJson } from "@/lib/cf-multipart";
 
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
-const FLUX2_DEV = "@cf/black-forest-labs/flux-2-dev";
+
+function toUint8Array(base64: string): number[] {
+  const clean = base64.includes(",") ? base64.split(",")[1] : base64;
+  return Array.from(new Uint8Array(Buffer.from(clean, "base64")));
+}
 
 export async function POST(req: NextRequest) {
   if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
@@ -18,18 +26,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
   }
   try {
-    const res = await cfFlux2(CF_ACCOUNT_ID, CF_API_TOKEN, FLUX2_DEV,
-      { prompt: "enhance this image: increase sharpness, improve clarity, boost detail, professional quality, 4k resolution, maintain original composition and colors", width: "1024", height: "1024", steps: "20" },
-      [{ fieldName: "input_image_0", buf: base64ToNodeBuffer(imageBase64), filename: "image.png" }]
+    const res = await cfJson(CF_ACCOUNT_ID, CF_API_TOKEN,
+      "@cf/runwayml/stable-diffusion-v1-5-img2img",
+      {
+        prompt: "high resolution, sharp details, 4k, professional quality, enhanced clarity, crisp textures",
+        image: toUint8Array(imageBase64),
+        strength: 0.2,
+        num_steps: 20,
+        guidance: 7.5,
+      }
     );
     if (!res.ok) {
       const err = await res.json().catch(() => ({})) as any;
       throw new Error(err?.errors?.[0]?.message || `CF error ${res.status}`);
     }
-    const data = await res.json();
-    const imageB64 = data?.result?.image;
-    if (!imageB64) throw new Error("No image in response");
-    return NextResponse.json({ result: `data:image/png;base64,${imageB64}` });
+    const buf = await res.arrayBuffer();
+    return NextResponse.json({ result: `data:image/png;base64,${Buffer.from(buf).toString("base64")}` });
   } catch (err) {
     console.error("[upscaler]", err);
     return NextResponse.json({ error: err instanceof Error ? err.message : "Failed" }, { status: 500 });
