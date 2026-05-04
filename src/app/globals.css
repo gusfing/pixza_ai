@@ -2,11 +2,45 @@
 
 @theme {
   --color-canvas-bg: #0d1117;
+
+  /* Override neutral palette to use standard gray values (fixes lab(0 0 0) issue) */
+  --color-neutral-50:  #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
 }
 
 :root {
   --background: #0d1117;
   --foreground: #e6edf3;
+
+  /* shadcn/ui CSS variables */
+  --card: #161b22;
+  --card-foreground: #e6edf3;
+  --popover: #161b22;
+  --popover-foreground: #e6edf3;
+  --primary: #7c6af7;
+  --primary-foreground: #ffffff;
+  --secondary: #21262d;
+  --secondary-foreground: #e6edf3;
+  --muted: #21262d;
+  --muted-foreground: rgba(255,255,255,0.5);
+  --accent: #21262d;
+  --accent-foreground: #e6edf3;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255,255,255,0.08);
+  --input: rgba(255,255,255,0.08);
+  --ring: #7c6af7;
+  --radius: 0.5rem;
+
   /* Handle colors */
   --handle-color-image: #10b981;
   --handle-color-text: #3b82f6;
@@ -18,7 +52,7 @@
 html {
   overflow-x: hidden;
   overscroll-behavior-x: none;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
