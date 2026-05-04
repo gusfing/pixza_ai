@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
           strength: 0.99,
           num_steps: 20,
           guidance: 7.5,
+          disable_safety_checker: true,
         }),
       }
     );

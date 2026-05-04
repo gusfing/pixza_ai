@@ -31,8 +31,10 @@ export async function POST(req: NextRequest) {
       {
         prompt: "high resolution, sharp details, 4k, professional quality, enhanced clarity, crisp textures",
         image: toUint8Array(imageBase64),
-        strength: 0.2,
+        disable_safety_checker: true,
+        strength: 0.99,
         num_steps: 20,
+        disable_safety_checker: true,
         guidance: 7.5,
       }
     );

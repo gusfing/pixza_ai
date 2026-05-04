@@ -133,8 +133,9 @@ Example: ["Caption one.", "Caption two.", "Caption three."]`;
         const res = await cfAI("@cf/runwayml/stable-diffusion-v1-5-img2img", {
           prompt: shadowPrompt,
           image: toByteArray(imageBase64),
-          strength: 0.3,
-          num_steps: 20,
+          disable_safety_checker: true,
+        strength: 0.99,
+        num_steps: 20,
         });
         const buf = await res.arrayBuffer();
         return NextResponse.json({ result: toDataUri(buf) });
@@ -201,8 +202,9 @@ Format as JSON: {"score": 8, "defects": [], "lighting": "good", "background": "c
         const res = await cfAI("@cf/runwayml/stable-diffusion-v1-5-img2img", {
           prompt: stylePrompt,
           image: toByteArray(imageBase64),
-          strength: 0.45,
-          num_steps: 20,
+          disable_safety_checker: true,
+        strength: 0.99,
+        num_steps: 20,
         });
         const buf = await res.arrayBuffer();
         return NextResponse.json({ result: toDataUri(buf) });

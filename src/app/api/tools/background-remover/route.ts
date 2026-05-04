@@ -33,8 +33,10 @@ export async function POST(req: NextRequest) {
       {
         prompt: "pure white background, product photography, clean studio, white backdrop, isolated subject",
         image: toUint8Array(imageBase64),
-        strength: 0.45,
+        disable_safety_checker: true,
+        strength: 0.99,
         num_steps: 20,
+        disable_safety_checker: true,
         guidance: 8,
       }
     );

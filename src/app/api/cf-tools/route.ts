@@ -63,8 +63,9 @@ export async function POST(req: NextRequest) {
         const res = await cfAI("@cf/runwayml/stable-diffusion-v1-5-img2img", {
           prompt,
           image: Array.from(Buffer.from(base64, "base64")),
-          strength: 0.75,
-          num_steps: 20,
+          disable_safety_checker: true,
+        strength: 0.99,
+        num_steps: 20,
         });
         // Returns image bytes
         const buffer = await res.arrayBuffer();

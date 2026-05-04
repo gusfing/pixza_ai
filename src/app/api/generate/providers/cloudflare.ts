@@ -79,6 +79,7 @@ export async function generateWithCloudflare(
         image: Array.from(new Uint8Array(base64ToNodeBuffer(input.images![0]))),
         num_steps: 20,
         strength: 0.75,
+        disable_safety_checker: true,
       };
       if (input.parameters) {
         if (input.parameters.num_steps !== undefined) body.num_steps = Number(input.parameters.num_steps);
