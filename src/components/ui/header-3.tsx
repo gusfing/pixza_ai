@@ -55,7 +55,7 @@ export function Header() {
     >
       <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6">
         {/* Logo — left */}
-        <Link href="/landing" className="flex items-center gap-2.5 group shrink-0">
+        <Link href="/" className="flex items-center gap-2.5 group shrink-0">
           <div className="w-8 h-8 rounded-lg overflow-hidden transition-transform group-hover:scale-105">
             <img src="/pixza-logo.png" alt="Pixza" className="w-8 h-8 object-cover" />
           </div>

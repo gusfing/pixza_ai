@@ -103,7 +103,7 @@ export default function ToolsPage() {
       {/* Header */}
       <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 sticky top-0 bg-[#0d1117]/90 backdrop-blur-xl z-50">
         <div className="flex items-center gap-3">
-          <Link href="/landing" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <img src="/pixza-logo.png" alt="" className="w-6 h-6 rounded-lg object-contain" />
             <span className="text-sm font-bold text-white">Pixza Studio</span>
           </Link>

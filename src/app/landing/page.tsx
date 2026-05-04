@@ -379,7 +379,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-12 mb-16">
           <div className="col-span-2">
-            <Link href="/landing" className="flex items-center gap-2.5 mb-5">
+            <Link href="/" className="flex items-center gap-2.5 mb-5">
               <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center">
                 <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert" />
               </div>

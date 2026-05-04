@@ -120,7 +120,7 @@ export default function BlogPage() {
     <div className="min-h-screen bg-[#0d1117] text-white font-sans antialiased">
       {/* Header */}
       <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 sticky top-0 bg-[#0d1117]/90 backdrop-blur-xl z-50">
-        <Link href="/landing" className="flex items-center gap-2 no-underline">
+        <Link href="/" className="flex items-center gap-2 no-underline">
           <img src="/pixza-logo.png" alt="" className="w-6 h-6 rounded-lg object-contain" />
           <span className="text-sm font-bold text-white">Pixza Studio</span>
         </Link>

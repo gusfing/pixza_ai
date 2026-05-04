@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   async redirects() {
     return [
+      { source: "/landing", destination: "/", permanent: true },
       { source: "/auth/login", destination: "/auth/signin", permanent: true },
       { source: "/login", destination: "/auth/signin", permanent: true },
       { source: "/signup", destination: "/auth/signup", permanent: true },

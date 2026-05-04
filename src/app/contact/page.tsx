@@ -49,7 +49,7 @@ export default function ContactPage() {
     <main className="min-h-screen bg-[#0d1117] selection:bg-white selection:text-black py-32 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Back Link */}
-        <Link href="/landing" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors mb-20 group">
+        <Link href="/" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors mb-20 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-bold uppercase tracking-widest">Back to Studio</span>
         </Link>
