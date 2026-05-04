@@ -111,7 +111,7 @@ export function ModelSearchDialog({
     trackModelUsage,
   } = useWorkflowStore();
   // Use stable selector for API keys to prevent unnecessary re-fetches
-  const { replicateApiKey, falApiKey, kieApiKey, wavespeedApiKey } = useProviderApiKeys();
+  const { falApiKey, kieApiKey, wavespeedApiKey } = useProviderApiKeys();
   const { screenToFlowPosition } = useReactFlow();
 
   // State
@@ -242,7 +242,7 @@ export function ModelSearchDialog({
         setIsLoading(false);
       }
     }
-  }, [debouncedSearch, providerFilter, capabilityFilter, replicateApiKey, falApiKey, kieApiKey, wavespeedApiKey]);
+  }, [debouncedSearch, providerFilter, capabilityFilter, falApiKey, kieApiKey, wavespeedApiKey]);
 
   // Fetch models when filters change
   useEffect(() => {
@@ -356,46 +356,29 @@ export function ModelSearchDialog({
   // Get provider badge color
   const getProviderBadgeColor = (provider: ProviderType) => {
     switch (provider) {
-      case "gemini":
-        return "bg-green-500/20 text-green-300";
-      case "replicate":
-        return "bg-blue-500/20 text-blue-300";
-      case "fal":
-        return "bg-yellow-500/20 text-yellow-300";
-      case "kie":
-        return "bg-orange-500/20 text-orange-300";
-      case "wavespeed":
-        return "bg-purple-500/20 text-purple-300";
-      default:
-        return "bg-neutral-500/20 text-neutral-300";
+      case "gemini":     return "bg-green-500/20 text-green-300";
+      case "kie":        return "bg-orange-500/20 text-orange-300";
+      case "wavespeed":  return "bg-purple-500/20 text-purple-300";
+      case "cloudflare": return "bg-neutral-500/20 text-neutral-300";
+      default:           return "bg-neutral-500/20 text-neutral-300";
     }
   };
 
   // Get provider display name
   const getProviderDisplayName = (provider: ProviderType) => {
     switch (provider) {
-      case "gemini":
-        return "Assistant Engine";
-      case "replicate":
-        return "Experimental Engine";
-      case "fal":
-        return "Premium Engine";
-      case "kie":
-        return "Advanced Pipeline";
-      case "wavespeed":
-        return "Hyper-Speed Engine";
-      case "cloudflare":
-        return "Standard Engine";
-      default:
-        return provider;
+      case "gemini":     return "Assistant Engine";
+      case "kie":        return "KIE Engine";
+      case "wavespeed":  return "Hyper-Speed Engine";
+      case "cloudflare": return "Standard Engine";
+      default:           return provider;
     }
   };
 
   // Compute which providers are available based on client API keys + server env vars
   const availableProviders = useMemo(() => {
-    const providers = new Set<ProviderType>(["gemini", "fal"]); // Always available
+    const providers = new Set<ProviderType>(["gemini", "cloudflare"]); // Always available
     // Client-side keys (from localStorage/provider settings)
-    if (replicateApiKey) providers.add("replicate");
     if (kieApiKey) providers.add("kie");
     if (wavespeedApiKey) providers.add("wavespeed");
     // Server-side keys (from env vars, reported by /api/models)
@@ -403,7 +386,7 @@ export function ModelSearchDialog({
       providers.add(p as ProviderType);
     }
     return providers;
-  }, [replicateApiKey, kieApiKey, wavespeedApiKey, serverAvailableProviders]);
+  }, [kieApiKey, wavespeedApiKey, serverAvailableProviders]);
 
   // Reset provider filter if current selection becomes unavailable
   useEffect(() => {
@@ -466,14 +449,9 @@ export function ModelSearchDialog({
   const getModelUrl = (model: ProviderModel): string | null => {
     if (model.pageUrl) return model.pageUrl;
     switch (model.provider) {
-      case "replicate":
-        return `https://replicate.com/${model.id}`;
-      case "fal":
-        return `https://fal.ai/models/${model.id}`;
-      case "wavespeed":
-        return `https://wavespeed.ai`;
-      default:
-        return null;
+      case "wavespeed": return `https://wavespeed.ai`;
+      case "kie":       return `https://kie.ai`;
+      default:          return null;
     }
   };
 
@@ -647,12 +625,12 @@ export function ModelSearchDialog({
                   <PremiumIcon />
                 </button>
               )}
-              {(availableProviders.has("replicate") || availableProviders.has("kie") || availableProviders.has("wavespeed")) && (
+              {(availableProviders.has("kie") || availableProviders.has("wavespeed")) && (
                 <button
-                  onClick={() => setProviderFilter(availableProviders.has("replicate") ? "replicate" : availableProviders.has("kie") ? "kie" : "wavespeed" as any)}
+                  onClick={() => setProviderFilter(availableProviders.has("kie") ? "kie" : "wavespeed")}
                   title="Advanced Pipelines"
                   className={`p-2 rounded transition-colors ${
-                    (providerFilter === "replicate" || providerFilter === "kie" || providerFilter === "wavespeed")
+                    (providerFilter === "kie" || providerFilter === "wavespeed")
                       ? "bg-amber-500/20 text-amber-300"
                       : "text-neutral-400 hover:text-amber-300 hover:bg-neutral-700"
                   }`}

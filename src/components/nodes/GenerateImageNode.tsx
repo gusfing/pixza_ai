@@ -59,7 +59,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
   const updateNodeData = useWorkflowStore((state) => state.updateNodeData);
   const generationsPath = useWorkflowStore((state) => state.generationsPath);
   // Use stable selector for API keys to prevent unnecessary re-fetches
-  const { replicateApiKey, falApiKey, kieApiKey, replicateEnabled, kieEnabled } = useProviderApiKeys();
+  const { falApiKey, kieApiKey, kieEnabled } = useProviderApiKeys();
   const [isLoadingCarouselImage, setIsLoadingCarouselImage] = useState(false);
   const [externalModels, setExternalModels] = useState<ProviderModel[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
@@ -85,16 +85,12 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
     providers.push({ id: "gemini", name: "Gemini" });
     // fal.ai is always available (works without key but rate limited)
     providers.push({ id: "fal", name: "fal.ai" });
-    // Add Replicate if configured
-    if (replicateEnabled && replicateApiKey) {
-      providers.push({ id: "replicate", name: "Replicate" });
-    }
     // Add Kie.ai if configured
     if (kieEnabled && kieApiKey) {
       providers.push({ id: "kie", name: "Kie.ai" });
     }
     return providers;
-  }, [replicateEnabled, replicateApiKey, kieEnabled, kieApiKey]);
+  }, [kieEnabled, kieApiKey]);
 
   // Migrate legacy data: derive selectedModel from model field if missing
   useEffect(() => {
@@ -131,11 +127,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
         const errorData = await response.json().catch(() => ({}));
         const errorMsg = errorData.error || `Failed to load models (${response.status})`;
         setExternalModels([]);
-        setModelsFetchError(
-          currentProvider === "replicate" && response.status === 401
-            ? "Invalid Replicate API key. Check your settings."
-            : errorMsg
-        );
+        setModelsFetchError(errorMsg);
       }
     } catch (error) {
       setExternalModels([]);
@@ -143,7 +135,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
     } finally {
       setIsLoadingModels(false);
     }
-  }, [currentProvider, replicateApiKey, falApiKey, kieApiKey]);
+  }, [currentProvider, falApiKey, kieApiKey]);
 
   useEffect(() => {
     fetchModels();

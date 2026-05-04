@@ -7,12 +7,12 @@ import { NextRequest, NextResponse } from "next/server";
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
 
-function base64ToBytes(base64: string): Uint8Array {
+function base64ToBytes(base64: string): ArrayBuffer {
   const clean = base64.includes(",") ? base64.split(",")[1] : base64;
-  return new Uint8Array(Buffer.from(clean, "base64"));
+  return Buffer.from(clean, "base64").buffer as ArrayBuffer;
 }
 
-async function flux2Dev(imageBuffer: Uint8Array, prompt: string): Promise<string> {
+async function flux2Dev(imageBuffer: ArrayBuffer, prompt: string): Promise<string> {
   const form = new FormData();
   form.append("prompt", prompt);
   form.append("input_image_0", new Blob([imageBuffer], { type: "image/png" }), "image.png");

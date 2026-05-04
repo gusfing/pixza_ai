@@ -47,7 +47,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
   const nodeData = data;
   const updateNodeData = useWorkflowStore((state) => state.updateNodeData);
   // Use stable selector for API keys to prevent unnecessary re-fetches
-  const { geminiApiKey, replicateApiKey, falApiKey, kieApiKey, replicateEnabled, kieEnabled } = useProviderApiKeys();
+  const { geminiApiKey, falApiKey, kieApiKey, kieEnabled } = useProviderApiKeys();
   const generationsPath = useWorkflowStore((state) => state.generationsPath);
   const [externalModels, setExternalModels] = useState<ProviderModel[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
@@ -77,16 +77,12 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
     }
     // fal.ai is always available (works without key but rate limited)
     providers.push({ id: "fal", name: "fal.ai" });
-    // Add Replicate if configured
-    if (replicateEnabled && replicateApiKey) {
-      providers.push({ id: "replicate", name: "Replicate" });
-    }
     // Add Kie.ai if configured
     if (kieEnabled && kieApiKey) {
       providers.push({ id: "kie", name: "Kie.ai" });
     }
     return providers;
-  }, [geminiApiKey, replicateEnabled, replicateApiKey, kieEnabled, kieApiKey]);
+  }, [geminiApiKey, kieEnabled, kieApiKey]);
 
   // Fetch models from external providers when provider changes
   const fetchModels = useCallback(async () => {
@@ -104,11 +100,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
         const errorData = await response.json().catch(() => ({}));
         const errorMsg = errorData.error || `Failed to load models (${response.status})`;
         setExternalModels([]);
-        setModelsFetchError(
-          currentProvider === "replicate" && response.status === 401
-            ? "Invalid Replicate API key. Check your settings."
-            : errorMsg
-        );
+        setModelsFetchError(errorMsg);
       }
     } catch (error) {
       setExternalModels([]);
@@ -116,7 +108,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps<GenerateVide
     } finally {
       setIsLoadingModels(false);
     }
-  }, [currentProvider, geminiApiKey, replicateApiKey, falApiKey, kieApiKey]);
+  }, [currentProvider, geminiApiKey, falApiKey, kieApiKey]);
 
   useEffect(() => {
     fetchModels();

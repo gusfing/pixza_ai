@@ -212,7 +212,7 @@ function GenerateImageControls({ node }: { node: Node }) {
   const updateNodeData = useWorkflowStore((state) => state.updateNodeData);
   const regenerateNode = useWorkflowStore((state) => state.regenerateNode);
   const isRunning = useWorkflowStore((state) => state.isRunning);
-  const { replicateApiKey, falApiKey, kieApiKey, replicateEnabled, kieEnabled } = useProviderApiKeys();
+  const { falApiKey, kieApiKey, kieEnabled } = useProviderApiKeys();
   const [externalModels, setExternalModels] = useState<ProviderModel[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelsFetchError, setModelsFetchError] = useState<string | null>(null);
@@ -225,14 +225,11 @@ function GenerateImageControls({ node }: { node: Node }) {
     const providers: { id: ProviderType; name: string }[] = [];
     providers.push({ id: "gemini", name: "Gemini" });
     providers.push({ id: "fal", name: "fal.ai" });
-    if (replicateEnabled && replicateApiKey) {
-      providers.push({ id: "replicate", name: "Replicate" });
-    }
     if (kieEnabled && kieApiKey) {
       providers.push({ id: "kie", name: "Kie.ai" });
     }
     return providers;
-  }, [replicateEnabled, replicateApiKey, kieEnabled, kieApiKey]);
+  }, [kieEnabled, kieApiKey]);
 
   // Fetch models from external providers
   const fetchModels = useCallback(async () => {
@@ -265,7 +262,7 @@ function GenerateImageControls({ node }: { node: Node }) {
     } finally {
       setIsLoadingModels(false);
     }
-  }, [currentProvider, replicateApiKey, falApiKey, kieApiKey]);
+  }, [currentProvider, falApiKey, kieApiKey]);
 
   useEffect(() => {
     fetchModels();
@@ -386,7 +383,7 @@ function GenerateImageControls({ node }: { node: Node }) {
   const supportsResolution = currentModelId === "nano-banana-pro" || currentModelId === "nano-banana-2";
   const aspectRatios = currentModelId === "nano-banana-2" ? EXTENDED_ASPECT_RATIOS : BASE_ASPECT_RATIOS;
   const resolutions = currentModelId === "nano-banana-2" ? RESOLUTIONS_NB2 : RESOLUTIONS_PRO;
-  const hasExternalProviders = !!(replicateEnabled && replicateApiKey);
+  const hasExternalProviders = !!(kieEnabled && kieApiKey);
 
   return (
     <>

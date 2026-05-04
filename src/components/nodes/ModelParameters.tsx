@@ -80,7 +80,7 @@ function ModelParametersInner({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Use stable selector for API keys to prevent unnecessary re-fetches
-  const { replicateApiKey, falApiKey, kieApiKey, wavespeedApiKey } = useProviderApiKeys();
+  const { falApiKey, kieApiKey, wavespeedApiKey } = useProviderApiKeys();
 
   const isVeoModel = modelId?.startsWith("veo-");
 
@@ -106,9 +106,6 @@ function ModelParametersInner({
 
       try {
         const headers: HeadersInit = {};
-        if (replicateApiKey) {
-          headers["X-Replicate-Key"] = replicateApiKey;
-        }
         if (falApiKey) {
           headers["X-Fal-Key"] = falApiKey;
         }
@@ -151,7 +148,7 @@ function ModelParametersInner({
     };
 
     fetchSchema();
-  }, [modelId, provider, replicateApiKey, falApiKey, kieApiKey, wavespeedApiKey, onInputsLoaded]);
+  }, [modelId, provider, falApiKey, kieApiKey, wavespeedApiKey, onInputsLoaded]);
 
   // Notify parent to resize node when schema loads
   useEffect(() => {

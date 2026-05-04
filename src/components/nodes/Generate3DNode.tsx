@@ -23,7 +23,7 @@ type Generate3DNodeType = Node<Generate3DNodeData, "generate3d">;
 export function Generate3DNode({ id, data, selected }: NodeProps<Generate3DNodeType>) {
   const nodeData = data;
   const updateNodeData = useWorkflowStore((state) => state.updateNodeData);
-  const { replicateApiKey, falApiKey, kieApiKey } = useProviderApiKeys();
+  const { falApiKey, kieApiKey } = useProviderApiKeys();
   const [isBrowseDialogOpen, setIsBrowseDialogOpen] = useState(false);
 
   // Inline parameters infrastructure

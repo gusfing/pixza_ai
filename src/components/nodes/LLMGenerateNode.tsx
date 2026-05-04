@@ -13,6 +13,7 @@ const LLM_PROVIDERS: { value: LLMProvider; label: string }[] = [
   { value: "google", label: "Google" },
   { value: "openai", label: "OpenAI" },
   { value: "anthropic", label: "Anthropic" },
+  { value: "cloudflare", label: "Cloudflare (Free)" },
 ];
 
 const LLM_MODELS: Record<LLMProvider, { value: LLMModelType; label: string }[]> = {
@@ -30,6 +31,16 @@ const LLM_MODELS: Record<LLMProvider, { value: LLMModelType; label: string }[]> 
     { value: "claude-sonnet-4.5", label: "Claude Sonnet 4.5" },
     { value: "claude-haiku-4.5", label: "Claude Haiku 4.5" },
     { value: "claude-opus-4.6", label: "Claude Opus 4.6" },
+  ],
+  cloudflare: [
+    { value: "llama-3.3-70b-fast",  label: "Llama 3.3 70B (Fast)" },
+    { value: "llama-4-scout",        label: "Llama 4 Scout 17B" },
+    { value: "kimi-k2.6",            label: "Kimi K2.6 (1T)" },
+    { value: "qwq-32b",              label: "QwQ 32B (Reasoning)" },
+    { value: "gemma-4-26b",          label: "Gemma 4 26B" },
+    { value: "mistral-small-3.1",    label: "Mistral Small 3.1" },
+    { value: "deepseek-r1-32b",      label: "DeepSeek R1 32B" },
+    { value: "llama-3.1-8b",         label: "Llama 3.1 8B" },
   ],
 };
 
