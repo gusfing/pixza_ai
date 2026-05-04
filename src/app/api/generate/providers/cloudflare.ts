@@ -8,6 +8,7 @@
  * - Legacy text-to-image (FLUX Schnell, SDXL, etc.): JSON
  */
 import { GenerationInput, GenerationOutput } from "@/lib/providers/types";
+import { base64ToNodeBuffer, buildMultipart, cfJson } from "@/lib/cf-multipart";
 
 // FLUX.2 models — use multipart/form-data
 const FLUX2_MODELS = new Set([
@@ -25,11 +26,6 @@ const LEGACY_IMG2IMG_MODELS = new Set([
 function base64ToUint8Array(base64: string): number[] {
   const clean = base64.includes(",") ? base64.split(",")[1] : base64;
   return Array.from(new Uint8Array(Buffer.from(clean, "base64")));
-}
-
-function base64ToBytes(base64: string): Uint8Array {
-  const clean = base64.includes(",") ? base64.split(",")[1] : base64;
-  return new Uint8Array(Buffer.from(clean, "base64"));
 }
 
 export async function generateWithCloudflare(
@@ -51,35 +47,36 @@ export async function generateWithCloudflare(
     };
 
     if (isFlux2) {
-      // ── FLUX.2 models: multipart/form-data ──────────────────
-      const form = new FormData();
-      form.append("prompt", input.prompt || "");
-      form.append("width", "1024");
-      form.append("height", "1024");
-
+      // ── FLUX.2 models: multipart/form-data (manual, no Blob) ─
+      const fields: Record<string, string> = {
+        prompt: input.prompt || "",
+        width: "1024",
+        height: "1024",
+      };
       if (input.parameters) {
-        if (input.parameters.num_steps !== undefined) form.append("steps", String(Number(input.parameters.num_steps)));
-        if (input.parameters.seed !== undefined && input.parameters.seed !== "") form.append("seed", String(Number(input.parameters.seed)));
+        if (input.parameters.num_steps !== undefined) fields.steps = String(Number(input.parameters.num_steps));
+        if (input.parameters.seed !== undefined && input.parameters.seed !== "") fields.seed = String(Number(input.parameters.seed));
+      }
+      if (hasImage && input.parameters?.strength !== undefined) {
+        fields.strength = String(Number(input.parameters.strength));
       }
 
+      const files: { fieldName: string; buf: Buffer; mime?: string; filename?: string }[] = [];
       if (hasImage) {
-        // FLUX.2 Dev supports up to 4 reference images: input_image_0..3
-        const images = input.images!.slice(0, 4);
-        images.forEach((img, i) => {
-          const bytes = base64ToBytes(img);
-          form.append(`input_image_${i}`, new Blob([bytes], { type: "image/png" }), `image_${i}.png`);
+        input.images!.slice(0, 4).forEach((img, i) => {
+          files.push({ fieldName: `input_image_${i}`, buf: base64ToNodeBuffer(img), filename: `image_${i}.png` });
         });
-        if (input.parameters?.strength !== undefined) form.append("strength", String(Number(input.parameters.strength)));
       }
 
-      fetchBody = form;
-      // Do NOT set Content-Type — let fetch set it with boundary
+      const { body, contentType } = buildMultipart(fields, files);
+      fetchBody = body as unknown as BodyInit;
+      headers["Content-Type"] = contentType;
 
     } else if (isLegacyImg2Img && hasImage) {
       // ── Legacy img2img: JSON with Uint8Array ─────────────────
       const body: Record<string, unknown> = {
         prompt: input.prompt || "",
-        image: base64ToUint8Array(input.images![0]),
+        image: Array.from(new Uint8Array(base64ToNodeBuffer(input.images![0]))),
         num_steps: 20,
         strength: 0.75,
       };

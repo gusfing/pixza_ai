@@ -1,66 +1,33 @@
-/**
- * AI Background Generator API
- * Uses FLUX.2 Dev to replace background with AI-generated scene
- */
 import { NextRequest, NextResponse } from "next/server";
+import { base64ToNodeBuffer, cfFlux2, cfJson } from "@/lib/cf-multipart";
 
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID ?? "";
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN  ?? "";
+const FLUX2_DEV = "@cf/black-forest-labs/flux-2-dev";
 
-function base64ToBytes(base64: string): ArrayBuffer {
-  const clean = base64.includes(",") ? base64.split(",")[1] : base64;
-  return Buffer.from(clean, "base64").buffer as ArrayBuffer;
-}
-
-async function flux2Dev(imageBuffer: ArrayBuffer, prompt: string): Promise<string> {
-  const form = new FormData();
-  form.append("prompt", prompt);
-  form.append("input_image_0", new Blob([imageBuffer], { type: "image/png" }), "image.png");
-  form.append("width", "1024");
-  form.append("height", "1024");
-  form.append("steps", "20");
-
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-2-dev`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${CF_API_TOKEN}` },
-      body: form,
-    }
+async function flux2WithImage(imageBase64: string, prompt: string, steps = "20"): Promise<string> {
+  const res = await cfFlux2(CF_ACCOUNT_ID, CF_API_TOKEN, FLUX2_DEV,
+    { prompt, width: "1024", height: "1024", steps },
+    [{ fieldName: "input_image_0", buf: base64ToNodeBuffer(imageBase64), filename: "image.png" }]
   );
-
   if (!res.ok) {
     const err = await res.json().catch(() => ({})) as any;
     throw new Error(err?.errors?.[0]?.message || `CF error ${res.status}`);
   }
-
   const data = await res.json();
   const imageB64 = data?.result?.image;
   if (!imageB64) throw new Error("No image in response");
   return `data:image/png;base64,${imageB64}`;
 }
 
-async function flux2Text(prompt: string): Promise<string> {
-  const form = new FormData();
-  form.append("prompt", prompt);
-  form.append("width", "1024");
-  form.append("height", "1024");
-  form.append("steps", "4");
-
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-2-dev`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${CF_API_TOKEN}` },
-      body: form,
-    }
+async function flux2TextOnly(prompt: string): Promise<string> {
+  const res = await cfFlux2(CF_ACCOUNT_ID, CF_API_TOKEN, FLUX2_DEV,
+    { prompt, width: "1024", height: "1024", steps: "4" }
   );
-
   if (!res.ok) {
     const err = await res.json().catch(() => ({})) as any;
     throw new Error(err?.errors?.[0]?.message || `CF error ${res.status}`);
   }
-
   const data = await res.json();
   const imageB64 = data?.result?.image;
   if (!imageB64) throw new Error("No image in response");
@@ -82,20 +49,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
   }
   try {
-    const imgBuf = base64ToBytes(imageBase64);
-
     if (mode === "remove-only") {
-      // White background removal
-      const cutout = await flux2Dev(imgBuf, "remove the background, replace with pure white background, keep subject intact, product photography");
+      const cutout = await flux2WithImage(imageBase64, "remove the background, replace with pure white background, keep subject intact, product photography");
       return NextResponse.json({ cutout, background: null });
     }
-
-    // Generate new background + composite with subject
     const [cutout, background] = await Promise.all([
-      flux2Dev(imgBuf, `keep the exact subject from the reference image, place it on: ${prompt}, professional product photography, high quality`),
-      flux2Text(`${prompt}, product photography background, no product, no people, professional, high quality, 4k`),
+      flux2WithImage(imageBase64, `keep the exact subject from the reference image, place it on: ${prompt}, professional product photography, high quality`),
+      flux2TextOnly(`${prompt}, product photography background, no product, no people, professional, high quality, 4k`),
     ]);
-
     return NextResponse.json({ cutout, background });
   } catch (err) {
     console.error("[ai-background]", err);
