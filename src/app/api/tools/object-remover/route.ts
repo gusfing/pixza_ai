@@ -1,7 +1,3 @@
-/**
- * Object Remover
- * Uses SD img2img to remove objects and fill naturally
- */
 import { NextRequest, NextResponse } from "next/server";
 import { cfJson } from "@/lib/cf-multipart";
 
@@ -36,11 +32,10 @@ export async function POST(req: NextRequest) {
       {
         prompt: fillPrompt,
         image: toUint8Array(imageBase64),
-        disable_safety_checker: true,
-        strength: 0.99,
+        strength: 0.75,
         num_steps: 20,
-        disable_safety_checker: true,
         guidance: 7.5,
+        disable_safety_checker: true,
       }
     );
     if (!res.ok) {

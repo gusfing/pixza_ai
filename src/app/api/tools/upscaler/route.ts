@@ -1,7 +1,3 @@
-/**
- * Image Upscaler / Enhancer
- * Uses SD img2img with low strength to enhance sharpness
- */
 import { NextRequest, NextResponse } from "next/server";
 import { cfJson } from "@/lib/cf-multipart";
 
@@ -31,11 +27,10 @@ export async function POST(req: NextRequest) {
       {
         prompt: "high resolution, sharp details, 4k, professional quality, enhanced clarity, crisp textures",
         image: toUint8Array(imageBase64),
-        disable_safety_checker: true,
-        strength: 0.99,
+        strength: 0.2,
         num_steps: 20,
-        disable_safety_checker: true,
         guidance: 7.5,
+        disable_safety_checker: true,
       }
     );
     if (!res.ok) {

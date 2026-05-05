@@ -1,8 +1,3 @@
-/**
- * Background Remover
- * Uses SD v1.5 img2img to replace background with white
- * Falls back to FLUX Schnell text-to-image if no image provided
- */
 import { NextRequest, NextResponse } from "next/server";
 import { cfJson } from "@/lib/cf-multipart";
 
@@ -27,17 +22,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
   }
   try {
-    // Use SD img2img with very low strength to preserve subject, change background to white
     const res = await cfJson(CF_ACCOUNT_ID, CF_API_TOKEN,
       "@cf/runwayml/stable-diffusion-v1-5-img2img",
       {
         prompt: "pure white background, product photography, clean studio, white backdrop, isolated subject",
         image: toUint8Array(imageBase64),
-        disable_safety_checker: true,
-        strength: 0.99,
+        strength: 0.45,
         num_steps: 20,
-        disable_safety_checker: true,
         guidance: 8,
+        disable_safety_checker: true,
       }
     );
     if (!res.ok) {
