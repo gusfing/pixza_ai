@@ -80,7 +80,10 @@ export default function WaitlistPage() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover z-0"
         >
+          {/* Primary: your Cloudinary video — make sure it's set to Public in Cloudinary dashboard */}
           <source src="https://res.cloudinary.com/dfonotyfb/video/upload/v1775585556/dds3_1_rqhg7x.mp4" type="video/mp4" />
+          {/* Fallback: free cinematic stock video */}
+          <source src="https://cdn.coverr.co/videos/coverr-typing-on-a-laptop-1584/1080p.mp4" type="video/mp4" />
         </video>
 
         {/* Dark overlay — gradient from bottom */}

@@ -6,7 +6,6 @@ import { SessionProvider } from "@/components/SessionProvider";
 import { WPAuthProvider } from "@/lib/wp-auth-context";
 import { PromoPopup } from "@/components/ui/promo-popup";
 import { LowCreditsPopup } from "@/components/ui/low-credits-popup";
-import { PageTransition } from "@/components/ui/page-transition";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -38,9 +37,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         
         <WPAuthProvider>
           <SessionProvider>
-            <PageTransition>
-              {children}
-            </PageTransition>
+            {children}
             <Toast />
             <PromoPopup />
             <LowCreditsPopup />
