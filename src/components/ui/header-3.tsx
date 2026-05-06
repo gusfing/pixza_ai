@@ -61,7 +61,7 @@ const TOOLS_MENU = [
 ];
 
 const COMPANY_MENU = [
-  { icon: Sparkles,    title: "About",         desc: "Our story and mission",          href: "/" },
+  { icon: Sparkles,    title: "About",         desc: "Our story and mission",          href: "/about" },
   { icon: Leaf,        title: "Blog",          desc: "Tutorials, guides, updates",     href: "/blog" },
   { icon: Users,       title: "Contact",       desc: "Get in touch with us",           href: "/contact" },
   { icon: CreditCard,  title: "Pricing",       desc: "Free, Pro, Agency plans",        href: "/#pricing" },

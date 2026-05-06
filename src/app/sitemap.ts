@@ -93,6 +93,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // ── Blog ───────────────────────────────────────────────────
     {
+      url: `${base}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${base}/blog`,
       lastModified: now,
       changeFrequency: "daily",
