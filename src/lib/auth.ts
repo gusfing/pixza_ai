@@ -14,8 +14,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+      // After Google login, redirect to WP sync endpoint
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
     Credentials({
       name: "credentials",
@@ -44,12 +52,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      // For Google sign-in, allow it — WP sync happens via redirect
+      if (account?.provider === "google") {
+        return true;
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        const dbUser = await db.user.findUnique({ where: { id: user.id } });
-        token.plan = dbUser?.plan ?? "FREE";
-        token.role = dbUser?.role ?? "USER";
+        try {
+          const dbUser = await db.user.findUnique({ where: { id: user.id } });
+          token.plan = (dbUser as any)?.plan ?? "FREE";
+          token.role = (dbUser as any)?.role ?? "USER";
+        } catch {
+          token.plan = "FREE";
+          token.role = "USER";
+        }
+      }
+      if (account?.provider === "google") {
+        token.isGoogle = true;
       }
       return token;
     },
@@ -58,8 +81,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
         (session.user as { plan?: string }).plan = token.plan as string;
         (session.user as { role?: string }).role = token.role as string;
+        (session.user as { isGoogle?: boolean }).isGoogle = token.isGoogle as boolean;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // After Google OAuth, go to WP sync endpoint
+      if (url.includes("/api/auth/callback/google")) {
+        return `${baseUrl}/api/auth/google-wp-sync`;
+      }
+      if (url.startsWith(baseUrl)) return url;
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      return baseUrl;
     },
   },
 });

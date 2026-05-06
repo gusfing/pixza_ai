@@ -919,3 +919,123 @@ function pixza_inline_media_picker_script() {
     </script>
     <?php
 }
+
+
+// ---------------------------------------------------------------------------
+// REST API – Google OAuth sync
+// Creates or logs in a WP user from Google OAuth data
+// Called by Next.js after successful Google sign-in
+// ---------------------------------------------------------------------------
+
+add_action( 'rest_api_init', function() {
+    register_rest_route( 'pixza/v1', '/google-auth', array(
+        'methods'             => WP_REST_Server::CREATABLE,
+        'callback'            => 'pixza_rest_google_auth',
+        'permission_callback' => 'pixza_rest_auth',
+        'args'                => array(
+            'email'  => array( 'required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_email' ),
+            'name'   => array( 'required' => false, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ),
+            'avatar' => array( 'required' => false, 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ),
+        ),
+    ) );
+} );
+
+function pixza_rest_google_auth( WP_REST_Request $request ) {
+    $email  = $request->get_param( 'email' );
+    $name   = $request->get_param( 'name' )   ?? '';
+    $avatar = $request->get_param( 'avatar' ) ?? '';
+
+    if ( ! is_email( $email ) ) {
+        return new WP_Error( 'invalid_email', 'Invalid email address.', array( 'status' => 400 ) );
+    }
+
+    // Check if user exists
+    $user = get_user_by( 'email', $email );
+
+    if ( ! $user ) {
+        // Create new WP user
+        $username = sanitize_user( strtolower( explode( '@', $email )[0] ) . '_' . wp_rand( 100, 999 ) );
+        // Ensure username is unique
+        while ( username_exists( $username ) ) {
+            $username = sanitize_user( strtolower( explode( '@', $email )[0] ) . '_' . wp_rand( 1000, 9999 ) );
+        }
+
+        $user_id = wp_create_user( $username, wp_generate_password( 24, true, true ), $email );
+
+        if ( is_wp_error( $user_id ) ) {
+            return new WP_Error( 'create_failed', $user_id->get_error_message(), array( 'status' => 500 ) );
+        }
+
+        // Set display name
+        wp_update_user( array(
+            'ID'           => $user_id,
+            'display_name' => $name ?: $username,
+            'first_name'   => $name ? explode( ' ', $name )[0] : '',
+        ) );
+
+        // Set default meta
+        update_user_meta( $user_id, 'pixza_plan',             'free' );
+        update_user_meta( $user_id, 'pixza_credits',          100 );
+        update_user_meta( $user_id, 'pixza_credits_limit',    100 );
+        update_user_meta( $user_id, 'pixza_google_avatar',    $avatar );
+        update_user_meta( $user_id, 'pixza_auth_provider',    'google' );
+
+        $user = get_user_by( 'id', $user_id );
+    } else {
+        // Update avatar if provided
+        if ( $avatar ) {
+            update_user_meta( $user->ID, 'pixza_google_avatar', $avatar );
+        }
+    }
+
+    // Generate JWT token using the JWT Auth plugin
+    // This requires the JWT Authentication for WP REST API plugin to be active
+    $token_response = wp_remote_post( rest_url( 'jwt-auth/v1/token' ), array(
+        'body'    => json_encode( array(
+            'username' => $user->user_login,
+            'password' => '', // We'll use a different approach
+        ) ),
+        'headers' => array( 'Content-Type' => 'application/json' ),
+        'timeout' => 10,
+    ) );
+
+    // Alternative: generate a temporary token manually
+    // Since we can't get the password, we'll use a signed token approach
+    $token_data = array(
+        'iss'  => get_bloginfo( 'url' ),
+        'iat'  => time(),
+        'nbf'  => time(),
+        'exp'  => time() + ( DAY_IN_SECONDS * 7 ),
+        'data' => array(
+            'user' => array(
+                'id' => $user->ID,
+            ),
+        ),
+    );
+
+    // Use JWT Auth plugin's secret key if available
+    $secret_key = defined( 'JWT_AUTH_SECRET_KEY' ) ? JWT_AUTH_SECRET_KEY : get_option( 'pixza_wp_secret', '' );
+
+    if ( empty( $secret_key ) ) {
+        return new WP_Error( 'no_secret', 'JWT secret not configured.', array( 'status' => 500 ) );
+    }
+
+    // Encode using the same method as JWT Auth plugin
+    if ( function_exists( 'jwt_auth_generate_token' ) ) {
+        // Use the JWT Auth plugin's function if available
+        $token = jwt_auth_generate_token( $user );
+    } else {
+        // Manual JWT encoding (HS256)
+        $header  = base64_encode( json_encode( array( 'typ' => 'JWT', 'alg' => 'HS256' ) ) );
+        $payload = base64_encode( json_encode( $token_data ) );
+        $sig     = hash_hmac( 'sha256', "$header.$payload", $secret_key, true );
+        $token   = "$header.$payload." . base64_encode( $sig );
+    }
+
+    return rest_ensure_response( array(
+        'token'      => $token,
+        'user_email' => $user->user_email,
+        'user_login' => $user->user_login,
+        'user_id'    => $user->ID,
+    ) );
+}
