@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = (process.env.NEXT_PUBLIC_APP_URL ?? "https://pixzastudio.com").replace(/\/$/, "");
+  const base = "https://pixzastudio.com";
 
   return {
     rules: [
@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: [
           "/",
-          "/landing",
+          "/about",
           "/create",
           "/studio",
           "/examples",
@@ -18,8 +18,10 @@ export default function robots(): MetadataRoute.Robots {
           "/tools/ai-background",
           "/tools/object-remover",
           "/tools/image-upscaler",
+          "/tools/magic-eraser",
           "/batch",
           "/blog",
+          "/waitlist",
           "/auth/signin",
           "/auth/signup",
           "/contact",
@@ -37,9 +39,9 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
         ],
       },
-      // Block AI crawlers from scraping generated content
+      // Block AI training crawlers
       {
-        userAgent: ["GPTBot", "ChatGPT-User", "CCBot", "anthropic-ai", "Claude-Web"],
+        userAgent: ["GPTBot", "ChatGPT-User", "CCBot", "anthropic-ai", "Claude-Web", "Google-Extended"],
         disallow: ["/"],
       },
     ],

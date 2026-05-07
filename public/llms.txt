@@ -1,26 +1,27 @@
-# Pixza Studio — AI Creative Platform
-# llms.txt — AI/LLM Discovery File
-# https://llmstxt.org
+# Pixza Studio
 
-> Pixza Studio is an AI-powered creative platform for image, video, audio, and 3D generation. Built for creators, designers, and businesses in India and globally. Subscription-based with a free tier.
+> Pixza Studio is an AI-powered creative platform for image, video, audio, and 3D generation. Built for creators, designers, and businesses. Subscription-based with a free tier starting at ₹0/month.
 
-## Product
+## Pages
 
 - [Home](https://pixzastudio.com/): Landing page with features, pricing, and demos
-- [Create](https://pixzastudio.com/create): Simple AI generation mode — text to image/video/audio/3D
-- [Studio](https://pixzastudio.com/studio): Visual node canvas for building multi-step AI pipelines
-- [Tools](https://pixzastudio.com/tools): Free AI tools — background remover, magic eraser, upscaler, object remover
-- [Batch Editor](https://pixzastudio.com/batch): Apply AI operations to multiple images at once
+- [About](https://pixzastudio.com/about): Our story, mission, and values
+- [Create](https://pixzastudio.com/create): Simple AI generation — text to image, video, audio, 3D
+- [Studio](https://pixzastudio.com/studio): Visual node canvas for multi-step AI pipelines
 - [Examples](https://pixzastudio.com/examples): Community-generated examples with prompts
-- [Gallery](https://pixzastudio.com/gallery): Personal generation history
+- [Blog](https://pixzastudio.com/blog): AI tutorials, model comparisons, workflow guides
+- [Contact](https://pixzastudio.com/contact): Get in touch
+- [Waitlist](https://pixzastudio.com/waitlist): Join early access
 
-## AI Tools (Free)
+## Tools
 
-- [Background Remover](https://pixzastudio.com/tools/background-remover): Remove image backgrounds instantly
-- [Magic Eraser](https://pixzastudio.com/tools/magic-eraser): Paint over objects to erase them with AI fill
-- [AI Background Generator](https://pixzastudio.com/tools/ai-background): Replace backgrounds with AI-generated scenes
-- [Object Remover](https://pixzastudio.com/tools/object-remover): Remove unwanted objects from photos
-- [Image Upscaler](https://pixzastudio.com/tools/image-upscaler): Enhance and sharpen images with AI
+- [Tools Hub](https://pixzastudio.com/tools): All free AI tools
+- [Background Remover](https://pixzastudio.com/tools/background-remover): Remove image backgrounds instantly — free
+- [Magic Eraser](https://pixzastudio.com/tools/magic-eraser): Paint to erase objects, AI fills seamlessly — free
+- [AI Background Generator](https://pixzastudio.com/tools/ai-background): Replace backgrounds with AI scenes — free
+- [Object Remover](https://pixzastudio.com/tools/object-remover): Remove unwanted objects from photos — free
+- [Image Upscaler](https://pixzastudio.com/tools/image-upscaler): Enhance and sharpen images — free
+- [Batch Editor](https://pixzastudio.com/batch): Apply AI to 50 images at once — free
 
 ## Pricing
 
@@ -28,44 +29,38 @@
 - Pro: ₹999/month — 3,000 credits, FLUX Dev, Imagen 4, Seedance video, no watermarks
 - Agency: ₹2,999/month — 8,000 credits, Veo 3 Fast, everything in Pro, priority support
 
-## AI Models Available
+## AI Models
 
-### Image Generation
-- FLUX.1 Schnell (free, Cloudflare)
-- FLUX.2 Klein 4B/9B (free, Cloudflare)
-- FLUX.2 Dev (free, Cloudflare, image-to-image)
-- SDXL, SDXL Lightning, DreamShaper (free, Cloudflare)
-- Gemini Flash Image (free quota)
-- FLUX Dev Ultra Fast (Pro, WaveSpeed)
-- Imagen 3 / Imagen 4 (Pro, Google)
+### Image (Free)
+- FLUX.1 Schnell (Cloudflare)
+- FLUX.2 Klein 4B/9B (Cloudflare)
+- FLUX.2 Dev with image-to-image (Cloudflare)
+- SDXL, SDXL Lightning, DreamShaper (Cloudflare)
+- Gemini Flash Image (Google)
 
-### Video Generation
-- Wan 2.1 Fast (Pro, WaveSpeed)
-- Seedance 1.5 Lite/Pro (Pro, WaveSpeed)
-- Seedance 2.0 (Agency, WaveSpeed)
-- Veo 3 Fast (Agency, KIE.ai — $0.40/8s)
-- Veo 2 (Agency, Google)
-- Veo 3 (Agency, Google)
+### Image (Pro)
+- FLUX Dev Ultra Fast (WaveSpeed)
+- Imagen 3 / Imagen 4 (Google)
 
-## Content
+### Video (Pro)
+- Wan 2.1 Fast (WaveSpeed)
+- Seedance 1.5 Lite/Pro (WaveSpeed)
 
-- [Blog](https://pixzastudio.com/blog): AI tutorials, model comparisons, workflow guides
-- [Waitlist](https://pixzastudio.com/waitlist): Join early access
-
-## Company
-
-- [Contact](https://pixzastudio.com/contact): Get in touch
-- [Privacy Policy](https://pixzastudio.com/privacy)
-- [Terms of Service](https://pixzastudio.com/terms)
+### Video (Agency)
+- Seedance 2.0 (WaveSpeed)
+- Veo 3 Fast (KIE.ai)
+- Veo 2 / Veo 3 (Google)
 
 ## Technical
 
-- Built with: Next.js 16, TypeScript, Tailwind CSS, Prisma, WordPress (auth + CMS)
+- Framework: Next.js 16, TypeScript, Tailwind CSS
+- Auth: WordPress JWT
 - Payments: Razorpay (INR)
-- AI Providers: Cloudflare Workers AI, Google Gemini/Vertex AI, WaveSpeed, KIE.ai
+- AI: Cloudflare Workers AI, Google Gemini, WaveSpeed, KIE.ai
 - Deployment: Vercel
 
-## Optional
+## Links
 
 - [Sitemap](https://pixzastudio.com/sitemap.xml)
-- [RSS/Blog Feed](https://pixzastudio.com/blog)
+- [Privacy Policy](https://pixzastudio.com/privacy)
+- [Terms of Service](https://pixzastudio.com/terms)

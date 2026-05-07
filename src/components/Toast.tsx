@@ -19,7 +19,7 @@ interface ToastItem {
 
 interface ToastStore {
   toasts: ToastItem[];
-  show: (message: string, type?: ToastType, options?: Partial<Omit<ToastItem, "id" | "message" | "type">>) => void;
+  show: (message: string, type?: ToastType, options?: Partial<Omit<ToastItem, "id" | "message" | "type">> | boolean, details?: string | null) => void;
   success: (message: string, options?: Partial<Omit<ToastItem, "id" | "message" | "type">>) => void;
   error:   (message: string, options?: Partial<Omit<ToastItem, "id" | "message" | "type">>) => void;
   warning: (message: string, options?: Partial<Omit<ToastItem, "id" | "message" | "type">>) => void;
@@ -41,11 +41,15 @@ export const useToast = create<ToastStore>((set, get) => ({
   persistent: false,
   details: null,
 
-  show: (message, type = "info", options = {}) => {
+  show: (message, type = "info", options = {}, legacyDetails) => {
+    // Support legacy 4-arg call: show(msg, type, persistent, details)
+    const opts: Partial<Omit<ToastItem, "id" | "message" | "type">> =
+      typeof options === "boolean"
+        ? { persistent: options, details: legacyDetails ?? null }
+        : { ...options };
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    set(s => ({ toasts: [...s.toasts.slice(-4), { id, message, type, ...options }] }));
-    // Legacy compat
-    set({ message, type, persistent: options.persistent ?? false, details: options.details ?? null });
+    set(s => ({ toasts: [...s.toasts.slice(-4), { id, message, type, ...opts }] }));
+    set({ message, type, persistent: opts.persistent ?? false, details: opts.details ?? null });
     return id;
   },
 
