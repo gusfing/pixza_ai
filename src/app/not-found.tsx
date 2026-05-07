@@ -16,7 +16,7 @@ export default function NotFound() {
           Go to Create
         </Link>
         <Link
-          href="/landing"
+          href="/"
           className="px-5 py-2.5 rounded-xl border border-white/10 text-white/60 text-sm font-bold hover:text-white hover:border-white/20 transition-all"
         >
           Home

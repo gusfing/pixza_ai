@@ -84,6 +84,20 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" dir="ltr" suppressHydrationWarning className={`${inter.variable} ${outfit.variable}`}>
       <head>
         <meta charSet="utf-8" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Pixza Studio",
+              "url": "https://pixzastudio.com",
+              "logo": "https://pixzastudio.com/pixza-logo.png",
+              "description": "AI creative studio for image, video, audio and 3D generation",
+              "sameAs": ["https://twitter.com/pixzastudio"]
+            })
+          }}
+        />
       </head>
       <body className={`${inter.className} antialiased selection:bg-white/10`}>
         {/* Global Grain Overlay */}

@@ -14,6 +14,12 @@ export default function AIBackgroundPage() {
       showPrompt
       promptPlaceholder="e.g. 'marble table, soft studio light' or 'forest at golden hour'…"
       dualResult
+      seoContent={`<h2>AI Background Generator — Replace Any Background Instantly</h2>
+<p>Transform your product photos with AI-generated backgrounds. Simply upload your image, describe the scene you want, and our AI removes the original background and replaces it with a photorealistic environment — all in one step.</p>
+<h3>How it works</h3>
+<p>Our tool first removes the existing background, then uses a text-to-image AI model to generate a new scene based on your description. You get both the clean cutout and the composited result.</p>
+<h3>Popular background ideas</h3>
+<ul><li>Studio lighting on marble or wood surfaces</li><li>Outdoor scenes: forests, beaches, cityscapes</li><li>Abstract gradients and color washes</li><li>Seasonal and holiday settings</li></ul>`}
     />
   );
 }

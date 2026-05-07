@@ -371,7 +371,7 @@ function FAQ() {
 function Footer() {
   const cols = [
     { title: "Product", links: [{ l: "Studio", h: "/studio" }, { l: "Simple Mode", h: "/create" }, { l: "Tools", h: "/tools" }, { l: "Batch Editor", h: "/batch" }, { l: "Pricing", h: "#pricing" }, { l: "Examples", h: "/examples" }] },
-    { title: "Company", links: [{ l: "Blog", h: "/blog" }, { l: "Contact", h: "/contact" }, { l: "About", h: "/landing" }] },
+    { title: "Company", links: [{ l: "Blog", h: "/blog" }, { l: "Contact", h: "/contact" }, { l: "About", h: "/about" }] },
     { title: "Legal", links: [{ l: "Privacy", h: "/privacy" }, { l: "Terms", h: "/terms" }] },
   ];
   return (
@@ -381,7 +381,7 @@ function Footer() {
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-5">
               <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center">
-                <img src="/pixza-logo.png" alt="" className="w-4 h-4 invert" />
+              <img src="/pixza-logo.png" alt="Pixza Studio" className="w-4 h-4 invert" />
               </div>
               <span className="font-black tracking-tighter text-white text-lg">Pixza Studio</span>
             </Link>
@@ -432,8 +432,27 @@ export default function LandingPage() {
     return () => { cancelAnimationFrame(animId); lenis?.destroy?.(); };
   }, []);
 
+  const webAppSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Pixza Studio",
+    "url": "https://pixzastudio.com",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web",
+    "description": "AI creative studio for image, video, audio and 3D generation. Free tier with FLUX, Gemini Flash, and Cloudflare AI.",
+    "offers": [
+      { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "INR" },
+      { "@type": "Offer", "name": "Pro", "price": "999", "priceCurrency": "INR" },
+      { "@type": "Offer", "name": "Agency", "price": "2999", "priceCurrency": "INR" }
+    ]
+  };
+
   return (
     <main className="bg-[#0d1117] text-white selection:bg-white selection:text-black">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
+      />
       <Header />
       <div className="h-screen w-full">
         <ScrollMorphHero />

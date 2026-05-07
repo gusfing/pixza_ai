@@ -19,6 +19,7 @@ interface ToolLayoutProps {
   showPrompt?: boolean;
   promptPlaceholder?: string;
   dualResult?: boolean; // show cutout + background side by side
+  seoContent?: string; // additional SEO-friendly content
 }
 
 export function ToolLayout({
@@ -34,6 +35,7 @@ export function ToolLayout({
   showPrompt = false,
   promptPlaceholder = "Describe the background or style…",
   dualResult = false,
+  seoContent,
 }: ToolLayoutProps) {
   const [image, setImage] = useState<string | null>(null);
   const [imageName, setImageName] = useState("");
@@ -123,7 +125,7 @@ export function ToolLayout({
       <div className="max-w-5xl mx-auto px-6 py-10">
         {/* Title */}
         <div className="mb-10 text-center">
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white mb-3">{title}</h2>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white mb-3">{title}</h1>
           <p className="text-base text-white/40 max-w-lg mx-auto">{description}</p>
         </div>
 
@@ -277,6 +279,14 @@ export function ToolLayout({
             )}
           </div>
         </div>
+
+        {/* SEO content */}
+        {seoContent && (
+          <section className="mt-16 pt-10 border-t border-white/5">
+            <div className="prose prose-invert prose-sm max-w-none text-white/40 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: seoContent }} />
+          </section>
+        )}
       </div>
     </div>
   );

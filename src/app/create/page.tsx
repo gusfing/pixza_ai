@@ -1079,9 +1079,9 @@ export default function CreatePage() {
 
       {/* ── Sidebar ── */}
       <aside className="hidden lg:flex flex-col items-center py-6 w-20 shrink-0 bg-[#0d1117] border-r border-white/5 z-50 relative">
-        <Link href="/landing" className="mb-10 group">
+        <Link href="/" className="mb-10 group">
           <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center transition-transform group-hover:scale-110">
-            <img src="/pixza-logo.png" alt="" className="w-10 h-10 object-cover" />
+            <img src="/pixza-logo.png" alt="Pixza Studio home" className="w-10 h-10 object-cover" />
           </div>
         </Link>
 
@@ -1148,7 +1148,7 @@ export default function CreatePage() {
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         {/* Mobile header */}
         <header className="lg:hidden flex items-center justify-between px-5 h-14 border-b border-white/5 shrink-0">
-          <Link href="/landing" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center">
               <img src="/pixza-logo.png" alt="" className="w-7 h-7 object-cover" />
             </div>

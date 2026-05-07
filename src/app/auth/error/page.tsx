@@ -33,7 +33,7 @@ function ErrorContent() {
         <Link href="/auth/signin" className="w-full py-3 rounded-2xl bg-white text-black text-sm font-black text-center hover:bg-white/90 transition-all">
           Try Again
         </Link>
-        <Link href="/landing" className="text-center text-xs text-white/30 hover:text-white transition-colors">
+        <Link href="/" className="text-center text-xs text-white/30 hover:text-white transition-colors">
           Back to home
         </Link>
       </div>

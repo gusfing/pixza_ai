@@ -273,7 +273,7 @@ export default function MagicEraserPage() {
       <div className="max-w-5xl mx-auto px-6 py-10">
         {/* Title */}
         <div className="mb-8 text-center">
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white mb-3">Magic Eraser</h2>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white mb-3">Magic Eraser</h1>
           <p className="text-base text-white/40 max-w-lg mx-auto">
             Paint over anything you want removed. AI fills it in seamlessly — free, powered by Cloudflare.
           </p>
@@ -465,6 +465,23 @@ export default function MagicEraserPage() {
             </div>
           </div>
         )}
+
+        {/* SEO content */}
+        <section className="mt-16 pt-10 border-t border-white/5">
+          <div className="prose prose-invert prose-sm max-w-none text-white/40 leading-relaxed">
+            <h2 className="text-white/60 text-lg font-bold mb-3">Free AI Magic Eraser — Paint to Remove Anything</h2>
+            <p>Pixza Studio&apos;s Magic Eraser lets you paint over any part of an image and have AI fill it in seamlessly. Remove people, objects, text, or blemishes with a simple brush stroke — no Photoshop skills required.</p>
+            <h3 className="text-white/50 text-base font-bold mt-4 mb-2">How it works</h3>
+            <p>Upload your image, paint red over the area you want removed, and click Erase. The AI uses inpainting to fill the selected region with realistic content that blends naturally with the surrounding image.</p>
+            <h3 className="text-white/50 text-base font-bold mt-4 mb-2">Common use cases</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Remove unwanted people or objects from photos</li>
+              <li>Clean up blemishes and imperfections in portraits</li>
+              <li>Erase text, watermarks, and logos</li>
+              <li>Fix distracting elements in product photography</li>
+            </ul>
+          </div>
+        </section>
       </div>
     </div>
   );

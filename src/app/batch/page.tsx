@@ -168,9 +168,9 @@ export default function BatchPage() {
         {/* Title */}
         <div className="mb-10">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-violet-400 mb-2">Batch Processing</p>
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white mb-3">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white mb-3">
             Edit hundreds of images<br />in one click.
-          </h2>
+          </h1>
           <p className="text-base text-white/40 max-w-lg">
             Upload up to 50 images and apply the same AI operation to all of them at once.
           </p>
@@ -362,6 +362,22 @@ export default function BatchPage() {
             )}
           </div>
         </div>
+
+        {/* SEO content */}
+        <section className="mt-16 pt-10 border-t border-white/5">
+          <div className="prose prose-invert prose-sm max-w-none text-white/40 leading-relaxed">
+            <h2 className="text-white/60 text-lg font-bold mb-3">Free AI Batch Image Editor — Process 50 Images at Once</h2>
+            <p>Pixza Studio&apos;s Batch Editor lets you apply AI operations to up to 50 images simultaneously. Save hours of manual editing by running background removal, upscaling, or object removal across your entire image library in one click.</p>
+            <h3 className="text-white/50 text-base font-bold mt-4 mb-2">Available batch operations</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li><strong>Background Remover</strong> — Strip backgrounds from product photos, portraits, and more</li>
+              <li><strong>Image Upscaler</strong> — Enhance resolution and sharpness across all images</li>
+              <li><strong>Object Remover</strong> — Clean up distractions from multiple photos at once</li>
+            </ul>
+            <h3 className="text-white/50 text-base font-bold mt-4 mb-2">How it works</h3>
+            <p>Upload up to 50 images, select your operation, and click Run. The editor processes each image sequentially and lets you download all results at once. No sign-in required — completely free.</p>
+          </div>
+        </section>
       </div>
     </div>
   );
