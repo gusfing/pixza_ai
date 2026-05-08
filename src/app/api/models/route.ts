@@ -474,6 +474,60 @@ const CLOUDFLARE_MODELS: ProviderModel[] = [
   },
 ];
 
+// WaveSpeed image models (added separately — fetched dynamically but also listed here for Studio)
+const WAVESPEED_IMAGE_MODELS: ProviderModel[] = [
+  {
+    id: "wavespeed-ai/flux-dev-ultra-fast",
+    name: "FLUX Dev Ultra Fast",
+    description: "Ultra-fast FLUX Dev by WaveSpeed. Excellent quality at ~$0.005/image. Best speed/quality ratio.",
+    provider: "wavespeed",
+    capabilities: ["text-to-image"],
+    isFree: false,
+    pricing: { type: "per-run", amount: 0.005, currency: "USD" },
+    coverImage: undefined,
+  },
+  {
+    id: "wavespeed-ai/flux-kontext-dev-ultra-fast",
+    name: "FLUX Kontext Dev",
+    description: "FLUX Kontext Dev by Black Forest Labs via WaveSpeed. Text-guided image editing — change objects, styles, backgrounds with a prompt. $0.015/image.",
+    provider: "wavespeed",
+    capabilities: ["text-to-image", "image-to-image"],
+    isFree: false,
+    pricing: { type: "per-run", amount: 0.015, currency: "USD" },
+    coverImage: undefined,
+  },
+  {
+    id: "wavespeed-ai/flux-kontext-pro",
+    name: "FLUX Kontext Pro",
+    description: "FLUX Kontext Pro — improved prompt adherence and accurate typography generation. Best for precise image editing. $0.04/image.",
+    provider: "wavespeed",
+    capabilities: ["text-to-image", "image-to-image"],
+    isFree: false,
+    pricing: { type: "per-run", amount: 0.04, currency: "USD" },
+    coverImage: undefined,
+  },
+  {
+    id: "wavespeed-ai/flux-kontext-max",
+    name: "FLUX Kontext Max",
+    description: "FLUX Kontext Max — maximum quality image editing with best prompt adherence and typography. $0.08/image.",
+    provider: "wavespeed",
+    capabilities: ["text-to-image", "image-to-image"],
+    isFree: false,
+    pricing: { type: "per-run", amount: 0.08, currency: "USD" },
+    coverImage: undefined,
+  },
+  {
+    id: "bytedance/seedream-v4.5",
+    name: "Seedream 4.5",
+    description: "ByteDance Seedream 4.5 — high-quality text-to-image with excellent portrait and product photography. $0.027/image.",
+    provider: "wavespeed",
+    capabilities: ["text-to-image", "image-to-image"],
+    isFree: false,
+    pricing: { type: "per-run", amount: 0.027, currency: "USD" },
+    coverImage: undefined,
+  },
+];
+
 // Gemini video models (native Veo via Gemini API)
 const GEMINI_VIDEO_MODELS: ProviderModel[] = [
   {
@@ -1169,6 +1223,7 @@ export async function GET(
   // Add Cloudflare models if included (hardcoded, no API call needed for discovery)
   if (includeCloudflare) {
     let cfModels = CLOUDFLARE_MODELS;
+
     if (searchQuery) {
       cfModels = filterModelsBySearch(cfModels, searchQuery);
     }
@@ -1209,12 +1264,17 @@ export async function GET(
         if (provider === "wavespeed") {
           // Fetch all models from WaveSpeed API
           const allWaveSpeedModels = await fetchWaveSpeedModels(wavespeedKey!);
+          // Merge with our hardcoded image models (ensures they always appear)
+          const merged = [...WAVESPEED_IMAGE_MODELS];
+          for (const m of allWaveSpeedModels) {
+            if (!merged.find(x => x.id === m.id)) merged.push(m);
+          }
           // Cache the full list
-          setCachedModels(cacheKey, allWaveSpeedModels);
+          setCachedModels(cacheKey, merged);
           // Apply search filter if needed
           models = searchQuery
-            ? filterModelsBySearch(allWaveSpeedModels, searchQuery)
-            : allWaveSpeedModels;
+            ? filterModelsBySearch(merged, searchQuery)
+            : merged;
         } else {
           models = [];
         }

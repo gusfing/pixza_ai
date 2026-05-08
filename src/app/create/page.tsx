@@ -55,9 +55,15 @@ const MODELS: Model[] = [
   { provider: "gemini",     modelId: "nano-banana",                                       label: "Gemini Flash Image",   tabs: ["Image"], badge: "Free",    tier: "free",   creditCost: 1 },
 
   // ── PRO TIER — Image ───────────────────────────────────────
-  // WaveSpeed FLUX — ~₹1.7/image, very fast
+  // WaveSpeed FLUX Dev — ~₹1.7/image, very fast
   { provider: "wavespeed",  modelId: "wavespeed-ai/flux-dev-ultra-fast",                  label: "FLUX Dev Ultra Fast",  tabs: ["Image"], badge: "Fast",    tier: "pro",    creditCost: 2 },
   { provider: "wavespeed",  modelId: "wavespeed-ai/flux-dev/fp8",                         label: "FLUX Dev",             tabs: ["Image"],                   tier: "pro",    creditCost: 2 },
+  // FLUX Kontext — image editing via text prompts (i2i) — $0.015–$0.08/img
+  { provider: "wavespeed",  modelId: "wavespeed-ai/flux-kontext-dev-ultra-fast",          label: "FLUX Kontext Dev",     tabs: ["Image"], badge: "i2i",     tier: "pro",    creditCost: 2 },
+  { provider: "wavespeed",  modelId: "wavespeed-ai/flux-kontext-pro",                     label: "FLUX Kontext Pro",     tabs: ["Image"], badge: "i2i",     tier: "pro",    creditCost: 4 },
+  { provider: "wavespeed",  modelId: "wavespeed-ai/flux-kontext-max",                     label: "FLUX Kontext Max",     tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 7 },
+  // Seedream 4.5 — ByteDance, $0.027/img — great for portraits/products
+  { provider: "wavespeed",  modelId: "bytedance/seedream-v4.5",                           label: "Seedream 4.5",         tabs: ["Image"], badge: "New",     tier: "pro",    creditCost: 3 },
   // Gemini Imagen — ~₹3.3–3.4/image
   { provider: "gemini",     modelId: "nano-banana-pro",                                   label: "Imagen 3",             tabs: ["Image"], badge: "Google",  tier: "pro",    creditCost: 4 },
   { provider: "gemini",     modelId: "nano-banana-2",                                     label: "Imagen 4",             tabs: ["Image"], badge: "Best",    tier: "pro",    creditCost: 5 },
