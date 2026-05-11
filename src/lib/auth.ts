@@ -16,7 +16,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-      // After Google login, redirect to WP sync endpoint
       authorization: {
         params: {
           prompt: "consent",
@@ -52,13 +51,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      // For Google sign-in, allow it — WP sync happens via redirect
-      if (account?.provider === "google") {
-        return true;
-      }
-      return true;
-    },
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
@@ -86,13 +78,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // After Google OAuth, go to WP sync endpoint
-      if (url.includes("/api/auth/callback/google")) {
-        return `${baseUrl}/api/auth/google-wp-sync`;
+      // After Google OAuth completes, sync with WP then go to /create
+      if (url.includes("/api/auth/google-wp-sync")) {
+        return url;
       }
       if (url.startsWith(baseUrl)) return url;
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      return baseUrl;
+      return `${baseUrl}/create`;
     },
   },
 });

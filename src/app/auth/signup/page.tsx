@@ -42,7 +42,7 @@ export default function SignUpPage() {
       {/* Google sign up */}
       <button
         type="button"
-        onClick={() => signIn("google", { callbackUrl: "/onboarding" })}
+        onClick={() => signIn("google", { callbackUrl: "/api/auth/google-wp-sync" })}
         className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-sm font-bold text-white mb-6"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">

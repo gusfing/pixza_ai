@@ -66,7 +66,8 @@ function SignInForm() {
   const handleGoogle = async () => {
     setGoogleLoading(true);
     try {
-      await signIn("google", { callbackUrl: next });
+      // Redirect to WP sync endpoint after Google OAuth completes
+      await signIn("google", { callbackUrl: "/api/auth/google-wp-sync" });
     } catch {
       setError("Google sign-in failed. Please try again.");
       setGoogleLoading(false);
