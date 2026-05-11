@@ -4,24 +4,24 @@
 
 ## Pages
 
-- [Home](https://pixzastudio.com/): Landing page with features, pricing, and demos
-- [About](https://pixzastudio.com/about): Our story, mission, and values
-- [Create](https://pixzastudio.com/create): Simple AI generation — text to image, video, audio, 3D
-- [Studio](https://pixzastudio.com/studio): Visual node canvas for multi-step AI pipelines
-- [Examples](https://pixzastudio.com/examples): Community-generated examples with prompts
-- [Blog](https://pixzastudio.com/blog): AI tutorials, model comparisons, workflow guides
-- [Contact](https://pixzastudio.com/contact): Get in touch
-- [Waitlist](https://pixzastudio.com/waitlist): Join early access
+- [Home](https://pixzaai.com/): Landing page with features, pricing, and demos
+- [About](https://pixzaai.com/about): Our story, mission, and values
+- [Create](https://pixzaai.com/create): Simple AI generation — text to image, video, audio, 3D
+- [Studio](https://pixzaai.com/studio): Visual node canvas for multi-step AI pipelines
+- [Examples](https://pixzaai.com/examples): Community-generated examples with prompts
+- [Blog](https://pixzaai.com/blog): AI tutorials, model comparisons, workflow guides
+- [Contact](https://pixzaai.com/contact): Get in touch
+- [Waitlist](https://pixzaai.com/waitlist): Join early access
 
 ## Tools
 
-- [Tools Hub](https://pixzastudio.com/tools): All free AI tools
-- [Background Remover](https://pixzastudio.com/tools/background-remover): Remove image backgrounds instantly — free
-- [Magic Eraser](https://pixzastudio.com/tools/magic-eraser): Paint to erase objects, AI fills seamlessly — free
-- [AI Background Generator](https://pixzastudio.com/tools/ai-background): Replace backgrounds with AI scenes — free
-- [Object Remover](https://pixzastudio.com/tools/object-remover): Remove unwanted objects from photos — free
-- [Image Upscaler](https://pixzastudio.com/tools/image-upscaler): Enhance and sharpen images — free
-- [Batch Editor](https://pixzastudio.com/batch): Apply AI to 50 images at once — free
+- [Tools Hub](https://pixzaai.com/tools): All free AI tools
+- [Background Remover](https://pixzaai.com/tools/background-remover): Remove image backgrounds instantly — free
+- [Magic Eraser](https://pixzaai.com/tools/magic-eraser): Paint to erase objects, AI fills seamlessly — free
+- [AI Background Generator](https://pixzaai.com/tools/ai-background): Replace backgrounds with AI scenes — free
+- [Object Remover](https://pixzaai.com/tools/object-remover): Remove unwanted objects from photos — free
+- [Image Upscaler](https://pixzaai.com/tools/image-upscaler): Enhance and sharpen images — free
+- [Batch Editor](https://pixzaai.com/batch): Apply AI to 50 images at once — free
 
 ## Pricing
 
@@ -61,6 +61,6 @@
 
 ## Links
 
-- [Sitemap](https://pixzastudio.com/sitemap.xml)
-- [Privacy Policy](https://pixzastudio.com/privacy)
-- [Terms of Service](https://pixzastudio.com/terms)
+- [Sitemap](https://pixzaai.com/sitemap.xml)
+- [Privacy Policy](https://pixzaai.com/privacy)
+- [Terms of Service](https://pixzaai.com/terms)

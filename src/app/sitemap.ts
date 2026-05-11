@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 // Always use HTTPS production URL — never use NEXT_PUBLIC_APP_URL for sitemap
 // (that would put http://localhost in the sitemap)
-const BASE = "https://pixzastudio.com";
+const BASE = "https://pixzaai.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

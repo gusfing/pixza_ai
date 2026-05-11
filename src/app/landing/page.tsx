@@ -436,7 +436,7 @@ export default function LandingPage() {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Pixza Studio",
-    "url": "https://pixzastudio.com",
+    "url": "https://pixzaai.com",
     "applicationCategory": "DesignApplication",
     "operatingSystem": "Web",
     "description": "AI creative studio for image, video, audio and 3D generation. Free tier with FLUX, Gemini Flash, and Cloudflare AI.",
@@ -467,19 +467,19 @@ export default function LandingPage() {
       <FAQ />
 
       {/* CTA */}
-      <section className="py-32 px-6 border-t border-white/5">
+      <section className="py-32 px-6 border-t border-white/5 bg-white shadow-[0px_4px_12px_0px_rgba(0,0,0,0.15)] rounded-[35px]">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-6">
+          <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter mb-6">
             Start creating today.
           </h2>
-          <p className="text-white/40 text-lg mb-10">
+          <p className="text-black/40 text-lg mb-10">
             Free plan available. No credit card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup" className="btn-minimal btn-minimal-primary px-10 py-4 text-base font-black">
               Get Started Free
             </Link>
-            <Link href="/studio" className="btn-minimal btn-minimal-secondary px-10 py-4 text-base font-black">
+            <Link href="/studio" className="btn-minimal btn-minimal-secondary px-10 py-4 text-base font-black text-black">
               Open Studio
             </Link>
           </div>

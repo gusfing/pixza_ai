@@ -10,7 +10,7 @@ import { LowCreditsPopup } from "@/components/ui/low-credits-popup";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
-const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://pixzastudio.com").replace(/\/$/, "");
+const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://pixzaai.com").replace(/\/$/, "");
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -91,8 +91,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Pixza Studio",
-              "url": "https://pixzastudio.com",
-              "logo": "https://pixzastudio.com/pixza-logo.png",
+              "url": "https://pixzaai.com",
+              "logo": "https://pixzaai.com/pixza-logo.png",
               "description": "AI creative studio for image, video, audio and 3D generation",
               "sameAs": ["https://twitter.com/pixzastudio"]
             })

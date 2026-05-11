@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://pixzastudio.com").replace(/\/$/, "");
+const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://pixzaai.com").replace(/\/$/, "");
 
 export function createMetadata(opts: {
   title: string;
