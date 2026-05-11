@@ -72,7 +72,7 @@ const COMPANY_MENU = [
 /* ── Mega Menu Dropdown ─────────────────────────────────────── */
 function MegaMenuProduct() {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[680px] bg-[#0d1117]/98 backdrop-blur-xl border border-white/8 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50 p-5">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[680px] bg-[#0d1117]/98 backdrop-blur-xl border border-white/8 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50 p-5">
       <div className="grid grid-cols-3 gap-4">
         {/* Featured */}
         <div className="col-span-1">
@@ -128,7 +128,7 @@ function MegaMenuProduct() {
 
 function MegaMenuTools() {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[520px] bg-[#0d1117]/98 backdrop-blur-xl border border-white/8 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50 p-5">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[520px] bg-[#0d1117]/98 backdrop-blur-xl border border-white/8 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50 p-5">
       <div className="flex items-center justify-between mb-3">
         <p className="text-[9px] font-black uppercase tracking-widest text-white/25">Free AI Tools</p>
         <Link href="/tools" className="text-[10px] font-bold text-violet-400 hover:text-violet-300 flex items-center gap-1 transition-colors">
@@ -158,7 +158,7 @@ function MegaMenuTools() {
 
 function MegaMenuCompany() {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[360px] bg-[#0d1117]/98 backdrop-blur-xl border border-white/8 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50 p-4">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[360px] bg-[#0d1117]/98 backdrop-blur-xl border border-white/8 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50 p-4">
       <div className="grid grid-cols-2 gap-0.5">
         {COMPANY_MENU.map(item => (
           <Link key={item.title} href={item.href}
@@ -180,18 +180,28 @@ function MegaMenuCompany() {
 /* ── Nav Item with Mega Menu ────────────────────────────────── */
 function NavItem({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const ref = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const handleMouseEnter = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Small delay so mouse can travel from button to dropdown without closing
+    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  };
+
+  React.useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
 
   return (
-    <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
         className={cn(
           "flex items-center gap-1 px-3 py-1.5 text-[13px] font-semibold tracking-wide uppercase transition-colors",
@@ -201,6 +211,10 @@ function NavItem({ label, children }: { label: string; children: React.ReactNode
         {label}
         <ChevronDown className={cn("w-3 h-3 transition-transform duration-200", open && "rotate-180")} />
       </button>
+
+      {/* Invisible bridge fills the gap between button and dropdown */}
+      {open && <div className="absolute left-0 right-0 h-3 top-full" />}
+
       {open && children}
     </div>
   );
@@ -228,7 +242,6 @@ export function Header() {
           <div className="w-8 h-8 rounded-lg overflow-hidden transition-transform group-hover:scale-105">
             <img src="/pixza-logo.png" alt="Pixza" className="w-8 h-8 object-cover" />
           </div>
-          <span className="text-sm font-bold text-white/80 group-hover:text-white transition-colors hidden sm:block">Pixza</span>
         </Link>
 
         {/* Desktop mega nav */}
