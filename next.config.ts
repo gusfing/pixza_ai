@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Stable build ID prevents stale RSC chunk mismatches across deployments
+  generateBuildId: async () => {
+    return process.env.GIT_COMMIT_SHA ?? `build-${Date.now()}`;
+  },
   async redirects() {
     return [
       { source: "/landing", destination: "/", permanent: true },
@@ -13,6 +17,14 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        // Prevent RSC payload caching — avoids stale chunk 404s after redeployment
+        source: "/:path*",
+        has: [{ type: "query", key: "_rsc" }],
+        headers: [
+          { key: "Cache-Control", value: "no-store, must-revalidate" },
+        ],
+      },
       {
         // COOP/COEP only on the create page — needed for ONNX SharedArrayBuffer
         // Applying globally breaks third-party images (Unsplash, HuggingFace, etc.)
