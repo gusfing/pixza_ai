@@ -650,6 +650,18 @@ function pixza_register_rest_routes() {
             'permission_callback' => 'pixza_rest_auth',
         ),
     ) );
+
+    // Google OAuth sync
+    register_rest_route( $ns, '/google-auth', array(
+        'methods'             => WP_REST_Server::CREATABLE,
+        'callback'            => 'pixza_rest_google_auth',
+        'permission_callback' => 'pixza_rest_auth',
+        'args'                => array(
+            'email'  => array( 'required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_email' ),
+            'name'   => array( 'required' => false, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ),
+            'avatar' => array( 'required' => false, 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ),
+        ),
+    ) );
 }
 
 // ---------------------------------------------------------------------------
@@ -927,19 +939,6 @@ function pixza_inline_media_picker_script() {
 // Called by Next.js after successful Google sign-in
 // ---------------------------------------------------------------------------
 
-add_action( 'rest_api_init', function() {
-    register_rest_route( 'pixza/v1', '/google-auth', array(
-        'methods'             => WP_REST_Server::CREATABLE,
-        'callback'            => 'pixza_rest_google_auth',
-        'permission_callback' => 'pixza_rest_auth',
-        'args'                => array(
-            'email'  => array( 'required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_email' ),
-            'name'   => array( 'required' => false, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ),
-            'avatar' => array( 'required' => false, 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ),
-        ),
-    ) );
-} );
-
 function pixza_rest_google_auth( WP_REST_Request $request ) {
     $email  = $request->get_param( 'email' );
     $name   = $request->get_param( 'name' )   ?? '';
@@ -988,19 +987,13 @@ function pixza_rest_google_auth( WP_REST_Request $request ) {
         }
     }
 
-    // Generate JWT token using the JWT Auth plugin
-    // This requires the JWT Authentication for WP REST API plugin to be active
-    $token_response = wp_remote_post( rest_url( 'jwt-auth/v1/token' ), array(
-        'body'    => json_encode( array(
-            'username' => $user->user_login,
-            'password' => '', // We'll use a different approach
-        ) ),
-        'headers' => array( 'Content-Type' => 'application/json' ),
-        'timeout' => 10,
-    ) );
+    // Generate a signed session token using the WP API secret
+    $secret_key = defined( 'JWT_AUTH_SECRET_KEY' ) ? JWT_AUTH_SECRET_KEY : get_option( 'pixza_wp_secret', '' );
 
-    // Alternative: generate a temporary token manually
-    // Since we can't get the password, we'll use a signed token approach
+    if ( empty( $secret_key ) ) {
+        return new WP_Error( 'no_secret', 'JWT secret not configured.', array( 'status' => 500 ) );
+    }
+
     $token_data = array(
         'iss'  => get_bloginfo( 'url' ),
         'iat'  => time(),
@@ -1013,24 +1006,11 @@ function pixza_rest_google_auth( WP_REST_Request $request ) {
         ),
     );
 
-    // Use JWT Auth plugin's secret key if available
-    $secret_key = defined( 'JWT_AUTH_SECRET_KEY' ) ? JWT_AUTH_SECRET_KEY : get_option( 'pixza_wp_secret', '' );
-
-    if ( empty( $secret_key ) ) {
-        return new WP_Error( 'no_secret', 'JWT secret not configured.', array( 'status' => 500 ) );
-    }
-
-    // Encode using the same method as JWT Auth plugin
-    if ( function_exists( 'jwt_auth_generate_token' ) ) {
-        // Use the JWT Auth plugin's function if available
-        $token = jwt_auth_generate_token( $user );
-    } else {
-        // Manual JWT encoding (HS256)
-        $header  = base64_encode( json_encode( array( 'typ' => 'JWT', 'alg' => 'HS256' ) ) );
-        $payload = base64_encode( json_encode( $token_data ) );
-        $sig     = hash_hmac( 'sha256', "$header.$payload", $secret_key, true );
-        $token   = "$header.$payload." . base64_encode( $sig );
-    }
+    // Manual JWT encoding (HS256) – URL-safe base64
+    $header  = rtrim( strtr( base64_encode( wp_json_encode( array( 'typ' => 'JWT', 'alg' => 'HS256' ) ) ), '+/', '-_' ), '=' );
+    $payload = rtrim( strtr( base64_encode( wp_json_encode( $token_data ) ), '+/', '-_' ), '=' );
+    $sig     = rtrim( strtr( base64_encode( hash_hmac( 'sha256', "$header.$payload", $secret_key, true ) ), '+/', '-_' ), '=' );
+    $token   = "$header.$payload.$sig";
 
     return rest_ensure_response( array(
         'token'      => $token,
