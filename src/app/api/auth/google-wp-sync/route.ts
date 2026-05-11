@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const { email, name, image } = session.user;
 
     // Call WP to create or login the Google user
-    const res = await fetch(`${WP_URL}/wp-json/pixza/v1/google-auth`, {
+    const res = await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/google-auth")}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

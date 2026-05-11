@@ -30,7 +30,7 @@ export async function proxy(req: NextRequest) {
       const WP_SECRET = process.env.WP_API_SECRET ?? "";
 
       if (WP_URL) {
-        const res = await fetch(`${WP_URL}/wp-json/pixza/v1/waitlist/status`, {
+        const res = await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/waitlist/status")}`, {
           headers: {
             "Content-Type": "application/json",
             "X-WP-Secret": WP_SECRET,

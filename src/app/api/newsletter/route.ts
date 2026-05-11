@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   // Try to save to WordPress (if plugin supports it)
   if (WP_URL && WP_API_SECRET) {
-    await fetch(`${WP_URL}/wp-json/pixza/v1/newsletter/subscribe`, {
+    await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/newsletter/subscribe")}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-WP-Secret": WP_API_SECRET },
       body: JSON.stringify({ email }),

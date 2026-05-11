@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
   // Update WP user meta
   if (WP_URL && WP_API_SECRET) {
-    await fetch(`${WP_URL}/wp-json/pixza/v1/admin/users/${user.id}`, {
+    await fetch(`${WP_URL}/?rest_route=${encodeURIComponent(`/pixza/v1/admin/users/${user.id}`)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-WP-Secret": WP_API_SECRET },
       body: JSON.stringify({ subscription_status: "cancelled" }),

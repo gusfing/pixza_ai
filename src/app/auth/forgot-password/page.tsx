@@ -20,7 +20,7 @@ function ForgotPasswordForm() {
     setLoading(true); setError("");
     try {
       // WordPress handles password reset via its built-in system
-      const res = await fetch(`${WP_URL}/wp-json/pixza/v1/forgot-password`, {
+      const res = await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/forgot-password")}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

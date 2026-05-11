@@ -17,7 +17,7 @@ const HEADERS = {
 // GET — returns { enabled: boolean, count: number }
 export async function GET() {
   try {
-    const res = await fetch(`${WP_URL}/wp-json/pixza/v1/waitlist/status`, {
+    const res = await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/waitlist/status")}`, {
       headers: HEADERS,
       cache: "no-store",
     });
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${WP_URL}/wp-json/pixza/v1/waitlist/join`, {
+    const res = await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/waitlist/join")}`, {
       method: "POST",
       headers: HEADERS,
       body: JSON.stringify({ email, name }),

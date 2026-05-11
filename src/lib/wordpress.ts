@@ -4,8 +4,15 @@
  */
 
 const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "";
+// Use ?rest_route= — works even when pretty permalinks aren't routing /wp-json/
 const WP_API = `${WP_URL}/wp-json`;
 const WP_SECRET = process.env.WP_API_SECRET ?? "";
+
+// Build a WP REST API URL using ?rest_route= fallback
+function wpRestUrl(path: string, qs?: string): string {
+  const base = `${WP_URL}/?rest_route=${encodeURIComponent(path.startsWith("/") ? path : `/${path}`)}`;
+  return qs ? `${base}&${qs}` : base;
+}
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -227,7 +234,7 @@ export async function wpDeductCredits(
   model?: string,
   provider?: string,
 ): Promise<{ credits: number; limit: number }> {
-  const res = await fetch(`${WP_API}/pixza/v1/credits/deduct`, {
+  const res = await fetch(wpRestUrl("/pixza/v1/credits/deduct"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -249,7 +256,7 @@ export async function wpAdminSetUserCredits(
   userId: number,
   data: { credits?: number; credits_limit?: number; plan?: string }
 ): Promise<void> {
-  const res = await fetch(`${WP_API}/pixza/v1/admin/users/${userId}/credits`, {
+  const res = await fetch(wpRestUrl(`/pixza/v1/admin/users/${userId}/credits`), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -292,7 +299,7 @@ export async function wpAdminGetUsers(params?: {
   });
   if (params?.search) qs.set("search", params.search);
 
-  const res = await fetch(`${WP_API}/pixza/v1/admin/users?${qs}`, {
+  const res = await fetch(wpRestUrl("/pixza/v1/admin/users", qs.toString()), {
     headers: { "X-WP-Secret": WP_SECRET },
   });
   if (!res.ok) return { users: [], total: 0, pages: 1 };
@@ -306,7 +313,7 @@ export async function wpAdminUpdateUser(
   userId: number,
   data: { plan?: string; credits?: number; credits_limit?: number; role?: string; name?: string }
 ): Promise<void> {
-  const res = await fetch(`${WP_API}/pixza/v1/admin/users/${userId}`, {
+  const res = await fetch(wpRestUrl(`/pixza/v1/admin/users/${userId}`), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -328,7 +335,7 @@ export async function wpAdminGetStats(): Promise<{
   free_users: number;
   credits_issued: number;
 }> {
-  const res = await fetch(`${WP_API}/pixza/v1/admin/stats`, {
+  const res = await fetch(wpRestUrl("/pixza/v1/admin/stats"), {
     headers: { "X-WP-Secret": WP_SECRET },
   });
   if (!res.ok) return { total_users: 0, total_generations: 0, pro_users: 0, agency_users: 0, free_users: 0, credits_issued: 0 };
@@ -363,7 +370,7 @@ export async function wpCancelSubscription(token: string): Promise<void> {
 // ── Promotions / Coupons ──────────────────────────────────────
 
 export async function wpValidateCoupon(code: string): Promise<WPPromotion | null> {
-  const res = await fetch(`${WP_API}/pixza/v1/coupons/validate`, {
+  const res = await fetch(wpRestUrl("/pixza/v1/coupons/validate"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code }),
@@ -383,7 +390,7 @@ export async function wpGetTemplates(params?: {
     per_page: String(params?.per_page ?? 20),
     ...(params?.tab ? { "filter[meta_key]": "tab", "filter[meta_value]": params.tab } : {}),
   });
-  const res = await fetch(`${WP_API}/wp/v2/pixza_template?${qs}`);
+  const res = await fetch(wpRestUrl("/wp/v2/pixza_template", qs.toString()));
   if (!res.ok) return [];
   return res.json();
 }
@@ -396,7 +403,7 @@ export async function wpSendEmail(data: {
   template: "welcome" | "upgrade" | "reset_password" | "generation_done";
   vars?: Record<string, string>;
 }): Promise<void> {
-  await fetch(`${WP_API}/pixza/v1/email/send`, {
+  await fetch(wpRestUrl("/pixza/v1/email/send"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -446,7 +453,7 @@ export async function wpGetPosts(params?: { per_page?: number; page?: number; se
     _embed: "1",
   });
   if (params?.search) qs.set("search", params.search);
-  const res = await fetch(`${WP_API}/wp/v2/posts?${qs}`);
+  const res = await fetch(wpRestUrl("/wp/v2/posts", qs.toString()));
   if (!res.ok) return { items: [], pages: 1 };
   const totalPages = Number(res.headers.get("X-WP-TotalPages") ?? "1");
   const raw: any[] = await res.json();
@@ -501,10 +508,9 @@ async function wpFetch(
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  let url = `${WP_API}${path}`;
+  let url = wpRestUrl(path);
   if (token) {
-    const sep = url.includes("?") ? "&" : "?";
-    url += `${sep}_pixza_token=${encodeURIComponent(token)}`;
+    url += `&_pixza_token=${encodeURIComponent(token)}`;
   }
 
   return fetch(url, { ...options, headers });

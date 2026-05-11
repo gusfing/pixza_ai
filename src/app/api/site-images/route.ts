@@ -34,7 +34,7 @@ export async function GET() {
   try {
     if (!WP_URL) return NextResponse.json(DEFAULTS);
 
-    const res = await fetch(`${WP_URL}/wp-json/pixza/v1/site-images`, {
+    const res = await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/site-images")}`, {
       headers: {
         "Content-Type": "application/json",
         "X-WP-Secret": WP_SECRET,

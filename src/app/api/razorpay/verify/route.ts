@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   const credits = PLAN_CREDITS[plan] ?? 2000;
 
   try {
-    const upgradeRes = await fetch(`${WP_URL}/wp-json/pixza/v1/credits/add`, {
+    const upgradeRes = await fetch(`${WP_URL}/?rest_route=${encodeURIComponent("/pixza/v1/credits/add")}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Also store payment reference in WP user meta
-    await fetch(`${WP_URL}/wp-json/pixza/v1/admin/users/${user.id}`, {
+    await fetch(`${WP_URL}/?rest_route=${encodeURIComponent(`/pixza/v1/admin/users/${user.id}`)}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

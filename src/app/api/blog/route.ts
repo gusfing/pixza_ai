@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://backend.pixzaai.com";
 
+// Use ?rest_route= fallback — works even when pretty permalinks aren't routing /wp-json/
+function wpApi(path: string) {
+  return `${WP_URL}/?rest_route=${encodeURIComponent(path)}`;
+}
+
 function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, " ").trim();
 }
@@ -21,9 +26,9 @@ export async function GET(req: NextRequest) {
   const qs = new URLSearchParams({ per_page, page, _embed: "1" });
   if (search) qs.set("search", search);
 
-  const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?${qs}`, {
-    next: { revalidate: 60 },
-  });
+  const url = `${wpApi("/wp/v2/posts")}&${qs}`;
+
+  const res = await fetch(url, { next: { revalidate: 60 } });
 
   if (!res.ok) {
     return NextResponse.json({ items: [], pages: 1 }, { status: 200 });

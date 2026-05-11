@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const url = `${WP_URL}/wp-json${path}`;
+  const url = `${WP_URL}/?rest_route=${encodeURIComponent(path.startsWith("/") ? path : `/${path}`)}`;
 
   try {
     const res = await fetch(url, {
