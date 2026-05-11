@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://seashell-peafowl-234313.hostingersite.com";
+const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://backend.pixzaai.com";
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, " ").trim();

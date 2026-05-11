@@ -10,7 +10,7 @@
  * 5. Tests the full auth flow
  */
 
-const WP_URL = "https://seashell-peafowl-234313.hostingersite.com";
+const WP_URL = "https://backend.pixzaai.com";
 const WP_SECRET = "pixza_secret_key_2026_abc123";
 
 async function test(label, fn) {

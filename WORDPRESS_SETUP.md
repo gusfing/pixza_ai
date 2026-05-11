@@ -1,7 +1,7 @@
 # WordPress Setup for Pixza Studio
 
-**Site:** https://seashell-peafowl-234313.hostingersite.com  
-**Admin:** https://seashell-peafowl-234313.hostingersite.com/wp-admin
+**Site:** https://backend.pixzaai.com  
+**Admin:** https://backend.pixzaai.com/wp-admin
 
 ---
 
@@ -78,12 +78,12 @@ Once done, these endpoints should work:
 
 ```bash
 # Test JWT login
-curl -X POST https://seashell-peafowl-234313.hostingersite.com/wp-json/jwt-auth/v1/token \
+curl -X POST https://backend.pixzaai.com/wp-json/jwt-auth/v1/token \
   -H "Content-Type: application/json" \
   -d '{"username":"ks05460@gmail.com","password":"YOUR_PASSWORD"}'
 
 # Test Pixza namespace
-curl https://seashell-peafowl-234313.hostingersite.com/wp-json/pixza/v1/
+curl https://backend.pixzaai.com/wp-json/pixza/v1/
 ```
 
 ---
