@@ -11,7 +11,7 @@ import {
   ImageIcon, Video, Music, Box, Sparkles, Wand2, LayoutGrid,
   BookOpen, Users, Star, FileText, Shield, HelpCircle, Leaf, Zap,
   Scissors, ZoomIn, Eraser, Layers, ChevronDown, ArrowRight,
-  Cpu, Globe, CreditCard,
+  Cpu, Globe, CreditCard, Code2,
 } from "lucide-react";
 
 function useScroll(threshold: number) {
@@ -63,6 +63,7 @@ const TOOLS_MENU = [
 const COMPANY_MENU = [
   { icon: Sparkles,    title: "About",         desc: "Our story and mission",          href: "/about" },
   { icon: Leaf,        title: "Blog",          desc: "Tutorials, guides, updates",     href: "/blog" },
+  { icon: Code2,       title: "Developers",    desc: "API docs & integrations",        href: "/developers" },
   { icon: Users,       title: "Contact",       desc: "Get in touch with us",           href: "/contact" },
   { icon: CreditCard,  title: "Pricing",       desc: "Free, Pro, Agency plans",        href: "/#pricing" },
   { icon: FileText,    title: "Terms",         desc: "Terms of service",               href: "/terms" },
