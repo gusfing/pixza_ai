@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://backend.pixzaai.com";
+// Always fall back to the hardcoded WP URL — never allow empty string
+const WP_URL = (process.env.WP_URL ?? process.env.NEXT_PUBLIC_WP_URL ?? "https://backend.pixzaai.com").replace(/\/$/, "") || "https://backend.pixzaai.com";
 
 // Use ?rest_route= fallback — works even when pretty permalinks aren't routing /wp-json/
 function wpApi(path: string) {
@@ -28,14 +29,16 @@ export async function GET(req: NextRequest) {
 
   const url = `${wpApi("/wp/v2/posts")}&${qs}`;
 
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  try {
+    const res = await fetch(url, { cache: "no-store" });
 
-  if (!res.ok) {
-    return NextResponse.json({ items: [], pages: 1 }, { status: 200 });
-  }
+    if (!res.ok) {
+      console.error(`[blog] WP fetch failed: ${res.status} ${url}`);
+      return NextResponse.json({ items: [], pages: 1 }, { status: 200 });
+    }
 
-  const totalPages = Number(res.headers.get("X-WP-TotalPages") ?? "1");
-  const raw: any[] = await res.json();
+    const totalPages = Number(res.headers.get("X-WP-TotalPages") ?? "1");
+    const raw: any[] = await res.json();
 
   const items = raw.map((p: any) => {
     const embedded = p._embedded ?? {};
@@ -59,5 +62,9 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  return NextResponse.json({ items, pages: totalPages });
+    return NextResponse.json({ items, pages: totalPages });
+  } catch (err) {
+    console.error("[blog] fetch error:", err);
+    return NextResponse.json({ items: [], pages: 1 });
+  }
 }

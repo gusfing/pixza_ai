@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const WP_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://backend.pixzaai.com";
+const WP_URL = (process.env.WP_URL ?? process.env.NEXT_PUBLIC_WP_URL ?? "https://backend.pixzaai.com").replace(/\/$/, "") || "https://backend.pixzaai.com";
 
 // Use ?rest_route= fallback — works even when pretty permalinks aren't routing /wp-json/
 function wpApi(path: string) {
@@ -23,7 +23,7 @@ export async function GET(
   const { slug } = await params;
   const url = `${wpApi("/wp/v2/posts")}&slug=${encodeURIComponent(slug)}&_embed=1`;
 
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await fetch(url, { cache: "no-store" });
 
   if (!res.ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
