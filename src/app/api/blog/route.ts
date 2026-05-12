@@ -23,11 +23,16 @@ export async function GET(req: NextRequest) {
   const per_page = searchParams.get("per_page") ?? "7";
   const page = searchParams.get("page") ?? "1";
   const search = searchParams.get("search") ?? "";
+  const debug = searchParams.get("debug") === "1";
 
   const qs = new URLSearchParams({ per_page, page, _embed: "1" });
   if (search) qs.set("search", search);
 
   const url = `${wpApi("/wp/v2/posts")}&${qs}`;
+
+  if (debug) {
+    return NextResponse.json({ wp_url: WP_URL, fetch_url: url });
+  }
 
   try {
     const res = await fetch(url, { cache: "no-store" });
