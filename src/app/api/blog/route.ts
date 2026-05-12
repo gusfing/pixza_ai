@@ -33,7 +33,13 @@ export async function GET(req: NextRequest) {
   if (debug) {
     // Test the actual fetch and return full diagnostic info
     try {
-      const testRes = await fetch(url, { cache: "no-store" });
+      const testRes = await fetch(url, {
+        cache: "no-store",
+        headers: {
+          "User-Agent": "PixzaStudio/1.0 (https://pixzaai.com; blog-fetcher)",
+          "Accept": "application/json",
+        },
+      });
       const testBody = await testRes.text();
       return NextResponse.json({
         wp_url: WP_URL,
@@ -52,7 +58,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        "User-Agent": "PixzaStudio/1.0 (https://pixzaai.com; blog-fetcher)",
+        "Accept": "application/json",
+      },
+    });
 
     if (!res.ok) {
       console.error(`[blog] WP fetch failed: ${res.status} ${url}`);
