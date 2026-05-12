@@ -31,7 +31,24 @@ export async function GET(req: NextRequest) {
   const url = `${wpApi("/wp/v2/posts")}&${qs}`;
 
   if (debug) {
-    return NextResponse.json({ wp_url: WP_URL, fetch_url: url });
+    // Test the actual fetch and return full diagnostic info
+    try {
+      const testRes = await fetch(url, { cache: "no-store" });
+      const testBody = await testRes.text();
+      return NextResponse.json({
+        wp_url: WP_URL,
+        fetch_url: url,
+        status: testRes.status,
+        ok: testRes.ok,
+        body_preview: testBody.substring(0, 500),
+      });
+    } catch (e) {
+      return NextResponse.json({
+        wp_url: WP_URL,
+        fetch_url: url,
+        error: String(e),
+      });
+    }
   }
 
   try {
