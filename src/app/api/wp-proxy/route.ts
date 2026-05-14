@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Proxy WordPress API calls server-side to avoid browser CORS issues
+
+// Handle prefetch/GET requests gracefully
+export async function GET() {
+  return NextResponse.json({ error: "Method not allowed. Use POST." }, { status: 405 });
+}
+
 export async function POST(req: NextRequest) {
   // Use server-side var first, fall back to public var
   const WP_URL = process.env.WP_URL ?? process.env.NEXT_PUBLIC_WP_URL ?? "";

@@ -23,39 +23,11 @@ export async function GET(req: NextRequest) {
   const per_page = searchParams.get("per_page") ?? "7";
   const page = searchParams.get("page") ?? "1";
   const search = searchParams.get("search") ?? "";
-  const debug = searchParams.get("debug") === "1";
 
   const qs = new URLSearchParams({ per_page, page, _embed: "1" });
   if (search) qs.set("search", search);
 
   const url = `${wpApi("/wp/v2/posts")}&${qs}`;
-
-  if (debug) {
-    // Test the actual fetch and return full diagnostic info
-    try {
-      const testRes = await fetch(url, {
-        cache: "no-store",
-        headers: {
-          "User-Agent": "PixzaStudio/1.0 (https://pixzaai.com; blog-fetcher)",
-          "Accept": "application/json",
-        },
-      });
-      const testBody = await testRes.text();
-      return NextResponse.json({
-        wp_url: WP_URL,
-        fetch_url: url,
-        status: testRes.status,
-        ok: testRes.ok,
-        body_preview: testBody.substring(0, 500),
-      });
-    } catch (e) {
-      return NextResponse.json({
-        wp_url: WP_URL,
-        fetch_url: url,
-        error: String(e),
-      });
-    }
-  }
 
   try {
     const res = await fetch(url, {
